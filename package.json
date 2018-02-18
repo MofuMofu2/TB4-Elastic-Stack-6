@@ -1,17 +1,17 @@
 {
-  "name": "c93-onestop-techbook",
+  "name": "TB4-Elastic-Stack-6",
   "version": "0.0.1",
   "private": true,
   "description": "",
   "main": "Gruntfile.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/onestop-techbook/c93-onestop-techbook.git"
+    "url": "git+https://github.com/onestop-techbook/TB4-Elastic-Stack-6.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/onestop-techbook/c93-onestop-techbook/issues"
+    "url": "https://github.com/onestop-techbook/TB4-Elastic-Stack-6/issues"
   },
   "homepage": "",
   "engines": {
