@@ -9,3 +9,5 @@ APPENDIX:
 
 
 POSTDEF:
+  # 著者リスト
+  - editor.re
