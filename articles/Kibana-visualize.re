@@ -63,3 +63,13 @@ c201d78, MofuMofu2, froakie002@gmail.com, 2018-02-18 15:56:35 +0900, ひつよ�
 
 @<code>{git-log-to-json}というnpmパッケージを利用すると@<href>{https://www.npmjs.com/package/git-log-to-json}、Node.jsを
 利用してgit logをjson形式で出力できるようです。今回は本題から外れるので扱いませんが、またどこかで記事を公開したいですねー。
+
+@<code>{pretty}オプションの引数ですが、git logの情報は決められた形式以外にも普通の文字列を指定することができます。
+そして、標準出力をファイル出力する場合、オプションの1番最後に@<code>{> ファイル名}とすると出力することができます。
+#@#こういうのなんていうんだろうね、%aみたいなやつ
+
+なので、今回はこのようなgitコマンドを利用して、git logの情報をjsonファイルに出力しました。
+@<code>{--pretty=format}の引数で自分の欲しいjsonファイルを整形しておけば、Elasticsearchにデータを簡単に投入することができます。
+こうしておけば、LogstashやBeatsを介さなくてもすぐにKibanaをお試しできるってもんです@<fn>{kibana01-fn01}。
+
+//footnote[kibana01-fn01][別にLogstashやBeatsがいらない子とは言っていないぞ！]
