@@ -1,6 +1,6 @@
 PREDEF:
   # 前書き
-  introduciton.re
+  - introduciton.re
 
 CHAPS:
 
