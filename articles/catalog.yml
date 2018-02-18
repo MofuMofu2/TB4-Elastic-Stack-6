@@ -5,6 +5,8 @@ PREDEF:
 CHAPS:
   # Elastic Stack6のみどころ
   - newcommer.re
+  # Kibanaについて語り尽くす
+  - Kibana-visualize.re
 
 
 APPENDIX:
