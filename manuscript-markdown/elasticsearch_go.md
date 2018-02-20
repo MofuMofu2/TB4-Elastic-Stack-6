@@ -126,6 +126,30 @@ func main() {
 クライアントの作成時に以下の2つのオプションを指定しています。
 特にSetSniffはElasticsearchのコンテナへ接続する際に必要となる設定です。
 
+操作にあたっては、さきほど作成したMappingに対応するStructを通じておこなっていきます。
+なので、以下のStructを定義します。
+
+```
+type Chat struct {
+  User string `json:"user"`,
+  Message string `json:"message"`
+  Created time.Time `json:"created"`
+  Tag string `json:"tag"`
+}
+
+func main() {
+  esEndpoint := "http://localhost:9200"
+  ctx := context.Background()
+
+  client, err := elastic.NewClient(
+    elastic.SetURL(esEndpoint),
+    elastic.SetSniff(false),
+  )
+  if err != nil {
+    panic(err)
+  }
+}
+```
 
 #### ドキュメントの登録
 単一のドキュメントを登録します。
@@ -133,21 +157,27 @@ func main() {
 ```Go
 
 func main() {
+  esEndpoint := "http://localhost:9200"
   ctx := context.Background()
 
-  client, err := elastic.NewClient()
+  client, err := elastic.NewClient(
+    elastic.SetURL(esEndpoint),
+    elastic.SetSniff(false),
+  )
   if err != nil {
     panic(err)
   }
-}
 
 ```
 
 #### ドキュメントIDによる取得
+ドキュメントIDをもとにドキュメントを取得します。
 
 #### ドキュメントの更新
+ドキュメントIDをもとに登録したドキュメントを更新してみます。
 
 #### ドキュメントの削除
+ドキュメントIDをもとに登録したドキュメントを削除してみます。
 
 ### 検索の基本操作
 
