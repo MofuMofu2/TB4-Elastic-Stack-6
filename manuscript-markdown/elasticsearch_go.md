@@ -102,10 +102,56 @@ Elasticsearchを操作するにあたり利用するMapping定義は以下の通
 //TODO: Mappingの項目説明を加える
 
 ### 単純なCRUD操作
+それでは先ほど作成したIndexを対象に基本的なCRUDE操作をおこなってみましょう。
+操作を始めるために、まずはクライアントのオブジェクトを作成します。
+
+```Go
+
+func main() {
+  esEndpoint := "http://localhost:9200"
+  ctx := context.Background()
+
+  client, err := elastic.NewClient(
+    elastic.SetURL(esEndpoint),
+    elastic.SetSniff(false),
+  )
+  if err != nil {
+    panic(err)
+  }
+}
+
+```
+
+このクライアントオブジェクトを通じてElasticsearchを操作していきます。
+クライアントの作成時に以下の2つのオプションを指定しています。
+特にSetSniffはElasticsearchのコンテナへ接続する際に必要となる設定です。
+
+
+#### ドキュメントの登録
+単一のドキュメントを登録します。
+
+```Go
+
+func main() {
+  ctx := context.Background()
+
+  client, err := elastic.NewClient()
+  if err != nil {
+    panic(err)
+  }
+}
+
+```
+
+#### ドキュメントIDによる取得
+
+#### ドキュメントの更新
+
+#### ドキュメントの削除
 
 ### 検索の基本操作
 
-### ちょっと応用操作
+### ちょっと応用
 
 ## エラーハンドリング
 
