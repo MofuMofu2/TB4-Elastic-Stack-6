@@ -180,6 +180,11 @@ func main() {
 ドキュメントIDをもとに登録したドキュメントを削除してみます。
 
 ### 検索の基本操作
+### Term Query
+
+### Bool Query
+
+### Query String Query
 
 ### ちょっと応用
 
