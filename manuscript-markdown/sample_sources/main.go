@@ -41,4 +41,13 @@ func main() {
 		panic(err)
 	}
 
+	chat, err := client.Get().Index("chat").Type("chat").Id("1").Do(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	_, err = client.Delete().Index("chat").Type("chat").Id("1").Do(ctx)
+	if err != nil {
+		panic(err)
+	}
 }

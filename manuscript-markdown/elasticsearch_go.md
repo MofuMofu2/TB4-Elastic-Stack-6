@@ -258,25 +258,57 @@ func main() {
 ドキュメントIDをもとに登録したドキュメントを削除してみます。
 
 ```Go
+package main
+
+import (
+	"context"
+	"time"
+
+	"github.com/olivere/elastic"
+)
 
 type Chat struct {
-  User string `json:"user"`,
-  Message string `json:"message"`
-  Created time.Time `json:"created"`
-  Tag string `json:"tag"`
+	User    string    `json:"user"`
+	Message string    `json:"message"`
+	Created time.Time `json:"created"`
+	Tag     string    `json:"tag"`
 }
 
+const (
+	ChatIndex = "Chat"
+)
+
 func main() {
-  esEndpoint := "http://localhost:9200"
-  ctx := context.Background()
+	esUrl := "http://localhost:9200"
+	ctx := context.Background()
 
-  client, err := elastic.NewClient(
-    elastic.SetURL(esEndpoint),
-  )
-  if err != nil {
-    panic(err)
-  }
+	client, err := elastic.NewClient(
+		elastic.SetURL(esUrl),
+	)
+	if err != nil {
+		panic(err)
+	}
 
+	chatData := Chat{
+		User:    "user01",
+		Message: "test message",
+		Created: time.Now(),
+		Tag:     "tag01",
+	}
+
+  //登録
+  //省略
+
+
+  //参照
+  //省略
+
+  //削除
+	_, err = client.Delete().Index("chat").Type("chat").Id("1").Do(ctx)
+	if err != nil {
+		panic(err)
+	}
+}
 ```
 
 ### 検索の基本操作
