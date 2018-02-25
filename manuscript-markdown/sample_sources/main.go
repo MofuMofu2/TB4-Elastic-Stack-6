@@ -2,9 +2,20 @@ package main
 
 import (
 	"context"
-	"fmt"
+	"time"
 
 	"github.com/olivere/elastic"
+)
+
+type Chat struct {
+	User    string    `json:"user"`
+	Message string    `json:"message"`
+	Created time.Time `json:"created"`
+	Tag     string    `json:"tag"`
+}
+
+const (
+	ChatIndex = "Chat"
 )
 
 func main() {
@@ -18,7 +29,16 @@ func main() {
 		panic(err)
 	}
 
-	info, code, err := client.Ping(esUrl).Do(ctx)
-	fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)
+	chatData := Chat{
+		User:    "user01",
+		Message: "test message",
+		Created: time.Now(),
+		Tag:     "tag01",
+	}
+
+	_, err = client.Index().Index("chat").Type("chat").Id("1").BodyJson(&chatData).Do(ctx)
+	if err != nil {
+		panic(err)
+	}
 
 }

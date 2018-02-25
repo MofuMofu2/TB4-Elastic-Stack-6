@@ -147,26 +147,16 @@ func main() {
 }
 ```
 
+elastic.NewClientでクライアントを作成します。その際にelastic.ClientOptionFuncで複数の設定を渡すことができます。
+上のサンプルではelastic.SetURL()にて接続する先のElasticsearchのエンドポイントを指定しています。
+クライアントを作成すると、そのオブジェクトを通じてElasticsearchを操作することができるようになります。
+Elasticsearchのバージョン情報といったシステム情報を取得する際はPingを利用します。
+
+
 ### 単純なCRUD操作
 それでは先ほど作成したIndexを対象に基本的なCRUDE操作をおこなってみましょう。
 操作を始めるために、まずはクライアントのオブジェクトを作成します。
 
-```Go
-
-func main() {
-  esEndpoint := "http://localhost:9200"
-  ctx := context.Background()
-
-  client, err := elastic.NewClient(
-    elastic.SetURL(esEndpoint),
-    elastic.SetSniff(false),
-  )
-  if err != nil {
-    panic(err)
-  }
-}
-
-```
 
 このクライアントオブジェクトを通じてElasticsearchを操作していきます。
 クライアントの作成時に以下の2つのオプションを指定しています。
@@ -177,23 +167,10 @@ func main() {
 
 ```
 type Chat struct {
-  User string `json:"user"`,
-  Message string `json:"message"`
-  Created time.Time `json:"created"`
-  Tag string `json:"tag"`
-}
-
-func main() {
-  esEndpoint := "http://localhost:9200"
-  ctx := context.Background()
-
-  client, err := elastic.NewClient(
-    elastic.SetURL(esEndpoint),
-    elastic.SetSniff(false),
-  )
-  if err != nil {
-    panic(err)
-  }
+	User    string    `json:"user"`
+	Message string    `json:"message"`
+	Created time.Time `json:"created"`
+	Tag     string    `json:"tag"`
 }
 ```
 
@@ -205,26 +182,49 @@ IDの振り方には登録時にクライアント側で設定するか、Elasti
 さきほど作成したクライアントセッションを利用して操作をおこなっていきましょう。
 
 ```Go
+package main
+
+import (
+	"context"
+	"time"
+
+	"github.com/olivere/elastic"
+)
 
 type Chat struct {
-  User string `json:"user"`,
-  Message string `json:"message"`
-  Created time.Time `json:"created"`
-  Tag string `json:"tag"`
+	User    string    `json:"user"`
+	Message string    `json:"message"`
+	Created time.Time `json:"created"`
+	Tag     string    `json:"tag"`
 }
 
+const (
+	ChatIndex = "Chat"
+)
+
 func main() {
-  esEndpoint := "http://localhost:9200"
-  ctx := context.Background()
+	esUrl := "http://localhost:9200"
+	ctx := context.Background()
 
-  client, err := elastic.NewClient(
-    elastic.SetURL(esEndpoint),
-    elastic.SetSniff(false),
-  )
-  if err != nil {
-    panic(err)
-  }
+	client, err := elastic.NewClient(
+		elastic.SetURL(esUrl),
+	)
+	if err != nil {
+		panic(err)
+	}
 
+	chatData := Chat{
+		User:    "user01",
+		Message: "test message",
+		Created: time.Now(),
+		Tag:     "tag01",
+	}
+
+	_, err = client.Index().Index("chat").Type("chat").Id("1").BodyJson(&chatData).Do(ctx)
+	if err != nil {
+		panic(err)
+	}
+}
 ```
 
 #### ドキュメントIDによる取得
