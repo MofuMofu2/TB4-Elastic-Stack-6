@@ -41,7 +41,7 @@
 
 ElasticsearchのDockerイメージの細かなオプションなどは下記に記載があります。
 
->c https://hub.docker.com/_/elasticsearch/
+> https://hub.docker.com/_/elasticsearch/
 
 ## クライアントライブラリの選定
 まずはElasticsearchを操作するためのクライアントライブラリを決める必要があります。
@@ -108,7 +108,7 @@ Elasticsearchを操作するにあたり利用するMapping定義は以下の通
 Elasticsearch 6系のデータ型の詳細は本家ドキュメントを参照してみてください。
 多くのデータ型が標準でサポートされていています。
 
-> https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
+> <Elasticsearchのデータ型のページリンクを記載する>
 
 ### 単純なCRUD操作
 それでは先ほど作成したIndexを対象に基本的なCRUDE操作をおこなってみましょう。
@@ -192,83 +192,22 @@ func main() {
 
 #### ドキュメントIDによる取得
 次に先ほど登録したドキュメントをドキュメントIDを指定して取得します。
-olivere/elasticでは取得したドキュメントはStrucrtに詰め直し、そのStructのフィールドを経由してデータを取得できます。
+olivere/elasticでは取得したドキュメントはStrucrtに詰め直すことでデータを取得することができます。
 
-```Go
-
-type Chat struct {
-  User string `json:"user"`,
-  Message string `json:"message"`
-  Created time.Time `json:"created"`
-  Tag string `json:"tag"`
-}
-
-func main() {
-  esEndpoint := "http://localhost:9200"
-  ctx := context.Background()
-
-  client, err := elastic.NewClient(
-    elastic.SetURL(esEndpoint),
-    elastic.SetSniff(false),
-  )
-  if err != nil {
-    panic(err)
-  }
-
-```
+#### ドキュメントの更新
+ドキュメントIDをもとに登録したドキュメントを更新してみます。
 
 #### ドキュメントの削除
 ドキュメントIDをもとに登録したドキュメントを削除してみます。
 
-```Go
-
-type Chat struct {
-  User string `json:"user"`,
-  Message string `json:"message"`
-  Created time.Time `json:"created"`
-  Tag string `json:"tag"`
-}
-
-func main() {
-  esEndpoint := "http://localhost:9200"
-  ctx := context.Background()
-
-  client, err := elastic.NewClient(
-    elastic.SetURL(esEndpoint),
-    elastic.SetSniff(false),
-  )
-  if err != nil {
-    panic(err)
-  }
-
-```
-
 ### 検索の基本操作
-さて、基本的なCRUTを通じてElasticsearchの基本をおさえたところで、いよいよ検索処理について見ていきましょう。
-Elasticsearchは多くの検索機能をサポートしています。本章ではその中でも代表的な以下についてみていきます。
+### Term Query
 
-* Term Query
-* Bool Query
-* Query String Query
+### Bool Query
 
-#### Term Query
-
-#### Bool Query
-
-#### Query String Query
+### Query String Query
 
 ### ちょっと応用
-ここでは少し応用的な機能についてみていきましょう。
-
-* Scroll
-* マルチフィールド
-* xxxxxx
-
-#### Scroll
-
-#### Multi Fieled
-
-#### xxxxx
 
 ## エラーハンドリング
 

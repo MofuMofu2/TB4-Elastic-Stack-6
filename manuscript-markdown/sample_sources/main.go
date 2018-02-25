@@ -9,4 +9,8 @@ import (
 func main() {
 	ctx := context.Background()
 	client, err := elastic.NewClient()
+	if err != nil {
+		panic(err)
+	}
+
 }
