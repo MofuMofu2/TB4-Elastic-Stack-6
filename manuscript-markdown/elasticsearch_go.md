@@ -15,7 +15,7 @@
 次にDockerイメージを起動します。
 
 ```
-# docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" docker.elastic.co/elasticsearch/elasticsearch
+# docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "network.publish_host=localhost" docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 ```
 
 起動に成功するとプロンプト上に起動ログが出力されます。
@@ -41,7 +41,7 @@
 
 ElasticsearchのDockerイメージの細かなオプションなどは下記に記載があります。
 
->c https://hub.docker.com/_/elasticsearch/
+> https://hub.docker.com/_/elasticsearch/
 
 ## クライアントライブラリの選定
 まずはElasticsearchを操作するためのクライアントライブラリを決める必要があります。
@@ -115,6 +115,37 @@ Elasticsearch 6系のデータ型の詳細は本家ドキュメントを参照�
 多くのデータ型が標準でサポートされていています。
 
 > https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
+
+### Hello, Elasticsearch with GO
+それでGoを使ってElasticsearchを触っていきましょう。
+まずはさきほどDockerで起動したElasticsearchへの接続確認も確認も兼ねて、Elasticsearchのバージョン情報などを取得してみましょう。
+
+```Go
+package main
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/olivere/elastic"
+)
+
+func main() {
+	esUrl := "http://localhost:9200"
+	ctx := context.Background()
+
+	client, err := elastic.NewClient(
+		elastic.SetURL(esUrl),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	info, code, err := client.Ping(esUrl).Do(ctx)
+	fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)
+
+}
+```
 
 ### 単純なCRUD操作
 それでは先ほど作成したIndexを対象に基本的なCRUDE操作をおこなってみましょう。
@@ -241,7 +272,6 @@ func main() {
 
   client, err := elastic.NewClient(
     elastic.SetURL(esEndpoint),
-    elastic.SetSniff(false),
   )
   if err != nil {
     panic(err)
