@@ -593,9 +593,87 @@ func main() {
 * Alias
   * インデックスに別名をつけてアクセスすることができる機能です。任意の検索条件を指定したエイリアスも作成することが可能で、RDBのビューのような機能も利用できます。
 
-#### Scroll
+#### Scroll API
+Scroll APIを利用することで、スクロールタイプのページング機能を手軽に利用することができます。Elasticsearchにはlimit&offsetでの取得もできます。
+ただし、limit&offsetの場合、都度検索がおこなわれたうえで指定したoffsetからlimit数分のドキュメントを取得するため、取得結果に抜け漏れや重複が生じる可能性があります。
+一方でScroll APIを利用した場合、初回検索時のスナップショットが生成されます。そのため、Scroll APIが返すスクロールIDを利用することで、初回検索時のスナップショットに対して任意の箇所からページングをおこなうことができます。
+使い方もとても簡単で、elastic.ScrollServiceを介して操作することができます。
 
-#### Multi Fieleds
+```
+package main
+
+import (
+	"context"
+	"time"
+
+	"github.com/olivere/elastic"
+)
+
+type Chat struct {
+	User    string    `json:"user"`
+	Message string    `json:"message"`
+	Created time.Time `json:"created"`
+	Tag     string    `json:"tag"`
+}
+
+const (
+	ChatIndex = "Chat"
+)
+
+func main() {
+	esUrl := "http://localhost:9200"
+	ctx := context.Background()
+
+	client, err := elastic.NewClient(
+		elastic.SetURL(esUrl),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	termQuery := elastic.NewTermQuery("user", "山田")
+	results, err := client.Scroll("chat").Query(termQuery).Size(10).Do(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	results, err = client.Scroll("chat").Query(termQuery).Size(10).ScrollId(results.ScrollId).Do(ctx)
+	if err != nil {
+		panic(err)
+	}
+}
+```
+
+#### Multi Fields
+Multi Fields機能を利用することで一つのフィールドに対してことなるデータ型やAnalyze設定を指定することができます。
+といってもすぐにピンとこないかもしれませんので、実際にMulti Fieldsの設定をしているMapping定義をみてみましょう。
+
+```
+
+{
+  "mappings": {
+    "_doc": {
+      "properties": {
+        "user": {
+          "type": "text",
+          "fields": {
+            "raw": { 
+              "type":  "keyword"
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+```
+
+userフィールドのtypeにmulti_fieldを指定しています。以下のようにフィールドを指定して操作することができます。
+* user：Analyzeされていない
+* user.analyzed：Analyzeされている
+
+インデクシングする際はuserフィールドにのみ投入すればOKです。
 
 #### Alias
 

@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"reflect"
 	"time"
 
 	"github.com/olivere/elastic"
@@ -31,20 +29,14 @@ func main() {
 		panic(err)
 	}
 
-	boolQuery := elastic.NewBoolQuery()
-	boolQuery.Must(elastic.NewTermQuery("user", "佐藤")
-	boolQuery.Should(elastic.NewTermQuery("message", "Elasticsearch")
-	boolQuery.MustNot(elastic.NewTermQuery("message", "Solor")
-	results, err := client.Search().Index("chat").Query(termQuery).Do(ctx)
+	termQuery := elastic.NewTermQuery("user", "山田")
+	results, err := client.Scroll("chat").Query(termQuery).Size(10).Do(ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	var chattype Chat
-	for _, chat := range results.Each(reflect.TypeOf(chattype)) {
-		if c, ok := chat.(Chat); ok {
-			fmt.Println("Chat message is: %s", c.Message)
-		}
+	results, err = client.Scroll("chat").Query(termQuery).Size(10).ScrollId(results.ScrollId).Do(ctx)
+	if err != nil {
+		panic(err)
 	}
-
 }
