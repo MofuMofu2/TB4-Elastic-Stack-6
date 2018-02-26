@@ -1,8 +1,10 @@
 # GoではじめるElasticsearch
 
 ## はじめに
-本章ではElasticsearchの基本操作をGo言語を通じて体験していきましょう。
-基本的な操作を中心にちょっとしたTipsについても触れていきます。
+Elasticsearchの入門の多くはREST APIを使ったものが多いですが、実際にアプリケーション作成する際は何らかの言語のSDKを利用するかと思います。
+そうした際に意外と「あれ、これってどうやるんだ？」というのが多いものです。
+そこで、本章ではElasticsearchの基本操作をGo言語を通じて体験していきます。基本的な操作を中心にちょっとしたTipsについても触れていきます。
+Elasticsearchはとても多くの機能を有しています。そのため、全ての機能をカバーすることは難しいので代表的な機能について本章では記載していきます。
 
 ## Elasticsearch環境の準備
 今回はElastic社が提供しているDockerイメージを利用します。
@@ -719,7 +721,7 @@ func main() {
 olivere/elasticではelastic.Error経由で詳細なエラー情報を取得できます。これをもとにしてエラーハンドリングを実装することができます。
 
 ```Go
-_, err := client.IndexExists("chat").Do()
+ err := client.IndexExists("chat").Do()
 if err != nil {
     // Get *elastic.Error which contains additional information
     e, ok := err.(*elastic.Error)
