@@ -45,8 +45,9 @@ b4b18e9 [add] 著者リストを追加
 * コミット時刻（いつコミットしたのかを特定する為に必要）
 * コミットメッセージ（概要しりたいじゃん？）
 
-コミットの時刻は@<code>{iso}形式で出力しておいた方が楽そう。最低限分まではみたい。
+コミットの時刻は@<code>{iso}形式で出力しておきます。Kibanaでグラフを描画する際に、コミット時刻を横軸にしたい為です。
 
+参考URL@<href>{https://git-scm.com/docs/pretty-formats}
 
 //cmd{
 $ git log  --oneline --pretty=format:"%h, %an, %ae, %ad, %s " --date="iso"
