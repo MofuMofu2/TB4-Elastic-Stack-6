@@ -74,6 +74,18 @@ $ sudo yum install logstash
 $ /usr/share/logstash/bin/logstash --version
 logstash 6.2.2
 ```
+
+S3をデータソースにするため、"S3 Input Plugin"をインストールします。
+
+> S3 Input Plugin: https://www.elastic.co/guide/en/logstash/current/plugins-inputs-s3.html
+
+```bash
+$ /usr/share/logstash/bin/logstash-plugin install logstash-input-s3
+Validating logstash-input-s3
+Installing logstash-input-s3
+Installation successful
+```
+
 ### Elasticsearchをインストール
 
 Output先としてElasticsearchを利用するため、Elasticsearchをインストールします。
@@ -99,6 +111,7 @@ elasticsearch  	0:off	1:off	2:on	3:on	4:on	5:on	6:off
 Elasticsearchのファイル構成は以下です。
 
 ```bash
+### Elasticsearch directory structure
 /etc/elasticsearch/
  ┣ elasticsearch.yml
  ┣ jvm.options
@@ -124,6 +137,31 @@ $ network.host: 0.0.0.0
 | 4   | discovery.zen.ping.unicast.hosts   | クラスタを組む際にノードを指定                                         |
 | 5   | discovery.zen.minimum_master_nodes | 必要最低限のノード数を指定                                             |
 
+Elasticsearchを起動し、動作確認をします。
+curlで実行し、レスポンスが返ってくれば問題なく起動してます。
 
+```bash
+### Service activation
+$ service elasticsearch start
+Starting elasticsearch:                                    [  OK  ]
+### Check the operation of elasticsearch
+$ curl localhost:9200
+{
+  "name" : "F5iPU0m",
+  "cluster_name" : "elasticsearch",
+  "cluster_uuid" : "Tc_Wn8RJRZ2wjAFsJkShAw",
+  "version" : {
+    "number" : "6.2.2",
+    "build_hash" : "10b1edd",
+    "build_date" : "2018-02-16T19:01:30.685723Z",
+    "build_snapshot" : false,
+    "lucene_version" : "7.2.1",
+    "minimum_wire_compatibility_version" : "5.6.0",
+    "minimum_index_compatibility_version" : "5.0.0"
+  },
+  "tagline" : "You Know, for Search"
+}
+```
 
+## Logstashを
 
