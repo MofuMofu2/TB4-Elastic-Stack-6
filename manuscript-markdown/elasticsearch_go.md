@@ -313,17 +313,157 @@ func main() {
 
 ### 検索の基本操作
 さて、基本的なCRUTを通じてElasticsearchの基本をおさえたところで、いよいよ検索処理について見ていきましょう。
-Elasticsearchは多くの検索機能をサポートしています。本章ではその中でも代表的な以下についてみていきます。
+Elasticsearchは多くの検索機能をサポートしていますが、本章ではその中でも代表的な以下についてみていきます。
 
+* Match Query
+  * 指定した文字列での全文検索をおこないます。検索時に指定した文字列はAnalyzerにより言語処理がなされたうえで、検索がおこなれます。
 * Term Query
+  * 指定した文字列での検索をおこないますが、Match Queryとは違い検索指定文字列がAnalyzeされません。例えば、タグ検索のように指定した文字列で完全一致させたドキュメントを探したい時などはTerm Queryを利用するといったケースです。
 * Bool Query
-* Query String Query
+  * AND/OR/NOTによる検索がおこなえます。実際にはmust/should/must_notといったElasticsearch独自の指定方法を利用します。検索条件をネストさせることも可能で、より複雑な検索クエリを組み立てることができます。
+
+#### Match Query
+Matchクエリは全文検索の肝です。Matchクエリでは、指定した検索文字列がAnalyzerにより言語処理がなされ検索がおこなわれます。
+ここでAnalyzerについて簡単に説明します。Analyzerの設定は全文検索処理の要です。そのため、設定内容も盛り沢山ですし、自然言語処理の知識も必要となってくるため、ここではあくまで触りだけを説明します。
+この本をきっかけにElasticsearchにもっと興味を持っていただけた方はAnalyzerを深掘ってみてください。
+
+#### Analyzerの基本
+Analyzerは以下の要素から構成されています。これらを組み合わせることでより柔軟な検索のためのインデックスを作成できます。
+* Tokenizer
+  * ドキュメントをどうトークン分割するかを定義します。トークン分割には様々な方法があり、有名なものだと形態素解析やN-Gramなどがあります。Tokenizerにより分割されたトークンをもとに検索文字列との比較がおこなわれます。各Analyzerは1つのTokenizerを持つことができます。
+* Character filters
+  * Tokenizerによるトークン分割がされる前に施す処理を定義します。例えば検索文字列のゆらぎを吸収するために、アルファベットの大文字・小文字を全て小文字に変換したり、カタカナの全角・半角を全て半角に統一したりといった処理をトークン分割の前処理として実施します。
+* Token filters
+  * Tokenizerによるトークン分割がされた後に施す処理を定義します。例えば、形態素解析のように品詞をもとにトークン分割するような場合、分割後のトークンから検索には不要そうな助詞を取り除いたりといった処理が該当します。
+
+ここでは先ほど作成したMapping定義をもとにAnalyzerの設定を加えてみます。
+さきほどのChat Mappingのmessageフィールドに日本語形態素解析プラグインであるKuromojiを適用してみましょう。
+
+```
+{
+  "settings": {
+    "analysis": {
+      "tokenizer": {
+        "kuromoji_tokenizer_search": {
+          "type": "kuromoji_tokenizer",
+          "mode": "search",
+          "discard_punctuation": "true"
+        }
+      },
+      "analyzer": {
+        "kuromoji_analyzer": {
+          "type": "custom",
+          "tokenizer": "kuromoji_tokenizer_search",
+          "filter": [
+            "kuromoji_baseform",
+            "kuromoji_part_of_speech"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "chat": {
+      "properties": {
+        "user": {
+          "type": "keyword"
+        },
+        "message": {
+          "type": "text",
+          "analyzer": "kuromoji_analyzer"
+        },
+        "created": {
+          "type": "date"
+        },
+        "tags": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}
+```
+
+Analyzerの設定はMapping定義のanalysisでおこないます。tokenizerでトークン分割の方法を設定し、analyzerで設定したtoknenizerと各filter群を組み合わせて一つのAnalyzerを作ります。
+本書では以下の設定でAnalyzerを設定しました。
+
+* アナライザ名
+  * kuromoji_analyzer
+* 適用Filter
+  * kuromoji_base: xxxxxxxxxxx
+  * kuromoji_part_of_speech: xxxxxxxxxxx
+
+作成したAnalyzerを適用したいMappingフィールドに指定することで、そのフィールドにAnalyzerで指定したインデクシングを施すことができます。
+Chatマッピングのmessageフィールドのanalyzerにさきほど作成したAnalyzerを指定することで適用します。
+
+ここではMapping定義を再作成します。
+
+```
+# curl -XDELETE 'http://localhost:9200/chat'
+# curl -XPUT 'http://localhost:9200/chat' -H "Content-Type: application/json" -d @mapping.json
+```
+
+これで準備が整いました！それではここの詳細にうつっていきましょう。
+
+#### Match Query
+olivere/elasticで検索機能を利用する際は、client経由でSearchメソッドを実行します。
+Searchメソッドはelastic.SearchServiceのQueryメソッドに検索条件を指定したelastic.MatchQueryを渡します。
+取得できたドキュメントをStruct経由で操作する際はreflectパッケージを使って操作します。
+
+```
+package main
+
+import (
+	"context"
+	"fmt"
+	"reflect"
+	"time"
+
+	"github.com/olivere/elastic"
+)
+
+type Chat struct {
+	User    string    `json:"user"`
+	Message string    `json:"message"`
+	Created time.Time `json:"created"`
+	Tag     string    `json:"tag"`
+}
+
+const (
+	ChatIndex = "Chat"
+)
+
+func main() {
+	esUrl := "http://localhost:9200"
+	ctx := context.Background()
+
+	client, err := elastic.NewClient(
+		elastic.SetURL(esUrl),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	query := elastic.NewMatchQuery("message", "テスト")
+	results, err := client.Search().Index("chat").Query(query).Do(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	var chattype Chat
+	for _, chat := range results.Each(reflect.TypeOf(chattype)) {
+		if c, ok := chat.(Chat); ok {
+			fmt.Println("Chat message is: %s", c.Message)
+		}
+	}
+}
+
+```
+
 
 #### Term Query
 
 #### Bool Query
-
-#### Query String Query
 
 ### ちょっと応用
 ここでは少し応用的な機能についてみていきましょう。
@@ -339,6 +479,3 @@ Elasticsearchは多くの検索機能をサポートしています。本章で�
 #### xxxxx
 
 ## エラーハンドリング
-
-## Amazon Elasticsearch Serviceを利用する際のポイント
-

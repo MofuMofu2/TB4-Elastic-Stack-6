@@ -2,6 +2,8 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"reflect"
 	"time"
 
 	"github.com/olivere/elastic"
@@ -29,25 +31,16 @@ func main() {
 		panic(err)
 	}
 
-	chatData := Chat{
-		User:    "user01",
-		Message: "test message",
-		Created: time.Now(),
-		Tag:     "tag01",
-	}
-
-	_, err = client.Index().Index("chat").Type("chat").Id("1").BodyJson(&chatData).Do(ctx)
+	query := elastic.
+	results, err := client.Search().Index("chat").Query(query).Do(ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	chat, err := client.Get().Index("chat").Type("chat").Id("1").Do(ctx)
-	if err != nil {
-		panic(err)
-	}
-
-	_, err = client.Delete().Index("chat").Type("chat").Id("1").Do(ctx)
-	if err != nil {
-		panic(err)
+	var chattype Chat
+	for _, chat := range results.Each(reflect.TypeOf(chattype)) {
+		if c, ok := chat.(Chat); ok {
+			fmt.Println("Chat message is: %s", c.Message)
+		}
 	}
 }

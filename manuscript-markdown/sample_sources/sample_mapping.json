@@ -1,0 +1,41 @@
+{
+  "settings": {
+    "analysis": {
+      "tokenizer": {
+        "kuromoji_tokenizer_search": {
+          "type": "kuromoji_tokenizer",
+          "mode": "search",
+          "discard_punctuation": "true"
+        }
+      },
+      "analyzer": {
+        "kuromoji_analyzer": {
+          "type": "custom",
+          "tokenizer": "kuromoji_tokenizer_search",
+          "filter": [
+            "kuromoji_baseform",
+            "kuromoji_part_of_speech"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "chat": {
+      "properties": {
+        "user": {
+          "type": "keyword"
+        },
+        "message": {
+          "type": "text"
+        },
+        "created": {
+          "type": "date"
+        },
+        "tags": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}
