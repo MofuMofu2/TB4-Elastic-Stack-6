@@ -28,8 +28,7 @@
   "name" : "WlZn3XP",                          
   "cluster_name" : "docker-cluster",           
   "cluster_uuid" : "7Ltq7Ph_Tv-cLofAglwp_g",   
-  "version" : {                                
-    "number" : "5.6.4",                        
+  "version" : {                                "number" : "5.6.4",                        
     "build_hash" : "8bbedf5",                  
     "build_date" : "2017-10-31T18:55:38.105Z", 
     "build_snapshot" : false,                  
@@ -706,12 +705,12 @@ func main() {
 
 	termQuery := elastic.NewTermQuery("user", "山田")
 
-  //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-	client.Alias().Add("test", "test02").Do(ctx)
-  //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-	client.Alias().AddWithFilter("test", "test02", termQuery).Do(ctx)
-  //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-	client.Alias().Remove("test", "test02").Do(ctx)
+  //chatインデックスに対してchat-aliasインデックスを作成
+	client.Alias().Add("chat", "chat-alias").Do(ctx)
+  //chatインデックスのmessageに山田だけが含まれるcaht-yamada-message-onlyエイリアスを作成
+	client.Alias().AddWithFilter("chat", "chat-yamada-message-only", termQuery).Do(ctx)
+  //chat-aliasエイリアスを削除
+	client.Alias().Remove("chat", "chat-alias").Do(ctx)
 }
 ```
 
@@ -719,7 +718,7 @@ func main() {
 最後にエラーハンドリングについて記載します。
 olivere/elasticではelastic.Error経由で詳細なエラー情報を取得できます。これをもとにしてエラーハンドリングを実装することができます。
 
-```
+```Go
 _, err := client.IndexExists("chat").Do()
 if err != nil {
     // Get *elastic.Error which contains additional information
@@ -728,6 +727,5 @@ if err != nil {
         //...
     }
     log.Printf("Elastic failed with status %d and error %s.", e.Status, e.Details)
-    ...
 }
 ```
