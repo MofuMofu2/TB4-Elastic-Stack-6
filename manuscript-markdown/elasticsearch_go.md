@@ -15,7 +15,7 @@
 次にDockerイメージを起動します。
 
 ```
-# docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "http.host=0.0.0.0" -e "transport.host=127.0.0.1" docker.elastic.co/elasticsearch/elasticsearch
+# docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "network.publish_host=localhost" docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 ```
 
 起動に成功するとプロンプト上に起動ログが出力されます。
@@ -64,8 +64,8 @@ Elastic社の公式クライアントもあるのですが、現時点では絶�
 
 ## Goで始めるElasticsearch
 ### IndexとType
-Elasticsearchで検索をおこなうために、まずIndexとTypeを作成しましょう。
-RDBMSで例えると以下に相当します。
+Elasticsearchで検索をおこなうために、まずIndexとTypeを作成します。
+RDBMSで例えと以下に相当します。
 * Indexはスキーマ/データベース
 * Typeはテーブル
 
@@ -85,13 +85,13 @@ Elasticsearchを操作するにあたり利用するMapping定義は以下の通
           "type": "keyword"
         },
         "message": {
-          "type": "keyword"
+          "type": "text"
         },
         "created": {
           "type": "date"
         },
         "tags": {
-          "type": "text"
+          "type": "keyword"
         }
       }
     }
@@ -99,37 +99,140 @@ Elasticsearchを操作するにあたり利用するMapping定義は以下の通
 }
 ```
 
-//TODO: Mappingの項目説明を加える
+今回はchatというTypeへドキュメントを登録していきます。propertiesにフィールドの項目を設定していきます。
+フィールド名とそのデータ型を"tyep"で指定していきます。今回指定しているデータ型は以下の通りです。
+
+| データ型 | 説明                                                                                                                                              |
+|----------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| keyword  | いわゆるString型です。後述するtext型もString型に相当します。しかしkeyword型の場合、そのフィールドへアナライザは適用されません。                   |
+| text     | String型に相当します。text型を指定したフィールドはアナライザと呼ばれるElasticsearchの高度な検索機能を利用した検索が可能となります。               |
+| date     | 日付型です。Elasticsearchへのデータ投入はJSONを介して行うため、実際にデータを投入する際はdateフォーマットに即した文字列を投入することになります。 |
+
+keyword型とtext型は両者ともString型に相当します。その違いはアナライザを設定できるか否かです。
+後ほど詳細を説明しますが、アナライザを適用することでそのフィールドに対し高度な全文検索を行うことができます。一方でkeyword型はアナライザが適用されないため、完全一致での検索が求めらます。
+
+Elasticsearch 6系のデータ型の詳細は本家ドキュメントを参照してみてください。
+多くのデータ型が標準でサポートされていています。
+
+> https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
+
+### Hello, Elasticsearch with GO
+それでGoを使ってElasticsearchを触っていきましょう。
+まずはさきほどDockerで起動したElasticsearchへの接続確認も確認も兼ねて、Elasticsearchのバージョン情報などを取得してみましょう。
+
+```Go
+package main
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/olivere/elastic"
+)
+
+func main() {
+	esUrl := "http://localhost:9200"
+	ctx := context.Background()
+
+	client, err := elastic.NewClient(
+		elastic.SetURL(esUrl),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	info, code, err := client.Ping(esUrl).Do(ctx)
+	fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)
+
+}
+```
+
+elastic.NewClientでクライアントを作成します。その際にelastic.ClientOptionFuncで複数の設定を渡すことができます。
+上のサンプルではelastic.SetURL()にて接続する先のElasticsearchのエンドポイントを指定しています。
+クライアントを作成すると、そのオブジェクトを通じてElasticsearchを操作することができるようになります。
+Elasticsearchのバージョン情報といったシステム情報を取得する際はPingを利用します。
+
 
 ### 単純なCRUD操作
 それでは先ほど作成したIndexを対象に基本的なCRUDE操作をおこなってみましょう。
 操作を始めるために、まずはクライアントのオブジェクトを作成します。
 
-```Go
-
-func main() {
-  esEndpoint := "http://localhost:9200"
-  ctx := context.Background()
-
-  client, err := elastic.NewClient(
-    elastic.SetURL(esEndpoint),
-    elastic.SetSniff(false),
-  )
-  if err != nil {
-    panic(err)
-  }
-}
-
-```
 
 このクライアントオブジェクトを通じてElasticsearchを操作していきます。
 クライアントの作成時に以下の2つのオプションを指定しています。
 特にSetSniffはElasticsearchのコンテナへ接続する際に必要となる設定です。
 
 操作にあたっては、さきほど作成したMappingに対応するStructを通じておこなっていきます。
-なので、以下のStructを定義します。
+なので、今回サンプルとして利用するChat Mappingに対応するStructを定義します。
 
 ```
+type Chat struct {
+	User    string    `json:"user"`
+	Message string    `json:"message"`
+	Created time.Time `json:"created"`
+	Tag     string    `json:"tag"`
+}
+```
+
+#### ドキュメントの登録
+まずは単一のドキュメントを登録します。
+Elasticsearchは登録されたドキュメントに対してドキュメントIDと呼ばれるドキュメントを一意に識別するためのIDとを付与します。
+IDの振り方には登録時にクライアント側で設定するか、Elasticsearch側でランダムに振ってもらうかの2通りがあります。
+今回は登録時にクライアント側でドキュメントIDを指定してみましょう。
+さきほど作成したクライアントセッションを利用して操作をおこなっていきましょう。
+
+```Go
+package main
+
+import (
+	"context"
+	"time"
+
+	"github.com/olivere/elastic"
+)
+
+type Chat struct {
+	User    string    `json:"user"`
+	Message string    `json:"message"`
+	Created time.Time `json:"created"`
+	Tag     string    `json:"tag"`
+}
+
+const (
+	ChatIndex = "Chat"
+)
+
+func main() {
+	esUrl := "http://localhost:9200"
+	ctx := context.Background()
+
+	client, err := elastic.NewClient(
+		elastic.SetURL(esUrl),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	chatData := Chat{
+		User:    "user01",
+		Message: "test message",
+		Created: time.Now(),
+		Tag:     "tag01",
+	}
+
+	_, err = client.Index().Index("chat").Type("chat").Id("1").BodyJson(&chatData).Do(ctx)
+	if err != nil {
+		panic(err)
+	}
+}
+```
+
+#### ドキュメントIDによる取得
+次に先ほど登録したドキュメントをドキュメントIDを指定して取得します。
+olivere/elasticでは取得したドキュメントはStrucrtに詰め直し、そのStructのフィールドを経由してデータを取得できます。
+
+```Go
+
 type Chat struct {
   User string `json:"user"`,
   Message string `json:"message"`
@@ -148,45 +251,92 @@ func main() {
   if err != nil {
     panic(err)
   }
-}
-```
-
-#### ドキュメントの登録
-単一のドキュメントを登録します。
-
-```Go
-
-func main() {
-  esEndpoint := "http://localhost:9200"
-  ctx := context.Background()
-
-  client, err := elastic.NewClient(
-    elastic.SetURL(esEndpoint),
-    elastic.SetSniff(false),
-  )
-  if err != nil {
-    panic(err)
-  }
 
 ```
-
-#### ドキュメントIDによる取得
-ドキュメントIDをもとにドキュメントを取得します。
-
-#### ドキュメントの更新
-ドキュメントIDをもとに登録したドキュメントを更新してみます。
 
 #### ドキュメントの削除
 ドキュメントIDをもとに登録したドキュメントを削除してみます。
 
+```Go
+package main
+
+import (
+	"context"
+	"time"
+
+	"github.com/olivere/elastic"
+)
+
+type Chat struct {
+	User    string    `json:"user"`
+	Message string    `json:"message"`
+	Created time.Time `json:"created"`
+	Tag     string    `json:"tag"`
+}
+
+const (
+	ChatIndex = "Chat"
+)
+
+func main() {
+	esUrl := "http://localhost:9200"
+	ctx := context.Background()
+
+	client, err := elastic.NewClient(
+		elastic.SetURL(esUrl),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	chatData := Chat{
+		User:    "user01",
+		Message: "test message",
+		Created: time.Now(),
+		Tag:     "tag01",
+	}
+
+  //登録
+  //省略
+
+
+  //参照
+  //省略
+
+  //削除
+	_, err = client.Delete().Index("chat").Type("chat").Id("1").Do(ctx)
+	if err != nil {
+		panic(err)
+	}
+}
+```
+
 ### 検索の基本操作
-### Term Query
+さて、基本的なCRUTを通じてElasticsearchの基本をおさえたところで、いよいよ検索処理について見ていきましょう。
+Elasticsearchは多くの検索機能をサポートしています。本章ではその中でも代表的な以下についてみていきます。
 
-### Bool Query
+* Term Query
+* Bool Query
+* Query String Query
 
-### Query String Query
+#### Term Query
+
+#### Bool Query
+
+#### Query String Query
 
 ### ちょっと応用
+ここでは少し応用的な機能についてみていきましょう。
+
+* Scroll
+* マルチフィールド
+* xxxxxx
+
+#### Scroll
+
+#### Multi Fieled
+
+#### xxxxx
 
 ## エラーハンドリング
 
