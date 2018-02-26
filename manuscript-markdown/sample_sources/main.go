@@ -29,25 +29,19 @@ func main() {
 		panic(err)
 	}
 
-	chatData := Chat{
-		User:    "user01",
-		Message: "test message",
-		Created: time.Now(),
-		Tag:     "tag01",
-	}
-
-	_, err = client.Index().Index("chat").Type("chat").Id("1").BodyJson(&chatData).Do(ctx)
+	termQuery := elastic.NewTermQuery("user", "山田")
+	results, err := client.Scroll("chat").Query(termQuery).Size(10).Do(ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	chat, err := client.Get().Index("chat").Type("chat").Id("1").Do(ctx)
+	results, err = client.Scroll("chat").Query(termQuery).Size(10).ScrollId(results.ScrollId).Do(ctx)
 	if err != nil {
 		panic(err)
 	}
 
-	_, err = client.Delete().Index("chat").Type("chat").Id("1").Do(ctx)
-	if err != nil {
-		panic(err)
-	}
+	elastic.AliasAddAction.Index("teste")
+	client.Alias().Add("test", "test02").Do(ctx)
+	client.Alias().AddWithFilter("test", "test02", termQuery).Do(ctx)
+	client.Alias().Remove("test", "test02").Do(ctx)
 }
