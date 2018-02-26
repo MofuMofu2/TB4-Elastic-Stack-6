@@ -460,22 +460,141 @@ func main() {
 
 ```
 
-
 #### Term Query
+Termクエリを利用することで、指定した文字列を完全に含むドキュメントを検索することができます。
+olivere/elasticでTermクエリを利用する際はTerm Queryはelastic.TermQueryを利用します。
+elastic.NewTermQueryは検索対象のフィールドと検索文字列を指定します。
+
+```
+package main
+
+import (
+	"context"
+	"fmt"
+	"reflect"
+	"time"
+
+	"github.com/olivere/elastic"
+)
+
+type Chat struct {
+	User    string    `json:"user"`
+	Message string    `json:"message"`
+	Created time.Time `json:"created"`
+	Tag     string    `json:"tag"`
+}
+
+const (
+	ChatIndex = "Chat"
+)
+
+func main() {
+	esUrl := "http://localhost:9200"
+	ctx := context.Background()
+
+	client, err := elastic.NewClient(
+		elastic.SetURL(esUrl),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	termQuery := elastic.NewTermQuery("User", "山田")
+	results, err := client.Search().Index("chat").Query(termQuery).Do(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	var chattype Chat
+	for _, chat := range results.Each(reflect.TypeOf(chattype)) {
+		if c, ok := chat.(Chat); ok {
+			fmt.Println("Chat message is: %s", c.Message)
+		}
+	}
+
+}
+```
 
 #### Bool Query
+BoolクエリではAND/OR/NOTによる検索がおこなえます。検索条件をネストさせることも可能で、より複雑な検索クエリを組み立てることができます。
+実際にはmust/should/must_notといったElasticsearch独自の指定方法を利用します。
+
+
+| クエリ   | 説明              | oliver/elasticでの指定方法                                                                        |
+|----------|-------------------|---------------------------------------------------------------------------------------------------|
+| must     | ANDに相当します。 | boolQuery := elastic.NewBoolQuery() <br> boolQuery.Must(elastic.NewTermQuery("field", "value")    |
+| should   | ORに相当します。  | boolQuery := elastic.NewBoolQuery() <br> boolQuery.Should(elastic.NewTermQuery("field", "value")  |
+| must_not | NOTに相当します。 | boolQuery := elastic.NewBoolQuery() <br> boolQuery.MustNot(elastic.NewTermQuery("field", "value") |
+
+userが「佐藤」で、messageに「Elasticsearch」が含まれるが「Solor」が含まれないドキュメントを検索するクエリは以下の通りです。
+
+```
+package main
+
+import (
+	"context"
+	"fmt"
+	"reflect"
+	"time"
+
+	"github.com/olivere/elastic"
+)
+
+type Chat struct {
+	User    string    `json:"user"`
+	Message string    `json:"message"`
+	Created time.Time `json:"created"`
+	Tag     string    `json:"tag"`
+}
+
+const (
+	ChatIndex = "Chat"
+)
+
+func main() {
+	esUrl := "http://localhost:9200"
+	ctx := context.Background()
+
+	client, err := elastic.NewClient(
+		elastic.SetURL(esUrl),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	boolQuery := elastic.NewBoolQuery()
+	boolQuery.Must(elastic.NewTermQuery("user", "佐藤")
+	boolQuery.Should(elastic.NewTermQuery("message", "Elasticsearch")
+	boolQuery.MustNot(elastic.NewTermQuery("message", "Solor")
+	results, err := client.Search().Index("chat").Query(termQuery).Do(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	var chattype Chat
+	for _, chat := range results.Each(reflect.TypeOf(chattype)) {
+		if c, ok := chat.(Chat); ok {
+			fmt.Println("Chat message is: %s", c.Message)
+		}
+	}
+
+}
+```
+
+//TODO:ネストがふかいもの
 
 ### ちょっと応用
 ここでは少し応用的な機能についてみていきましょう。
 
-* Scroll
-* マルチフィールド
-* xxxxxx
+* Scroll API
+* Multi Fields
+* Alias
 
 #### Scroll
 
-#### Multi Fieled
+#### Multi Fieleds
 
-#### xxxxx
+#### Alias
 
 ## エラーハンドリング
+最後にエラーハンドリングについて記載します。

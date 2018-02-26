@@ -31,8 +31,11 @@ func main() {
 		panic(err)
 	}
 
-	query := elastic.
-	results, err := client.Search().Index("chat").Query(query).Do(ctx)
+	boolQuery := elastic.NewBoolQuery()
+	boolQuery.Must(elastic.NewTermQuery("user", "佐藤")
+	boolQuery.Should(elastic.NewTermQuery("message", "Elasticsearch")
+	boolQuery.MustNot(elastic.NewTermQuery("message", "Solor")
+	results, err := client.Search().Index("chat").Query(termQuery).Do(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -43,4 +46,5 @@ func main() {
 			fmt.Println("Chat message is: %s", c.Message)
 		}
 	}
+
 }
