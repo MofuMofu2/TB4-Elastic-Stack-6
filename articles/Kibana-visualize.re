@@ -60,7 +60,38 @@ c201d78, MofuMofu2, froakie002@gmail.com, 2018-02-18 15:56:35 +0900, ひつよ�
 4e62dae, MofuMofu2, froakie002@gmail.com, 2018-02-18 15:30:47 +0900, [fix] reviewファイルの前に半角ハイフンがなかったので修正
 //}
 
-これをjson形式で出力し、Elasticsearchに投入する。
+
+コミットログを何かしらのファイルに出力するには、gitコマンドの最後に@<code>{>（ファイル名）.（拡張子）}とします。
+しかし、このままファイル出力を行うとElasticsearchにデータを投入する前にLogstashで加工が必要です。
+
+#@#Elasticsearchにまんまで投入するのはjson以外にないのかね？
+
+Kibanaを手っ取り早く試したいのに、わざわざデータを加工するのはしんどいですよね。なので、コミットログをjsonで出力してみたいと思います。
+まずはコミットログをjsonっぽく出力してみます。@<code>{pretty}オプションは普通の文字ベタ打ちと組み合わせて利用することができます。
+
+#@#なんかベタ打ちはいい感じにへんこう
+
+//cmd{
+$ git log  --oneline --pretty=format:"{"commit_hash":%h,"author_name":%an,"author_email":%ae,"author_date":%ad,"subject":%s} " --date="iso"
+{commit_hash:020670e,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-26 21:15:22 +0900,subject:edited alias part}
+{commit_hash:1ebe8d1,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-26 20:56:47 +0900,subject:writing error handling}
+{commit_hash:0cffae6,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-26 20:37:14 +0900,subject:writing}
+{commit_hash:b39f3d6,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-26 20:02:50 +0900,subject:writing}
+{commit_hash:90a97d2,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-26 19:48:56 +0900,subject:writing}
+{commit_hash:934ef39,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-26 18:58:41 +0900,subject:writing}
+{commit_hash:52ce336,author_name:micci184,author_email:micci184@gmail.com,author_date:2018-02-26 10:24:54 +0900,subject:[add]logstash.md}
+{commit_hash:03850a1,author_name:micci184,author_email:micci184@gmail.com,author_date:2018-02-26 10:21:50 +0900,subject:Merge branch 'master' of https://github.com/MofuMofu2/TB4-Elastic-Stack-6}
+{commit_hash:7067f94,author_name:micci184,author_email:micci184@gmail.com,author_date:2018-02-26 10:19:54 +0900,subject:[add]logstash.md}
+{commit_hash:33937bc,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-25 13:25:53 +0900,subject:add deleting sammple}
+{commit_hash:22efb5a,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-25 13:17:55 +0900,subject:add indexing sammple}
+{commit_hash:1d2701d,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-25 12:57:22 +0900,subject:writing}
+{commit_hash:c57d160,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-25 12:03:37 +0900,subject:add description of data types}
+//}
+
+どうでしょうか？手書きでもjsonっぽくなりました。では、実際にこれをjsonファイルに出力してみたいと思います。
+
+@<code>{git log  --oneline --pretty=format:"{"commit_hash":%h,"author_name":%an,"author_email":%ae,"author_date":%ad,"subject":%s\} " --date="iso" >gitLog.json}と記述してみましょう。
+
 
 @<code>{git-log-to-json}というnpmパッケージを利用すると@<href>{https://www.npmjs.com/package/git-log-to-json}、Node.jsを
 利用してgit logをjson形式で出力できるようです。今回は本題から外れるので扱いませんが、またどこかで記事を公開したいですねー。
