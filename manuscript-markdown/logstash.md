@@ -355,7 +355,7 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 {
     "@timestamp" => 2018-02-26T08:15:31.322Z,
           "path" => "/etc/logstash/alb.logs",
-       "message" => "https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57 \"GET https://www.example.com:443/ HTTP/1.1\" \"curl/7.46.0\" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067 \"Root=1-58337281-1d84f3d73c47ec4e58577259\" www.example.com arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012",
+       "message" => "https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57 "GET https://www.example.com:443/ HTTP/1.1" "curl/7.46.0" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067 "Root=1-58337281-1d84f3d73c47ec4e58577259" www.example.com arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012,
       "@version" => "1",
           "host" => "ip-172-31-50-36"
 }
@@ -367,12 +367,417 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 
 ### Filterを使ってみる
 
+"Filter"では何を行うかというと、取得したログを正規表現でパースするGrokフィルタや、、地理情報を得るためのフィルタを施すことができます。
+今回のALBもGrokフィルタなどを使うことで構造化することが可能です。
+
+まず、ALBのログフォーマットを把握する必要があります。
+以下に記載します。
+
+```bash
+type timestamp elb client:port target:port request_processing_time target_processing_time response_processing_time elb_status_code target_status_code received_bytes sent_bytes "request" "user_agent" ssl_cipher ssl_protocol target_group_arn trace_id domain_name chosen_cert_arn
+```
+
+各フィールドについて以下に記載します。  
+
+| Log                      | Field                    | Type   |
+|:-------------------------|:-------------------------|:-------|
+| type                     | class                    | string |
+| timestamp                | date                     | date   |
+| elb                      | elb                      | string |
+| client_ip                | client_ip                | int    |
+| client_port              | target_port              | int    |
+| target_ip                | target_ip                | int    |
+| target_port              | target_port              | int    |
+| request_processing_time  | request_processing_time  | float  |
+| target_processing_time   | target_processing_time   | float  |
+| response_processing_time | response_processing_time | float  |
+| elb_status_code          | elb_status_code          | string |
+| target_status_code       | target_status_code       | string |
+| received_bytes           | received_bytes           | int    |
+| sent_bytes               | sent_bytes               | int    |
+| request                  | ELB_REQUEST_LINE         | string |
+| user_agent               | user_agent               | string |
+| ssl_cipher               | ssl_cipher               | string |
+| ssl_protocol             | ssl_protocol             | string |
+| target_group_arn         | target_group_arn         | string |
+| trace_id                 | trace_id                 | string |
+
+このフィールド単位でフィルタをかけられるようkey-valueにGrokフィルタで分解します。  
+ALB用の"grok-patterns"を記載したパターンファイルを作成します。  
+
+が、その前にパターンファイルを格納するディレクトリを作成します。
+パイプラインの設定ファイルにGrokフィルタを記載するでもいいのですが、可読性を上げるため外だしにしてます。
+
+```bash
+### Create directory
+$ mkdir /etc/logstash/patterns
+$ ll | grep patterns
+drwxr-xr-x 2 root root 4096 xxx xx xx:xx patterns
+```
+
+patternsディレクトリ配下にALBのパターンファイルを作成します。  
+中身については、闇深いのでここでは説明しません。。無邪気に貼っつけてください。  
+また、Typeは、インデックステンプレートで作成するのが一般的かと思いますが、今回は、パターンファイルの中で指定します。
+
+```bash
+$ sudo vim /etc/logstash/patterns/alb_patterns
+# Application Load Balancing
+ALB_ACCESS_LOG %{NOTSPACE:class} %{TIMESTAMP_ISO8601:date} %{NOTSPACE:elb}  (?:%{IP:client_ip}:%{INT:client_port:int}) (?:%{IP:backend_ip}:%{INT:backend_port:int}|-) (:?%{NUMBER:request_processing_time:float}|-1) (?:%{NUMBER:target_processing_time:float}|-1) (?:%{NUMBER:response_processing_time:float}|-1) (?:%{INT:elb_status_code}|-) (?:%{INT:target_status_code:int}|-) %{INT:received_bytes:int} %{INT:sent_bytes:int} \"%{ELB_REQUEST_LINE}\" \"(?:%{DATA:user_agent}|-)\" (?:%{NOTSPACE:ssl_cipher}|-) (?:%{NOTSPACE:ssl_protocol}|-)  %{NOTSPACE:target_group_arn} \"%{NOTSPACE:trace_id}\"
+```
+
+alb.confに"Fiter"を追加します。
+
+```bash
+### update alb.conf
+$ vim /etc/logstash/conf.d/alb.conf
+input {
+  file{
+    path=>"/etc/logstash/alb.log"
+    start_position=>"beginning"
+    sincedb_path => "/dev/null"
+  }
+}
+filter {
+  grok {
+    patterns_dir => ["/etc/logstash/patterns/alb_patterns"]
+    match => { "message" => "%{ALB_ACCESS_LOG}" }
+  }
+  date {
+    match => [ "date", "ISO8601" ]
+    timezone => "Asia/Tokyo"
+    target => "@timestamp"
+  }
+  geoip {
+    source => "client_ip"
+  }
+}
+output {
+  stdout { codec => rubydebug }
+}
+```
+
+更新できたら実行します。
+いい感じにkey-valueのかたちになっていることがわかります。
+
+```bash
+{
+                        "verb" => "GET",
+     "request_processing_time" => 0.086,
+                  "sent_bytes" => 57,
+                  "ssl_cipher" => "ECDHE-RSA-AES128-GCM-SHA256",
+                   "client_ip" => "5.10.83.30",
+                     "request" => "https://www.example.com:443/",
+                       "proto" => "https",
+                        "port" => "443",
+                  "user_agent" => "curl/7.46.0",
+                       "geoip" => {
+             "city_name" => "Amsterdam",
+              "location" => {
+            "lon" => 4.9167,
+            "lat" => 52.35
+        },
+              "timezone" => "Europe/Amsterdam",
+                    "ip" => "5.10.83.30",
+           "postal_code" => "1091",
+         "country_code3" => "NL",
+        "continent_code" => "EU",
+             "longitude" => 4.9167,
+          "country_name" => "Netherlands",
+           "region_name" => "North Holland",
+              "latitude" => 52.35,
+         "country_code2" => "NL",
+           "region_code" => "NH"
+    },
+          "target_status_code" => 200,
+                 "client_port" => 2817,
+                "backend_port" => 80,
+                    "trace_id" => "Root=1-58337281-1d84f3d73c47ec4e58577259",
+                       "class" => "https",
+            "target_group_arn" => "arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067",
+                     "urihost" => "www.example.com:443",
+                        "path" => [
+        [0] "/etc/logstash/alb.log",
+        [1] "/"
+    ],
+                 "httpversion" => "1.1",
+             "elb_status_code" => "200",
+                        "host" => "ip-172-31-50-36",
+                  "@timestamp" => 2016-08-10T23:39:43.065Z,
+      "target_processing_time" => 0.048,
+    "response_processing_time" => 0.037,
+                         "elb" => "app/my-loadbalancer/50dc6c495c0c9188",
+                "ssl_protocol" => "TLSv1.2",
+                        "date" => "2016-08-10T23:39:43.065466Z",
+                     "message" => "https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  5.10.83.30:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57 \"GET https://www.example.com:443/ HTTP/1.1\" \"curl/7.46.0\" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067 \"Root=1-58337281-1d84f3d73c47ec4e58577259\" www.example.com arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012",
+              "received_bytes" => 0,
+                  "backend_ip" => "10.0.0.1",
+                    "@version" => "1"
+}
+```
+
+ここでFilterで記載している内容について説明します。
+
+正規表現でパースする際にgrokフィルタを使用します。
+"patterns_dir"で外だししているパターンファイルを呼び出すことができます。
+"match"で"message"に取り込まれている値を対象に作成したGrok-Patterns(ここでいうALB_ACCESS_LOG)を適用しています。
+
+```bash
+### grok-filter
+  grok {
+    patterns_dir => ["/etc/logstash/patterns/alb_patterns"]
+    match => { "message" => "%{ALB_ACCESS_LOG}" }
+  }
+```
+
+dateフィルタで"@timestamp"をgrokフィルタで抽出した"date"を置き換えます。
+また、タイムゾーンを指定することも可能です。
 
 
-先ほどまでは、"Input"と"Output"についての動きをみましたが、ここからは、"Filter"を使った動きをみたいと思います。
 
 
+```bash
+  date {
+    match => [ "date", "ISO8601" ]
+    timezone => "Asia/Tokyo"
+    target => "@timestamp"
+  }
+```
+
+geoipフォルタを使用することでIPアドレスから地理情報を取得することが可能です。
+geoipフィルタの対象とするため、"client_ip"を指定してます。
+
+```bash
+  geoip {
+    source => "client_ip"
+  }
+```
+
+今回は使用していないですが、不要な値は、mutateで削除可能です。
+例えば、messageの値は、全てkey-valueでストアされているから不要なので削除といったことも可能です。
+個人的には、ストアされたデータで"_grokparsefailure"が発生した時の場合も踏まえると、残した方がいいと思ってます。
+
+messageを削除する場合は、Filterにmutateを追加します。
+
+```bash
+filter {
+  grok {
+    patterns_dir => ["/etc/logstash/patterns/alb_patterns"]
+    match => { "message" => "%{ALB_ACCESS_LOG}" }
+  }
+  date {
+    match => [ "date", "ISO8601" ]
+    timezone => "Asia/Tokyo"
+    target => "@timestamp"
+  }
+  geoip {
+    source => "client_ip"
+  }
+  ### mutateを追加し、remove_fieldでmessageを削除
+  mutate {
+    remove_field => [ "message" ]
+  }  
+}
+```
+
+補足ですが、コマンドラインで実行している際に以下のようなエラーが発生した場合は、Logstashのプロセスがすでに立ち上がっている時に発生します。
+
+```bash
+### Error executing logstash
+$ /usr/share/logstash/bin/logstash -f conf.d/alb.conf
+WARNING: Could not find logstash.yml which is typically located in $LS_HOME/config or /etc/logstash. You can specify the path using --path.settings. Continuing using the defaults
+Could not find log4j2 configuration at path /usr/share/logstash/config/log4j2.properties. Using default config which logs errors to the console
+[INFO ] 2018-xx-xx xx:xx:xx.xxx [main] scaffold - Initializing module {:module_name=>"netflow", :directory=>"/usr/share/logstash/modules/netflow/configuration"}
+[INFO ] 2018-xx-xx xx:xx:xx.xxx [main] scaffold - Initializing module {:module_name=>"fb_apache", :directory=>"/usr/share/logstash/modules/fb_apache/configuration"}
+[WARN ] 2018-xx-xx xx:xx:xx.xxx [LogStash::Runner] multilocal - Ignoring the 'pipelines.yml' file because modules or command line options are specified
+[FATAL] 2018-xx-xx xx:xx:xx.xxx [LogStash::Runner] runner - Logstash could not be started because there is already another instance using the configured data directory.  If you wish to run multiple instances, you must change the "path.data" setting.
+[ERROR] 2018-xx-xx xx:xx:xx.xxx [LogStash::Runner] Logstash - java.lang.IllegalStateException: org.jruby.exceptions.RaiseException: (SystemExit) exit
+```
+
+この場合の対処方法は、プロセスを強制的にkillします。
+
+```bash
+### Kill process
+$ ps -aux | grep logstash
+Warning: bad syntax, perhaps a bogus '-'? See /usr/share/doc/procps-3.2.8/FAQ
+root     32061  1.7 12.8 4811812 521780 pts/0  Tl   14:12   1:06 /usr/lib/jvm/java/bin/java -Xms2g -Xmx2g -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly -XX:+DisableExplicitGC -Djava.awt.headless=true -Dfile.encoding=UTF-8 -XX:+HeapDumpOnOutOfMemoryError -cp /usr/share/logstash/logstash-core/lib/jars/animal-sniffer-annotations-1.14.jar:/usr/share/logstash/logstash-core/lib/jars/commons-compiler-3.0.8.jar:/usr/share/logstash/logstash-core/lib/jars/error_prone_annotations-2.0.18.jar:/usr/share/logstash/logstash-core/lib/jars/google-java-format-1.5.jar:/usr/share/logstash/logstash-core/lib/jars/guava-22.0.jar:/usr/share/logstash/logstash-core/lib/jars/j2objc-annotations-1.1.jar:/usr/share/logstash/logstash-core/lib/jars/jackson-annotations-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/jackson-core-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/jackson-databind-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/jackson-dataformat-cbor-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/janino-3.0.8.jar:/usr/share/logstash/logstash-core/lib/jars/javac-shaded-9-dev-r4023-3.jar:/usr/share/logstash/logstash-core/lib/jars/jruby-complete-9.1.13.0.jar:/usr/share/logstash/logstash-core/lib/jars/jsr305-1.3.9.jar:/usr/share/logstash/logstash-core/lib/jars/log4j-api-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/log4j-core-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/log4j-slf4j-impl-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/logstash-core.jar:/usr/share/logstash/logstash-core/lib/jars/slf4j-api-1.7.25.jar org.logstash.Logstash -f conf.d/alb.conf
+root     32231  0.0  0.0 110468  2060 pts/0    S+   15:16   0:00 grep --color=auto logstash
+$ kill -9 32061
+```
+
+これでFilterについてなんとなくわかったと思います。
+次は、いよいよ最終形態のInputをS3にして、OutputをElasticsearchにする構成をやっていきたいと思います。
+
+## 最終な設定ファイルが完成するよ
+
+### Inputの編集
+
+"Input"部分が、現状だとファイル取り込みになっているので、S3に変更します。
+以下を記載します。
+
+```bash
+input {
+  s3 {
+    region => "ap-northeast-1"
+    bucket => "bucket"
+    prefix => "directory/"
+    interval => "60"
+    sincedb_path => "/var/lib/logstash/sincedb_alb"
+  }
+}
+```
+
+各オプションについて説明します。
+
+| No. | Item           | Content                                                         |
+|:----|:---------------|:----------------------------------------------------------------|
+| 1   | region| AWSのリージョンを指定|
+| 2   | bucket |バケットを指定|
+| 3   | prefix |バケット配下のディレクトリを指定|
+| 4   | interval|バケットからログを取り込む間隔を指定(sec)|
+| 5   | sincedb_path |sincedbファイルの出力先を指定|
+
+今回は、AWSのアクセスキーとシークレットキーを指定せず、IAM Roleをインスタンスに割り当てています。
+オプションで指定することは可能ですが、セキュリティ面からIAM Roleで制御してます。
+
+### Outputの編集
+
+やっとここまできましたね！
+最後に"Output"を標準出力からElasticsearchに変更します。
+
+```bash
+output {
+  elasticsearch {
+    hosts => [ "localhost:9200" ]
+    index => "alb-logs-%{+YYYYMMdd}"
+  }
+}
+```
+
+以下に各オプションについて説明します。
+インデックスは、日次で作成されるようにするため、"alb-logs-%{+YYYYMMdd}"と指定してます。
+
+| No. | Item           | Content                                                         |
+|:----|:---------------|:----------------------------------------------------------------|
+| 1   | hosts| elasticsearchの宛先を指定|
+| 2   | index| ストアする際に作られるインデックス名の指定|
 
 
+これで完成です！
+以下に最終的なパイプラインの設定ファイルを記載します。
 
+```bash
+### Final configuration file
+input {
+  s3 {
+    region => "ap-northeast-1"
+    bucket => "bucket"
+    prefix => "directory/"
+    interval => "60"
+    sincedb_path => "/var/lib/logstash/sincedb_alb"
+  }
+}
+filter {
+  grok {
+    patterns_dir => ["/etc/logstash/patterns/alb_patterns"]
+    match => { "message" => "%{ALB_ACCESS_LOG}" }
+  }
+  date {
+    match => [ "date", "ISO8601" ]
+    timezone => "Asia/Tokyo"
+    target => "@timestamp"
+  }
+  geoip {
+    source => "client_ip"
+  }
+}
+output {
+  elasticsearch {
+    hosts => [ "localhost:9200" ]
+  }
+}
+```
+
+それでは実行させるのですが、今までコマンドライン実行だったので、最後は、サービスで動かしたいと思います。
+
+```bash
+### Start logstash service
+$ initctl start logstash
+```
+
+インデックスが取り込まれているかを確認します。
+
+```bash
+$ curl -XGET localhost:9200/_cat/indices/logstash*
+yellow open logstash-logs-2016xxxx SJ07jipISK-kDlpV5tiHiA 5 1 42 0 650.6kb 650.6kb
+```
+
+ドキュメントも確認します。
+"curl -XGET localhost:9200/{index}/{type}/{id}"の形式で確認できます。
+また、"?pretty"を使用することで整形されます。
+
+```bash
+$ curl -XGET 'localhost:9200/logstash-2016.08.10/doc/DTAU02EB00Bh04bZnyp1/?pretty'
+{
+  "_index" : "logstash-2016.08.10",
+  "_type" : "doc",
+  "_id" : "DTAU02EB00Bh04bZnyp1",
+  "_version" : 1,
+  "found" : true,
+  "_source" : {
+    "message" : "https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  5.10.83.30:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57 \"GET https://www.example.com:443/ HTTP/1.1\" \"curl/7.46.0\" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067 \"Root=1-58337281-1d84f3d73c47ec4e58577259\" www.example.com arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012",
+    "path" : [
+      "/etc/logstash/alb.log",
+      "/"
+    ],
+    "client_ip" : "5.10.83.30",
+    "proto" : "https",
+    "httpversion" : "1.1",
+    "geoip" : {
+      "postal_code" : "1091",
+      "country_name" : "Netherlands",
+      "city_name" : "Amsterdam",
+      "ip" : "5.10.83.30",
+      "location" : {
+        "lon" : 4.9167,
+        "lat" : 52.35
+      },
+      "longitude" : 4.9167,
+      "region_name" : "North Holland",
+      "region_code" : "NH",
+      "country_code3" : "NL",
+      "continent_code" : "EU",
+      "timezone" : "Europe/Amsterdam",
+      "latitude" : 52.35,
+      "country_code2" : "NL"
+    },
+    "@version" : "1",
+    "response_processing_time" : 0.037,
+    "backend_port" : 80,
+    "target_status_code" : 200,
+    "user_agent" : "curl/7.46.0",
+    "sent_bytes" : 57,
+    "ssl_protocol" : "TLSv1.2",
+    "client_port" : 2817,
+    "date" : "2016-08-10T23:39:43.065466Z",
+    "port" : "443",
+    "target_processing_time" : 0.048,
+    "elb_status_code" : "200",
+    "request_processing_time" : 0.086,
+    "backend_ip" : "10.0.0.1",
+    "urihost" : "www.example.com:443",
+    "ssl_cipher" : "ECDHE-RSA-AES128-GCM-SHA256",
+    "target_group_arn" : "arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067",
+    "host" : "ip-172-31-50-36",
+    "trace_id" : "Root=1-58337281-1d84f3d73c47ec4e58577259",
+    "@timestamp" : "2016-08-10T23:39:43.065Z",
+    "verb" : "GET",
+    "class" : "https",
+    "request" : "https://www.example.com:443/",
+    "elb" : "app/my-loadbalancer/50dc6c495c0c9188",
+    "received_bytes" : 0
+  }
+}
+```
+
+Elasticsearchに取り込まれたことが確認できました。
 
