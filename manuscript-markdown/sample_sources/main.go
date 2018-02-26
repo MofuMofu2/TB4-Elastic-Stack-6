@@ -39,4 +39,9 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	elastic.AliasAddAction.Index("teste")
+	client.Alias().Add("test", "test02").Do(ctx)
+	client.Alias().AddWithFilter("test", "test02", termQuery).Do(ctx)
+	client.Alias().Remove("test", "test02").Do(ctx)
 }

@@ -676,6 +676,58 @@ userフィールドのtypeにmulti_fieldを指定しています。以下のよ�
 インデクシングする際はuserフィールドにのみ投入すればOKです。
 
 #### Alias
+Aliasを利用することでインデックスに別名をつけてアクセスすることができる機能です。任意の検索条件を指定したエイリアスも作成することが可能で、RDBのビューのような機能も利用できます。
+olivere/elasticではAliasServiceを経由して操作することができます。
+
+```
+package main
+
+import (
+	"context"
+	"time"
+
+	"github.com/olivere/elastic"
+)
+
+const (
+	ChatIndex = "Chat"
+)
+
+func main() {
+	esUrl := "http://localhost:9200"
+	ctx := context.Background()
+
+	client, err := elastic.NewClient(
+		elastic.SetURL(esUrl),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	termQuery := elastic.NewTermQuery("user", "山田")
+
+  //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	client.Alias().Add("test", "test02").Do(ctx)
+  //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	client.Alias().AddWithFilter("test", "test02", termQuery).Do(ctx)
+  //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+	client.Alias().Remove("test", "test02").Do(ctx)
+}
+```
 
 ## エラーハンドリング
 最後にエラーハンドリングについて記載します。
+olivere/elasticではelastic.Error経由で詳細なエラー情報を取得できます。これをもとにしてエラーハンドリングを実装することができます。
+
+```
+_, err := client.IndexExists("chat").Do()
+if err != nil {
+    // Get *elastic.Error which contains additional information
+    e, ok := err.(*elastic.Error)
+    if !ok {
+        //...
+    }
+    log.Printf("Elastic failed with status %d and error %s.", e.Status, e.Details)
+    ...
+}
+```
