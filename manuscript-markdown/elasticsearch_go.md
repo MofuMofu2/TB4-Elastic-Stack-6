@@ -7,22 +7,32 @@ Elasticsearchの入門の多くはREST APIを使ったものが多いですが�
 Elasticsearchはとても多くの機能を有しています。そのため、全ての機能をカバーすることは難しいので代表的な機能について本章では記載していきます。
 
 ## Elasticsearch環境の準備
-今回はElastic社が提供しているDockerイメージを利用します。
-下記のコマンドを実行してDockerイメージを取得します。
+今回はElastic社が提供している公式Dockerイメージを利用します。
+下記のコマンドを実行してDockerイメージを取得してください。
 
 ```
-# docker pull elasticsearch
+# docker pull docker.elastic.co/elasticsearch/elasticsearch:6.2.2 
 ```
 
-次にDockerイメージを起動します。
+下記コマンドで取得したDockerイメージが起動できるかを確認します。
 
 ```
-# docker run -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" -e "network.publish_host=localhost" docker.elastic.co/elasticsearch/elasticsearch:6.2.2
+# docker run -p 9200:9200  -e "discovery.type=single-node" -e "network.publish_host=localhost" docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 ```
 
 起動に成功するとプロンプト上に起動ログが出力されます。
+ポートマッピングで指定している9200ポートはElasticsearchへのAPIを実行するためのエンドポイントです。
+Elastic者のDockerイメージはDocker起動時に環境変数経由で設定を変更できます。
+本章で指定しているオプションは以下の通りです。
 
-正常に起動しているか確認してみます。下記コマンドによりElasticsearchの基本情報について取得できるか確認してみてください。
+
+| オプション           | 値          | 説明                                                                                                                                                                                                                                                 |
+|----------------------|-------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| discovery.type       | single-node | このElasticsearchはクラスタを構成せず、シングルノード構成であることを明示します。そうすることで起動時に自分自信をマスタノードとして設定し起動します。                                                                                                |
+| network.publish_host | localhost   | ElasticsearchのAPIエンドポイントとして公開するIPアドレスを指定します。指定しなかった場合、Dockerコンテナ内部のプライベートIPアドレスになります。そのため、ローカルホストから直接エンドポイントへ接続することができないため、この設定を入れています。 |
+
+正常に起動しているか確認してみましょう。さきほどマッピングした9200ポートでElasticsearchはREST APIのエンドポインを公開しています。
+下記コマンドによりElasticsearchの基本情報について取得できるか確認してみてください。
 
 ```
 # curl http://localhost:9200
@@ -30,14 +40,15 @@ Elasticsearchはとても多くの機能を有しています。そのため、�
   "name" : "WlZn3XP",                          
   "cluster_name" : "docker-cluster",           
   "cluster_uuid" : "7Ltq7Ph_Tv-cLofAglwp_g",   
-  "version" : {                                "number" : "5.6.4",                        
+  "version" : {                                
+    "number" : "5.6.4",                        
     "build_hash" : "8bbedf5",                  
     "build_date" : "2017-10-31T18:55:38.105Z", 
     "build_snapshot" : false,                  
     "lucene_version" : "6.6.1"                 
   },                                           
   "tagline" : "You Know, for Search"           
-} 
+}
 ```
 
 ElasticsearchのDockerイメージの細かなオプションなどは下記に記載があります。
@@ -64,6 +75,9 @@ Elastic社の公式クライアントもあるのですが、現時点では絶�
 ```
 
 ## Goで始めるElasticsearch
+さて、いよいよGoでElasticsearchを操作していきましょう。
+しかしその前に検索するデータを投入するためのIndexとTypeを作成していきましょう。
+
 ### IndexとType
 Elasticsearchで検索をおこなうために、まずIndexとTypeを作成します。
 RDBMSで例えと以下に相当します。
