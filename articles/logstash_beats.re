@@ -714,7 +714,7 @@ output {
 
 
 正規表現でパースする際にgrokフィルタを使用します。@<br>{}
-"patterns@<b>{dir"で外だししているパターンファイルを呼び出すことができます。@<br>{\}
+"patterns_dir"で外だししているパターンファイルを呼び出すことができます。@<br>{\}
 "match"で"message"に取り込まれている値を対象にGrok-Patterns(ここでいうALB}ACCESS_LOG)を適用しています。
 
 
