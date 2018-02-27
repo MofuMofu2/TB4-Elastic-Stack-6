@@ -435,19 +435,29 @@ Filebeatと同様にデータが取り込まれているかをKibanaを開いて
 
 > http://{Global_IP}:5601
 
-"Index Patterns"の画面を開くとFilebeatのインデックスパターンの他にMetricbeatのインデックスパターンがあることがわかります
+以下のトップページが開きます。  
+左ペインにある"Management"をクリックします。  
 
 [metricbeat01.png]
+
+"Index Patterns"をクリックします。
+
+[metricbeat02.png]
+
+Filebeatのインデックスパターンが登録されていることがわかります。
+
+[metricbeat03.png]
 
 左ペインにある"Dashboard"をクリックします。  
 検索ウィンドウから"Metricbeat"を入力すると様々なDashboardがヒットします。
 
-[filebeat02.png]
+[filebeat04.png]
 
-今回は、"[Metricbeat System] Host Overview"というDashboardをクリックします。  
+今回は、Nginxの"[Metricbeat System] Host Overview"というDashboardをクリックします。  
+取り込んだログがDashboardに表示されていることがわかります。
 CPUやメモリ、プロセスの状態をニアリアルタイムにモニタリングができていることがわかります。
 
-[filebeat03.png]
+[filebeat05.png]
 
 このようにサーバやコンテナなどにMetricbeatを導入することで一元的にモニタリングすることができます。
 次が最後ですが、監査ログを容易に取り込むための"Auditbeat"についてです。
