@@ -7,6 +7,7 @@ CHAPS:
   - newcommer.re
   # Kibanaについて語り尽くす
   - Kibana-visualize.re
+  - elasticsearch_go.re
 
 
 APPENDIX:

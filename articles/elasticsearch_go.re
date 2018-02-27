@@ -1,41 +1,54 @@
-# GoではじめるElasticsearch
 
-## はじめに
+= GoではじめるElasticsearch
+
+== はじめに
+
+
 Elasticsearchの入門の多くはREST APIを使ったものが多いですが、実際にアプリケーション作成する際は何らかの言語のSDKを利用するかと思います。
 そうした際に意外と「あれ、これってどうやるんだ？」というのが多いものです。
 そこで、本章ではElasticsearchの基本操作をGo言語を通じて体験していきます。基本的な操作を中心にちょっとしたTipsについても触れていきます。
 Elasticsearchはとても多くの機能を有しています。そのため、全ての機能をカバーすることは難しいので代表的な機能について本章では記載していきます。
 また本章ではElasticsearchのAPIを主に扱うため、Elasticsearchのクラスタリング機能といった機能については最低限触れていきます。
 
-## Elasticsearch環境の準備
+
+== Elasticsearch環境の準備
+
+
 今回はElastic社が提供している公式Dockerイメージを利用します。
 下記のコマンドを実行してDockerイメージを取得してください。
 
-```
+
+//emlist{
 # docker pull docker.elastic.co/elasticsearch/elasticsearch:6.2.2 
-```
+//}
+
 
 下記コマンドで取得したDockerイメージが起動できるかを確認します。
 
-```
+
+//emlist{
 # docker run -p 9200:9200  -e "discovery.type=single-node" -e "network.publish_host=localhost" docker.elastic.co/elasticsearch/elasticsearch:6.2.2
-```
+//}
+
 
 起動に成功するとプロンプト上に起動ログが出力されます。
 ポートマッピングで指定している9200ポートはElasticsearchへのAPIを実行するためのエンドポイントです。
 Elastic者のDockerイメージはDocker起動時に環境変数経由で設定を変更できます。
 本章で指定しているオプションは以下の通りです。
 
+//table[tbl1][]{
+オプション	値	説明
+-----------------
+discovery.type	single-node	このElasticsearchはクラスタを構成せず、シングルノード構成であることを明示します。そうすることで起動時に自分自信をマスタノードとして設定し起動します。
+network.publish_host	localhost	ElasticsearchのAPIエンドポイントとして公開するIPアドレスを指定します。指定しなかった場合、Dockerコンテナ内部のプライベートIPアドレスになります。そのため、ローカルホストから直接エンドポイントへ接続することができないため、この設定を入れています。
+//}
 
-| オプション           | 値          | 説明                                                                                                                                                                                                                                                 |
-|----------------------|-------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| discovery.type       | single-node | このElasticsearchはクラスタを構成せず、シングルノード構成であることを明示します。そうすることで起動時に自分自信をマスタノードとして設定し起動します。                                                                                                |
-| network.publish_host | localhost   | ElasticsearchのAPIエンドポイントとして公開するIPアドレスを指定します。指定しなかった場合、Dockerコンテナ内部のプライベートIPアドレスになります。そのため、ローカルホストから直接エンドポイントへ接続することができないため、この設定を入れています。 |
 
 正常に起動しているか確認してみましょう。さきほどマッピングした9200ポートでElasticsearchはREST APIのエンドポインを公開しています。
 下記コマンドによりElasticsearchの基本情報について取得できるか確認してみてください。
 
-```
+
+//emlist{
 # curl http://localhost:9200
 {                                              
   "name" : "WlZn3XP",                          
@@ -50,45 +63,77 @@ Elastic者のDockerイメージはDocker起動時に環境変数経由で設定�
   },                                           
   "tagline" : "You Know, for Search"           
 }
-```
+//}
+
 
 ElasticsearchのDockerイメージの細かなオプションなどは下記に記載があります。
 
-> https://hub.docker.com/_/elasticsearch/
 
-## クライアントライブラリの選定
+//quote{
+https://hub.docker.com/_/elasticsearch/
+
+//}
+
+== クライアントライブラリの選定
+
+
 まずはElasticsearchを操作するためのクライアントライブラリを決める必要があります。
 Elastic社の公式クライアントもあるのですが、現時点では絶賛開発中なうえにあまり活発にメンテナンスもされていません。。。
 
-> https://github.com/elastic/go-elasticsearch
+
+//quote{
+https://github.com/elastic/go-elasticsearch
+
+//}
+
 
 今回は下記のクライアントを利用します。
 
-> https://github.com/olivere/elastic
+
+//quote{
+https://github.com/olivere/elastic
+
+//}
+
 
 こちらのクライアントは開発も活発で、Elasticの早いバージョンアップにもいち早く対応されてます。
+
+
 
 それではライブラリをインストールしてみましょう。
 今回はgo getでインストールしますが、実際のプロダクト利用時はdepなどのパッケージ管理ツールの利用をおすすめします。
 
-```
-# go get "github.com/olivere/elastic"
-```
 
-## Goで始めるElasticsearch
+//emlist{
+# go get "github.com/olivere/elastic"
+//}
+
+== Goで始めるElasticsearch
+
+
 さて、いよいよGoでElasticsearchを操作していきましょう。
 しかしその前に検索するデータを投入するためのIndexとTypeを作成していきましょう。
 
-### IndexとType
+
+=== IndexとType
+
+
 Elasticsearchで検索をおこなうために、まずIndexとTypeを作成する必要があります。
 RDBMSで例えと以下に相当します。
 * Indexはスキーマ/データベース
 * Typeはテーブル
 
+
+
 と、よくこのようにRDBMSで例えられることが多いのですが、ここで注意が必要なのがTypeはElasticsearch 7系より廃止が予定されています。
 また5系までは1つのIndexに複数のTypeを作成できたのですが、6系では1つのIndexに1つのTypeのみ作れる仕様へ変わっています。
 
-> https://www.elastic.co/guide/en/elasticsearch/reference/master/removal-of-types.html
+
+//quote{
+https://www.elastic.co/guide/en/elasticsearch/reference/master/removal-of-types.html
+
+//}
+
 
 本書ではElasticsearch6系を利用するため、1 Indexに1 Typeを作成します。
 また、ElasticsearchはMapping定義を作成しなくてもデータを投入することもできます。
@@ -96,12 +141,18 @@ RDBMSで例えと以下に相当します。
 実際のアプリケーションでElasticsearchを利用する場合、Mapping定義によりデータスキーマを固めて利用することの方が多いかと思います。
 また、Mapping定義を作成することにより、各フィールド単位でより細かな検索設定をおこなえるため、本章では動的Mappingは利用せず、Mapping定義を作成し利用します。
 
-### 本章で利用するMapping定義
+
+=== 本章で利用するMapping定義
+
+
 本書ではChatアプリケーションを想定したIndex/Typeをもとに操作をおこなっていきます。
+
+
 
 Elasticsearchを操作するにあたり利用するMapping定義は以下の通りです。
 
-```
+
+//emlist{
 {
   "mappings": {
     "chat": {
@@ -122,55 +173,69 @@ Elasticsearchを操作するにあたり利用するMapping定義は以下の通
     }
   }
 }
-```
+//}
+
 
 今回はchatというTypeへドキュメントを登録していきます。propertiesにフィールドの項目を設定していきます。
 フィールド名とそのデータ型を"tyep"で指定していきます。今回指定しているデータ型は以下の通りです。
 
-| データ型 | 説明                                                                                                                                              |
-|----------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| keyword  | いわゆるString型です。後述するtext型もString型に相当します。しかしkeyword型の場合、そのフィールドへアナライザは適用されません。                   |
-| text     | String型に相当します。text型を指定したフィールドはアナライザと呼ばれるElasticsearchの高度な検索機能を利用した検索が可能となります。               |
-| date     | 日付型です。Elasticsearchへのデータ投入はJSONを介して行うため、実際にデータを投入する際はdateフォーマットに即した文字列を投入することになります。 |
+//table[tbl2][]{
+データ型	説明
+-----------------
+keyword	いわゆるString型です。後述するtext型もString型に相当します。しかしkeyword型の場合、そのフィールドへアナライザは適用されません。
+text	String型に相当します。text型を指定したフィールドはアナライザと呼ばれるElasticsearchの高度な検索機能を利用した検索が可能となります。
+date	日付型です。Elasticsearchへのデータ投入はJSONを介して行うため、実際にデータを投入する際はdateフォーマットに即した文字列を投入することになります。
+//}
+
 
 keyword型とtext型は両者ともString型に相当します。その違いはアナライザを設定できるか否かです。
 後ほど詳細を説明しますが、アナライザを適用することでそのフィールドに対し高度な全文検索を行うことができます。一方でkeyword型はアナライザが適用されないため、完全一致での検索が求めらます。
 
+
+
 Elasticsearch 6系のデータ型の詳細は本家ドキュメントを参照してみてください。
 多くのデータ型が標準でサポートされていています。
 
-> https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
 
-### Hello, Elasticsearch with GO
+//quote{
+https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
+
+//}
+
+=== Hello, Elasticsearch with GO
+
+
 それでGoを使ってElasticsearchを触っていきましょう。
 まずはさきほどDockerで起動したElasticsearchへの接続確認も確認も兼ねて、Elasticsearchのバージョン情報などを取得してみましょう。
 
-```Go
+
+//emlist[][Go]{
 package main
 
 import (
-	"context"
-	"fmt"
+    "context"
+    "fmt"
 
-	"github.com/olivere/elastic"
+    "github.com/olivere/elastic"
 )
 
 func main() {
-	esUrl := "http://localhost:9200"
-	ctx := context.Background()
+    esUrl := "http://localhost:9200"
+    ctx := context.Background()
 
-	client, err := elastic.NewClient(
-		elastic.SetURL(esUrl),
-	)
-	if err != nil {
-		panic(err)
-	}
+    client, err := elastic.NewClient(
+        elastic.SetURL(esUrl),
+    )
+    if err != nil {
+        panic(err)
+    }
 
-	info, code, err := client.Ping(esUrl).Do(ctx)
-	fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)
+    info, code, err := client.Ping(esUrl).Do(ctx)
+    fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)
 
 }
-```
+//}
+
 
 elastic.NewClientでクライアントを作成します。その際にelastic.ClientOptionFuncで複数の設定を渡すことができます。
 上のサンプルではelastic.SetURL()にて接続する先のElasticsearchのエンドポイントを指定しています。
@@ -178,85 +243,97 @@ elastic.NewClientでクライアントを作成します。その際にelastic.C
 Elasticsearchのバージョン情報といったシステム情報を取得する際はPingを利用します。
 
 
-### 単純なCRUD操作
+=== 単純なCRUD操作
+
+
 それでは先ほど作成したIndexを対象に基本的なCRUDE操作をおこなってみましょう。
 操作を始めるために、まずはクライアントのオブジェクトを作成します。
+
 
 
 このクライアントオブジェクトを通じてElasticsearchを操作していきます。
 クライアントの作成時に以下の2つのオプションを指定しています。
 特にSetSniffはElasticsearchのコンテナへ接続する際に必要となる設定です。
 
+
+
 操作にあたっては、さきほど作成したMappingに対応するStructを通じておこなっていきます。
 なので、今回サンプルとして利用するChat Mappingに対応するStructを定義します。
 
-```
-type Chat struct {
-	User    string    `json:"user"`
-	Message string    `json:"message"`
-	Created time.Time `json:"created"`
-	Tag     string    `json:"tag"`
-}
-```
 
-#### ドキュメントの登録
+//emlist{
+type Chat struct {
+    User    string    `json:"user"`
+    Message string    `json:"message"`
+    Created time.Time `json:"created"`
+    Tag     string    `json:"tag"`
+}
+//}
+
+==== ドキュメントの登録
+
+
 まずは単一のドキュメントを登録します。
 Elasticsearchは登録されたドキュメントに対してドキュメントIDと呼ばれるドキュメントを一意に識別するためのIDとを付与します。
 IDの振り方には登録時にクライアント側で設定するか、Elasticsearch側でランダムに振ってもらうかの2通りがあります。
 今回は登録時にクライアント側でドキュメントIDを指定してみましょう。
 さきほど作成したクライアントセッションを利用して操作をおこなっていきましょう。
 
-```Go
+
+//emlist[][Go]{
 package main
 
 import (
-	"context"
-	"time"
+    "context"
+    "time"
 
-	"github.com/olivere/elastic"
+    "github.com/olivere/elastic"
 )
 
 type Chat struct {
-	User    string    `json:"user"`
-	Message string    `json:"message"`
-	Created time.Time `json:"created"`
-	Tag     string    `json:"tag"`
+    User    string    `json:"user"`
+    Message string    `json:"message"`
+    Created time.Time `json:"created"`
+    Tag     string    `json:"tag"`
 }
 
 const (
-	ChatIndex = "Chat"
+    ChatIndex = "Chat"
 )
 
 func main() {
-	esUrl := "http://localhost:9200"
-	ctx := context.Background()
+    esUrl := "http://localhost:9200"
+    ctx := context.Background()
 
-	client, err := elastic.NewClient(
-		elastic.SetURL(esUrl),
-	)
-	if err != nil {
-		panic(err)
-	}
+    client, err := elastic.NewClient(
+        elastic.SetURL(esUrl),
+    )
+    if err != nil {
+        panic(err)
+    }
 
-	chatData := Chat{
-		User:    "user01",
-		Message: "test message",
-		Created: time.Now(),
-		Tag:     "tag01",
-	}
+    chatData := Chat{
+        User:    "user01",
+        Message: "test message",
+        Created: time.Now(),
+        Tag:     "tag01",
+    }
 
-	_, err = client.Index().Index("chat").Type("chat").Id("1").BodyJson(&chatData).Do(ctx)
-	if err != nil {
-		panic(err)
-	}
+    _, err = client.Index().Index("chat").Type("chat").Id("1").BodyJson(&chatData).Do(ctx)
+    if err != nil {
+        panic(err)
+    }
 }
-```
+//}
 
-#### ドキュメントIDによる取得
+==== ドキュメントIDによる取得
+
+
 次に先ほど登録したドキュメントをドキュメントIDを指定して取得します。
 olivere/elasticでは取得したドキュメントはStrucrtに詰め直し、そのStructのフィールドを経由してデータを取得できます。
 
-```Go
+
+//emlist[][Go]{
 
 type Chat struct {
   User string `json:"user"`,
@@ -277,49 +354,52 @@ func main() {
     panic(err)
   }
 
-```
+//}
 
-#### ドキュメントの削除
+==== ドキュメントの削除
+
+
 ドキュメントIDをもとに登録したドキュメントを削除してみます。
 
-```Go
+
+//emlist[][Go]{
 package main
 
 import (
-	"context"
-	"time"
+    "context"
+    "time"
 
-	"github.com/olivere/elastic"
+    "github.com/olivere/elastic"
 )
 
 type Chat struct {
-	User    string    `json:"user"`
-	Message string    `json:"message"`
-	Created time.Time `json:"created"`
-	Tag     string    `json:"tag"`
+    User    string    `json:"user"`
+    Message string    `json:"message"`
+    Created time.Time `json:"created"`
+    Tag     string    `json:"tag"`
 }
 
 const (
-	ChatIndex = "Chat"
+    ChatIndex = "Chat"
 )
 
 func main() {
-	esUrl := "http://localhost:9200"
-	ctx := context.Background()
+    esUrl := "http://localhost:9200"
+    ctx := context.Background()
 
-	client, err := elastic.NewClient(
-		elastic.SetURL(esUrl),
-	)
-	if err != nil {
-		panic(err)
-	}
+    client, err := elastic.NewClient(
+        elastic.SetURL(esUrl),
+    )
+    if err != nil {
+        panic(err)
+    }
 
-	chatData := Chat{
-		User:    "user01",
-		Message: "test message",
-		Created: time.Now(),
-		Tag:     "tag01",
-	}
+    chatData := Chat{
+        User:    "user01",
+        Message: "test message",
+        Created: time.Now(),
+        Tag:     "tag01",
+    }
 
   //登録
   //省略
@@ -329,30 +409,38 @@ func main() {
   //省略
 
   //削除
-	_, err = client.Delete().Index("chat").Type("chat").Id("1").Do(ctx)
-	if err != nil {
-		panic(err)
-	}
+    _, err = client.Delete().Index("chat").Type("chat").Id("1").Do(ctx)
+    if err != nil {
+        panic(err)
+    }
 }
-```
+//}
 
-### 検索の基本操作
+=== 検索の基本操作
+
+
 さて、基本的なCRUTを通じてElasticsearchの基本をおさえたところで、いよいよ検索処理について見ていきましょう。
 Elasticsearchは多くの検索機能をサポートしていますが、本章ではその中でも代表的な以下についてみていきます。
 
-* Match Query
-  * 指定した文字列での全文検索をおこないます。検索時に指定した文字列はAnalyzerにより言語処理がなされたうえで、検索がおこなれます。
-* Term Query
-  * 指定した文字列での検索をおこないますが、Match Queryとは違い検索指定文字列がAnalyzeされません。例えば、タグ検索のように指定した文字列で完全一致させたドキュメントを探したい時などはTerm Queryを利用するといったケースです。
-* Bool Query
-  * AND/OR/NOTによる検索がおこなえます。実際にはmust/should/must_notといったElasticsearch独自の指定方法を利用します。検索条件をネストさせることも可能で、より複雑な検索クエリを組み立てることができます。
+ * Match Query
+ ** 指定した文字列での全文検索をおこないます。検索時に指定した文字列はAnalyzerにより言語処理がなされたうえで、検索がおこなれます。
+ * Term Query
+ ** 指定した文字列での検索をおこないますが、Match Queryとは違い検索指定文字列がAnalyzeされません。例えば、タグ検索のように指定した文字列で完全一致させたドキュメントを探したい時などはTerm Queryを利用するといったケースです。
+ * Bool Query
+ ** AND/OR/NOTによる検索がおこなえます。実際にはmust/should/must_notといったElasticsearch独自の指定方法を利用します。検索条件をネストさせることも可能で、より複雑な検索クエリを組み立てることができます。
 
-#### Match Query
+
+==== Match Query
+
+
 Matchクエリは全文検索の肝です。Matchクエリでは、指定した検索文字列がAnalyzerにより言語処理がなされ検索がおこなわれます。
 ここでAnalyzerについて簡単に説明します。Analyzerの設定は全文検索処理の要です。そのため、設定内容も盛り沢山ですし、自然言語処理の知識も必要となってくるため、ここではあくまで触りだけを説明します。
 この本をきっかけにElasticsearchにもっと興味を持っていただけた方はAnalyzerを深掘ってみてください。
 
-#### Analyzerの基本
+
+==== Analyzerの基本
+
+
 Analyzerは以下の要素から構成されています。これらを組み合わせることでより柔軟な検索のためのインデックスを作成できます。
 * Tokenizer
   * ドキュメントをどうトークン分割するかを定義します。トークン分割には様々な方法があり、有名なものだと形態素解析やN-Gramなどがあります。Tokenizerにより分割されたトークンをもとに検索文字列との比較がおこなわれます。各Analyzerは1つのTokenizerを持つことができます。
@@ -361,12 +449,17 @@ Analyzerは以下の要素から構成されています。これらを組み合
 * Token filters
   * Tokenizerによるトークン分割がされた後に施す処理を定義します。例えば、形態素解析のように品詞をもとにトークン分割するような場合、分割後のトークンから検索には不要そうな助詞を取り除いたりといった処理が該当します。
 
+
+
 //TODO: イメージ図をいれる
+
+
 
 ここでは先ほど作成したMapping定義をもとにAnalyzerの設定を加えてみます。
 さきほどのChat Mappingのmessageフィールドに日本語形態素解析プラグインであるKuromojiを適用してみましょう。
 
-```
+
+//emlist{
 {
   "settings": {
     "analysis": {
@@ -409,273 +502,303 @@ Analyzerは以下の要素から構成されています。これらを組み合
     }
   }
 }
-```
+//}
+
 
 Analyzerの設定はMapping定義のanalysisでおこないます。tokenizerでトークン分割の方法を設定し、analyzerで設定したtoknenizerと各filter群を組み合わせて一つのAnalyzerを作ります。
 本書では以下の設定でAnalyzerを設定しました。
 
-* アナライザ名
-  * kuromoji_analyzer
-* 適用Filter
-  * kuromoji_base: xxxxxxxxxxx
-  * kuromoji_part_of_speech: xxxxxxxxxxx
+ * アナライザ名
+ ** kuromoji_analyzer
+ * 適用Filter
+ ** kuromoji_base: xxxxxxxxxxx
+ ** kuromoji@<b>{part}of_speech: xxxxxxxxxxx
+
+
 
 作成したAnalyzerを適用したいMappingフィールドに指定することで、そのフィールドにAnalyzerで指定したインデクシングを施すことができます。
 Chatマッピングのmessageフィールドのanalyzerにさきほど作成したAnalyzerを指定することで適用します。
 
+
+
 ここではMapping定義を再作成します。
 
-```
+
+//emlist{
 # curl -XDELETE 'http://localhost:9200/chat'
 # curl -XPUT 'http://localhost:9200/chat' -H "Content-Type: application/json" -d @mapping.json
-```
+//}
+
 
 これで準備が整いました！それではここの詳細にうつっていきましょう。
 
-#### Match Query
+
+==== Match Query
+
+
 olivere/elasticで検索機能を利用する際は、client経由でSearchメソッドを実行します。
 Searchメソッドはelastic.SearchServiceのQueryメソッドに検索条件を指定したelastic.MatchQueryを渡します。
 取得できたドキュメントをStruct経由で操作する際はreflectパッケージを使って操作します。
 
-```
+
+//emlist{
 package main
 
 import (
-	"context"
-	"fmt"
-	"reflect"
-	"time"
+    "context"
+    "fmt"
+    "reflect"
+    "time"
 
-	"github.com/olivere/elastic"
+    "github.com/olivere/elastic"
 )
 
 type Chat struct {
-	User    string    `json:"user"`
-	Message string    `json:"message"`
-	Created time.Time `json:"created"`
-	Tag     string    `json:"tag"`
+    User    string    `json:"user"`
+    Message string    `json:"message"`
+    Created time.Time `json:"created"`
+    Tag     string    `json:"tag"`
 }
 
 const (
-	ChatIndex = "Chat"
+    ChatIndex = "Chat"
 )
 
 func main() {
-	esUrl := "http://localhost:9200"
-	ctx := context.Background()
+    esUrl := "http://localhost:9200"
+    ctx := context.Background()
 
-	client, err := elastic.NewClient(
-		elastic.SetURL(esUrl),
-	)
-	if err != nil {
-		panic(err)
-	}
+    client, err := elastic.NewClient(
+        elastic.SetURL(esUrl),
+    )
+    if err != nil {
+        panic(err)
+    }
 
-	query := elastic.NewMatchQuery("message", "テスト")
-	results, err := client.Search().Index("chat").Query(query).Do(ctx)
-	if err != nil {
-		panic(err)
-	}
+    query := elastic.NewMatchQuery("message", "テスト")
+    results, err := client.Search().Index("chat").Query(query).Do(ctx)
+    if err != nil {
+        panic(err)
+    }
 
-	var chattype Chat
-	for _, chat := range results.Each(reflect.TypeOf(chattype)) {
-		if c, ok := chat.(Chat); ok {
-			fmt.Println("Chat message is: %s", c.Message)
-		}
-	}
+    var chattype Chat
+    for _, chat := range results.Each(reflect.TypeOf(chattype)) {
+        if c, ok := chat.(Chat); ok {
+            fmt.Println("Chat message is: %s", c.Message)
+        }
+    }
 }
 
-```
+//}
 
-#### Term Query
+==== Term Query
+
+
 Termクエリを利用することで、指定した文字列を完全に含むドキュメントを検索することができます。
 olivere/elasticでTermクエリを利用する際はTerm Queryはelastic.TermQueryを利用します。
 elastic.NewTermQueryは検索対象のフィールドと検索文字列を指定します。
 
-```
+
+//emlist{
 package main
 
 import (
-	"context"
-	"fmt"
-	"reflect"
-	"time"
+    "context"
+    "fmt"
+    "reflect"
+    "time"
 
-	"github.com/olivere/elastic"
+    "github.com/olivere/elastic"
 )
 
 type Chat struct {
-	User    string    `json:"user"`
-	Message string    `json:"message"`
-	Created time.Time `json:"created"`
-	Tag     string    `json:"tag"`
+    User    string    `json:"user"`
+    Message string    `json:"message"`
+    Created time.Time `json:"created"`
+    Tag     string    `json:"tag"`
 }
 
 const (
-	ChatIndex = "Chat"
+    ChatIndex = "Chat"
 )
 
 func main() {
-	esUrl := "http://localhost:9200"
-	ctx := context.Background()
+    esUrl := "http://localhost:9200"
+    ctx := context.Background()
 
-	client, err := elastic.NewClient(
-		elastic.SetURL(esUrl),
-	)
-	if err != nil {
-		panic(err)
-	}
+    client, err := elastic.NewClient(
+        elastic.SetURL(esUrl),
+    )
+    if err != nil {
+        panic(err)
+    }
 
-	termQuery := elastic.NewTermQuery("User", "山田")
-	results, err := client.Search().Index("chat").Query(termQuery).Do(ctx)
-	if err != nil {
-		panic(err)
-	}
+    termQuery := elastic.NewTermQuery("User", "山田")
+    results, err := client.Search().Index("chat").Query(termQuery).Do(ctx)
+    if err != nil {
+        panic(err)
+    }
 
-	var chattype Chat
-	for _, chat := range results.Each(reflect.TypeOf(chattype)) {
-		if c, ok := chat.(Chat); ok {
-			fmt.Println("Chat message is: %s", c.Message)
-		}
-	}
+    var chattype Chat
+    for _, chat := range results.Each(reflect.TypeOf(chattype)) {
+        if c, ok := chat.(Chat); ok {
+            fmt.Println("Chat message is: %s", c.Message)
+        }
+    }
 
 }
-```
+//}
 
-#### Bool Query
+==== Bool Query
+
+
 BoolクエリではAND/OR/NOTによる検索がおこなえます。検索条件をネストさせることも可能で、より複雑な検索クエリを組み立てることができます。
 実際にはmust/should/must_notといったElasticsearch独自の指定方法を利用します。
 
+//table[tbl3][]{
+クエリ	説明	oliver/elasticでの指定方法
+-----------------
+must	ANDに相当します。	boolQuery := elastic.NewBoolQuery() <br> boolQuery.Must(elastic.NewTermQuery("field", "value")
+should	ORに相当します。	boolQuery := elastic.NewBoolQuery() <br> boolQuery.Should(elastic.NewTermQuery("field", "value")
+must_not	NOTに相当します。	boolQuery := elastic.NewBoolQuery() <br> boolQuery.MustNot(elastic.NewTermQuery("field", "value")
+//}
 
-| クエリ   | 説明              | oliver/elasticでの指定方法                                                                        |
-|----------|-------------------|---------------------------------------------------------------------------------------------------|
-| must     | ANDに相当します。 | boolQuery := elastic.NewBoolQuery() <br> boolQuery.Must(elastic.NewTermQuery("field", "value")    |
-| should   | ORに相当します。  | boolQuery := elastic.NewBoolQuery() <br> boolQuery.Should(elastic.NewTermQuery("field", "value")  |
-| must_not | NOTに相当します。 | boolQuery := elastic.NewBoolQuery() <br> boolQuery.MustNot(elastic.NewTermQuery("field", "value") |
 
 userが「佐藤」で、messageに「Elasticsearch」が含まれるが「Solor」が含まれないドキュメントを検索するクエリは以下の通りです。
 
-```
+
+//emlist{
 package main
 
 import (
-	"context"
-	"fmt"
-	"reflect"
-	"time"
+    "context"
+    "fmt"
+    "reflect"
+    "time"
 
-	"github.com/olivere/elastic"
+    "github.com/olivere/elastic"
 )
 
 type Chat struct {
-	User    string    `json:"user"`
-	Message string    `json:"message"`
-	Created time.Time `json:"created"`
-	Tag     string    `json:"tag"`
+    User    string    `json:"user"`
+    Message string    `json:"message"`
+    Created time.Time `json:"created"`
+    Tag     string    `json:"tag"`
 }
 
 const (
-	ChatIndex = "Chat"
+    ChatIndex = "Chat"
 )
 
 func main() {
-	esUrl := "http://localhost:9200"
-	ctx := context.Background()
+    esUrl := "http://localhost:9200"
+    ctx := context.Background()
 
-	client, err := elastic.NewClient(
-		elastic.SetURL(esUrl),
-	)
-	if err != nil {
-		panic(err)
-	}
+    client, err := elastic.NewClient(
+        elastic.SetURL(esUrl),
+    )
+    if err != nil {
+        panic(err)
+    }
 
-	boolQuery := elastic.NewBoolQuery()
-	boolQuery.Must(elastic.NewTermQuery("user", "佐藤")
-	boolQuery.Should(elastic.NewTermQuery("message", "Elasticsearch")
-	boolQuery.MustNot(elastic.NewTermQuery("message", "Solor")
-	results, err := client.Search().Index("chat").Query(termQuery).Do(ctx)
-	if err != nil {
-		panic(err)
-	}
+    boolQuery := elastic.NewBoolQuery()
+    boolQuery.Must(elastic.NewTermQuery("user", "佐藤")
+    boolQuery.Should(elastic.NewTermQuery("message", "Elasticsearch")
+    boolQuery.MustNot(elastic.NewTermQuery("message", "Solor")
+    results, err := client.Search().Index("chat").Query(termQuery).Do(ctx)
+    if err != nil {
+        panic(err)
+    }
 
-	var chattype Chat
-	for _, chat := range results.Each(reflect.TypeOf(chattype)) {
-		if c, ok := chat.(Chat); ok {
-			fmt.Println("Chat message is: %s", c.Message)
-		}
-	}
+    var chattype Chat
+    for _, chat := range results.Each(reflect.TypeOf(chattype)) {
+        if c, ok := chat.(Chat); ok {
+            fmt.Println("Chat message is: %s", c.Message)
+        }
+    }
 
 }
-```
+//}
+
 
 //TODO:ネストがふかいもの
 
-### ちょっと応用
+
+=== ちょっと応用
+
+
 ここでは少し応用的な機能についてみていきましょう。
 
-* Scroll API
-  * Elasticsearchが提供しているページング機能です。limit&offsetと違い、検索時のスナップショットを保持し、カーソルを利用してページの取得をおこなえます。
-* Multi Fields
-  * Multi Fieldsタイプを指定することで1つのフィールドに対してデータ型やAnalyze設定がことなる複数のフィールドを保持することができます。
-* Alias
-  * インデックスに別名をつけてアクセスすることができる機能です。任意の検索条件を指定したエイリアスも作成することが可能で、RDBのビューのような機能も利用できます。
+ * Scroll API
+ ** Elasticsearchが提供しているページング機能です。limit&offsetと違い、検索時のスナップショットを保持し、カーソルを利用してページの取得をおこなえます。
+ * Multi Fields
+ ** Multi Fieldsタイプを指定することで1つのフィールドに対してデータ型やAnalyze設定がことなる複数のフィールドを保持することができます。
+ * Alias
+ ** インデックスに別名をつけてアクセスすることができる機能です。任意の検索条件を指定したエイリアスも作成することが可能で、RDBのビューのような機能も利用できます。
 
-#### Scroll API
+
+==== Scroll API
+
+
 Scroll APIを利用することで、スクロールタイプのページング機能を手軽に利用することができます。Elasticsearchにはlimit&offsetでの取得もできます。
 ただし、limit&offsetの場合、都度検索がおこなわれたうえで指定したoffsetからlimit数分のドキュメントを取得するため、取得結果に抜け漏れや重複が生じる可能性があります。
 一方でScroll APIを利用した場合、初回検索時のスナップショットが生成されます。そのため、Scroll APIが返すスクロールIDを利用することで、初回検索時のスナップショットに対して任意の箇所からページングをおこなうことができます。
 使い方もとても簡単で、elastic.ScrollServiceを介して操作することができます。
 
-```
+
+//emlist{
 package main
 
 import (
-	"context"
-	"time"
+    "context"
+    "time"
 
-	"github.com/olivere/elastic"
+    "github.com/olivere/elastic"
 )
 
 type Chat struct {
-	User    string    `json:"user"`
-	Message string    `json:"message"`
-	Created time.Time `json:"created"`
-	Tag     string    `json:"tag"`
+    User    string    `json:"user"`
+    Message string    `json:"message"`
+    Created time.Time `json:"created"`
+    Tag     string    `json:"tag"`
 }
 
 const (
-	ChatIndex = "Chat"
+    ChatIndex = "Chat"
 )
 
 func main() {
-	esUrl := "http://localhost:9200"
-	ctx := context.Background()
+    esUrl := "http://localhost:9200"
+    ctx := context.Background()
 
-	client, err := elastic.NewClient(
-		elastic.SetURL(esUrl),
-	)
-	if err != nil {
-		panic(err)
-	}
+    client, err := elastic.NewClient(
+        elastic.SetURL(esUrl),
+    )
+    if err != nil {
+        panic(err)
+    }
 
-	termQuery := elastic.NewTermQuery("user", "山田")
-	results, err := client.Scroll("chat").Query(termQuery).Size(10).Do(ctx)
-	if err != nil {
-		panic(err)
-	}
+    termQuery := elastic.NewTermQuery("user", "山田")
+    results, err := client.Scroll("chat").Query(termQuery).Size(10).Do(ctx)
+    if err != nil {
+        panic(err)
+    }
 
-	results, err = client.Scroll("chat").Query(termQuery).Size(10).ScrollId(results.ScrollId).Do(ctx)
-	if err != nil {
-		panic(err)
-	}
+    results, err = client.Scroll("chat").Query(termQuery).Size(10).ScrollId(results.ScrollId).Do(ctx)
+    if err != nil {
+        panic(err)
+    }
 }
-```
+//}
 
-#### Multi Fields
+==== Multi Fields
+
+
 Multi Fields機能を利用することで一つのフィールドに対してことなるデータ型やAnalyze設定を指定することができます。
 といってもすぐにピンとこないかもしれませんので、実際にMulti Fieldsの設定をしているMapping定義をみてみましょう。
 
-```
+
+//emlist{
 
 {
   "mappings": {
@@ -694,59 +817,69 @@ Multi Fields機能を利用することで一つのフィールドに対して�
   }
 }
 
-```
+//}
+
 
 userフィールドのtypeにmulti_fieldを指定しています。以下のようにフィールドを指定して操作することができます。
 * user：Analyzeされていない
 * user.analyzed：Analyzeされている
 
+
+
 インデクシングする際はuserフィールドにのみ投入すればOKです。
 
-#### Alias
+
+==== Alias
+
+
 Aliasを利用することでインデックスに別名をつけてアクセスすることができる機能です。任意の検索条件を指定したエイリアスも作成することが可能で、RDBのビューのような機能も利用できます。
 olivere/elasticではAliasServiceを経由して操作することができます。
 
-```
+
+//emlist{
 package main
 
 import (
-	"context"
-	"time"
+    "context"
+    "time"
 
-	"github.com/olivere/elastic"
+    "github.com/olivere/elastic"
 )
 
 const (
-	ChatIndex = "Chat"
+    ChatIndex = "Chat"
 )
 
 func main() {
-	esUrl := "http://localhost:9200"
-	ctx := context.Background()
+    esUrl := "http://localhost:9200"
+    ctx := context.Background()
 
-	client, err := elastic.NewClient(
-		elastic.SetURL(esUrl),
-	)
-	if err != nil {
-		panic(err)
-	}
+    client, err := elastic.NewClient(
+        elastic.SetURL(esUrl),
+    )
+    if err != nil {
+        panic(err)
+    }
 
-	termQuery := elastic.NewTermQuery("user", "山田")
+    termQuery := elastic.NewTermQuery("user", "山田")
 
   //chatインデックスに対してchat-aliasインデックスを作成
-	client.Alias().Add("chat", "chat-alias").Do(ctx)
+    client.Alias().Add("chat", "chat-alias").Do(ctx)
   //chatインデックスのmessageに山田だけが含まれるcaht-yamada-message-onlyエイリアスを作成
-	client.Alias().AddWithFilter("chat", "chat-yamada-message-only", termQuery).Do(ctx)
+    client.Alias().AddWithFilter("chat", "chat-yamada-message-only", termQuery).Do(ctx)
   //chat-aliasエイリアスを削除
-	client.Alias().Remove("chat", "chat-alias").Do(ctx)
+    client.Alias().Remove("chat", "chat-alias").Do(ctx)
 }
-```
+//}
 
-## エラーハンドリング
+== エラーハンドリング
+
+
 最後にエラーハンドリングについて記載します。
 olivere/elasticではelastic.Error経由で詳細なエラー情報を取得できます。これをもとにしてエラーハンドリングを実装することができます。
 
-```Go
+
+//emlist[][Go]{
  err := client.IndexExists("chat").Do()
 if err != nil {
     // Get *elastic.Error which contains additional information
@@ -756,4 +889,4 @@ if err != nil {
     }
     log.Printf("Elastic failed with status %d and error %s.", e.Status, e.Details)
 }
-```
+//}
