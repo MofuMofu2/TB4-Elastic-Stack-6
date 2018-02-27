@@ -9,6 +9,8 @@ CHAPS:
   - Kibana-visualize.re
   # GoではじめるElasticsearch
   - elasticsearch_go.re
+  # LogstashとBeatsの世界へようこそ
+  - logstash_beats.re
 
 
 APPENDIX:
