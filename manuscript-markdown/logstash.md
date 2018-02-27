@@ -779,5 +779,6 @@ $ curl -XGET 'localhost:9200/logstash-2016.08.10/doc/DTAU02EB00Bh04bZnyp1/?prett
 ```
 
 Elasticsearchに取り込まれたことが確認できました。
-次は、LogstashのイケてるPipelinesについて触れていきたいと思います。
+次は、LogstashのイケてるMultiple Pipelinesについて触れていきたいと思います。
+
 
