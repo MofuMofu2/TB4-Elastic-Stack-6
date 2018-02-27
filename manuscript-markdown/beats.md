@@ -442,17 +442,197 @@ Filebeatと同様にデータが取り込まれているかをKibanaを開いて
 左ペインにある"Dashboard"をクリックします。  
 検索ウィンドウから"Metricbeat"を入力すると様々なDashboardがヒットします。
 
-[filebeat02.png]
+[metricbeat02.png]
 
 今回は、"[Metricbeat System] Host Overview"というDashboardをクリックします。  
 CPUやメモリ、プロセスの状態をニアリアルタイムにモニタリングができていることがわかります。
 
-[filebeat03.png]
+[metricbeat03.png]
 
-このようにサーバやコンテナなどにMetricbeatを導入することで一元的にモニタリングすることができます。
+このようにサーバやコンテナなどにMetricbeatを導入することで一元的にモニタリングすることができます。  
 次が最後ですが、監査ログを容易に取り込むための"Auditbeat"についてです。
 
+## Auditbeat
+
+サーバの監査としてauditdが出力する"audit.log"をモニタリングしている方は多くいるのではないでしょうか。  
+"audit.log"を保管するだけでなく、ニアリアルタイムにモニタリングするためにLogstashなどのツールを利用している方もいると思います。  
+ただ、これから"audit.log"をモニタリングしたいという人からしたらハードルが高く、モニタリングするまでに時間を要してしまいます。  
+そこで、Beatsには、Auditbeatというデータシッパーがあるので容易に導入することができます。  
+ここまでFilbeatやMetricbeatを触ってきたらわかる通り、学習コストはほぼかからないでDashboardで閲覧するところまでできてしまいます。  
+
+それでは、ここからAuditbeatをインストールします。
+
+```bash
+### Install Auditbeat
+$ yum install auditbeat
+```
+
+Auditbeatの設定ファイルは、以下を使用します。  
+既存で設定してある内容は全て上書きしてください。
+
+```bash
+### Create auditbeat.yml
+$ vim /etc/auditbeat/auditbeat.yml
+###################### Auditbeat Configuration Example #########################
+
+# This is an example configuration file highlighting only the most common
+# options. The auditbeat.reference.yml file from the same directory contains all
+# the supported options with more comments. You can use it as a reference.
+#
+# You can find the full configuration reference here:
+# https://www.elastic.co/guide/en/beats/auditbeat/index.html
+
+#==========================  Modules configuration =============================
+auditbeat.modules:
+
+- module: auditd
+  audit_rules: |
+    ## Define audit rules here.
+    ## Create file watches (-w) or syscall audits (-a or -A). Uncomment these
+    ## examples or add your own rules.
+
+    ## If you are on a 64 bit platform, everything should be running
+    ## in 64 bit mode. This rule will detect any use of the 32 bit syscalls
+    ## because this might be a sign of someone exploiting a hole in the 32
+    ## bit API.
+    #-a always,exit -F arch=b32 -S all -F key=32bit-abi
+
+    ## Executions.
+    #-a always,exit -F arch=b64 -S execve,execveat -k exec
+
+    ## External access (warning: these can be expensive to audit).
+    #-a always,exit -F arch=b64 -S accept,bind,connect -F key=external-access
+
+    ## Identity changes.
+    #-w /etc/group -p wa -k identity
+    #-w /etc/passwd -p wa -k identity
+    #-w /etc/gshadow -p wa -k identity
+
+    ## Unauthorized access attempts.
+    #-a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EACCES -k access
+    #-a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
+
+- module: file_integrity
+  paths:
+  - /bin
+  - /usr/bin
+  - /sbin
+  - /usr/sbin
+  - /etc
 
 
+
+#==================== Elasticsearch template setting ==========================
+setup.template.settings:
+  index.number_of_shards: 3
+  #index.codec: best_compression
+  #_source.enabled: false
+
+#================================ General =====================================
+
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+#name:
+
+# The tags of the shipper are included in their own field with each
+# transaction published.
+#tags: ["service-X", "web-tier"]
+
+# Optional fields that you can specify to add additional information to the
+# output.
+#fields:
+#  env: staging
+
+
+#============================== Dashboards =====================================
+# These settings control loading the sample dashboards to the Kibana index. Loading
+# the dashboards is disabled by default and can be enabled either by setting the
+# options here, or by using the `-setup` CLI flag or the `setup` command.
+setup.dashboards.enabled: true
+
+# The URL from where to download the dashboards archive. By default this URL
+# has a value which is computed based on the Beat name and version. For released
+# versions, this URL points to the dashboard archive on the artifacts.elastic.co
+# website.
+#setup.dashboards.url:
+
+#============================== Kibana =====================================
+
+# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
+# This requires a Kibana endpoint configuration.
+setup.kibana:
+
+  # Kibana Host
+  # Scheme and port can be left out and will be set to the default (http and 5601)
+  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
+  # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
+  #host: "localhost:5601"
+
+#================================ Outputs =====================================
+
+# Configure what output to use when sending the data collected by the beat.
+
+#-------------------------- Elasticsearch output ------------------------------
+output.elasticsearch:
+  # Boolean flag to enable or disable the output module.
+  enabled: true
+  # Array of hosts to connect to.
+  hosts: ["localhost:9200"]
+
+  # Optional protocol and basic auth credentials.
+  #protocol: "https"
+  #username: "elastic"
+  #password: "changeme"
+
+#================================ Logging =====================================
+
+# Sets log level. The default log level is info.
+# Available log levels are: error, warning, info, debug
+#logging.level: debug
+
+# At debug level, you can selectively enable logging only for some components.
+# To enable all selectors use ["*"]. Examples of other selectors are "beat",
+# "publish", "service".
+#logging.selectors: ["*"]
+```
+
+設定が完了したので、Auditbeatを起動します。
+
+```bash
+### Start Auditbeat
+$ service auditbeat start
+Starting auditbeat: 2018-xx-xxTxx:xx:xx.xxxZ	INFO	instance/beat.go:468	Home path: [/usr/share/auditbeat] Config path: [/etc/auditbeat] Data path: [/var/lib/auditbeat] Logs path: [/var/log/auditbeat]
+2018-xx-xxTxx:xx:xx.xxxZ	INFO	instance/beat.go:475	Beat UUID: c8ed5e31-a553-4c66-a69d-401d9bf38c18
+2018-xx-xxTxx:xx:xx.xxxZ	INFO	instance/beat.go:213	Setup Beat: auditbeat; Version: 6.2.2
+2018-xx-xxTxx:xx:xx.xxxZ	INFO	elasticsearch/client.go:145	Elasticsearch url: http://localhost:9200
+2018-xx-xxTxx:xx:xx.xxxZ	INFO	pipeline/module.go:76	Beat name: ip-172-31-50-36
+2018-xx-xxTxx:xx:xx.xxxZ	INFO	[auditd]	auditd/audit_linux.go:65	auditd module is running as euid=0 on kernel=4.9.76-3.78.amzn1.x86_64
+2018-xx-xxTxx:xx:xx.xxxZ	INFO	[auditd]	auditd/audit_linux.go:88	socket_type=multicast will be used.
+Config OK
+                                                           [  OK  ]
+```
+
+データが取り込まれているかをKibanaを開いて確認します。  
+ブラウザを開いてKibanaへアクセスします。
+
+> http://{Global_IP}:5601
+
+"Index Patterns"の画面を開くとFilebeatのインデックスパターンの他にAuditbeatのインデックスパターンがあることがわかります
+
+[auditbeat01.png]
+
+左ペインにある"Dashboard"をクリックします。  
+検索ウィンドウから"Auditbeat"を入力すると様々なDashboardがヒットします。
+
+[auditbeat02.png]
+
+"[Auditbeat File Integrity] Overview"や"[Auditbeat Auditd] Overview"からモニタリングが可能です。
+
+[auditbeat03.png]
+
+これまでBeatsを見てきていかがでしたか？
+モニタリングしたいModuleを有効化するだけで容易にモニタリングできる環境が手に入ります。
+この他にもWidnowsを対象にしたものや、サービスの死活監視としてのBeatsなどがあります。
+同じような学習コストで体験できるので、体験して頂ければと思います。
 
 
