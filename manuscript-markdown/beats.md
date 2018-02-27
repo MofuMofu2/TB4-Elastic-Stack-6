@@ -1,12 +1,12 @@
 # Beats
 
-Beatsは、シンプルなデータ取り込みツールです。
-あれ？Logstashは？と思う方もいると思いますが、Logstashは、豊富な機能を持ってます。
-前回の章で説明したGrokフィルダで複雑なログを取り込むことも可能ですし、"Input"のデータソースを多種多様に選択することが可能です。
-そのため、Logstashを利用するには、学習コストもそれなりに発生するので、手軽に利用することができません。
+Beatsは、シンプルなデータ取り込みツールです。  
+あれ？Logstashは？と思う方もいると思いますが、Logstashは、豊富な機能を持ってます。  
+前回の章で説明したGrokフィルダで複雑なログを取り込むことも可能ですし、"Input"のデータソースを多種多様に選択することが可能です。  
+そのため、Logstashを利用するには、学習コストもそれなりに発生するので、手軽に利用することができません。  
 
-そこで、手軽にデータを取り込みたい時に利用するのがBeatsです。
-何が手軽かというとYAMLで完結するのです。
+そこで、手軽にデータを取り込みたい時に利用するのがBeatsです。  
+何が手軽かというとYAMLで完結するのです。  
 しかもほぼ設定する箇所はないです。
 
 ## Beats Family
@@ -28,7 +28,7 @@ Beatsは、シンプルなデータ取り込みツールです。
 
 ## Filebeat
 
-Filebeatを使用することで、Apache、Nginx、MySQLなどのログ収集、パースが容易にできます。
+Filebeatを使用することで、Apache、Nginx、MySQLなどのログ収集、パースが容易にできます。  
 また、KibanaのDashboardも生成するため、すぐにモニタリングを始めることができます。
 
 ### Filebeatをインストール
@@ -78,7 +78,7 @@ Stopping elasticsearch:                                    [  OK  ]
 Starting elasticsearch:                                    [  OK  ]
 ```
 
-FilebeatのNginx Moduleを使用して、どれだけ楽に構築できるかを触れたいと思います。
+FilebeatのNginx Moduleを使用して、どれだけ楽に構築できるかを触れたいと思います。  
 そのほかのModuleについては、以下の公式ページに記載してあります。
 
 > Filebeat Module: 
@@ -86,7 +86,7 @@ FilebeatのNginx Moduleを使用して、どれだけ楽に構築できるかを
 
 ### Kibanaをインストール
 
-KibanaのDashboardで取り込んだログを確認するところまで見るため、Kibanaをインストールします。
+KibanaのDashboardで取り込んだログを確認するところまで見るため、Kibanaをインストールします。  
 
 ```bash
 ### Install Kibana
@@ -115,7 +115,7 @@ $ service nginx start
 Starting nginx:                                            [  OK  ]
 ```
 
-curlを実行し、アクセスログが出力されているかを確認します。
+curlを実行し、アクセスログが出力されているかを確認します。  
 また、ステータスコード200が返ってきていることを確認します。
 
 ```bash
@@ -126,7 +126,7 @@ $ tail -f /var/log/nginx/access.log
 
 ### Filebeat Module
 
-Filebeatの設定ファイルを編集する前に、"filebeat.yml"のファイル置き換えとファイル名変更を行います。
+Filebeatの設定ファイルを編集する前に、"filebeat.yml"のファイル置き換えとファイル名変更を行います。  
 理由は、"filebeat.reference.yml"にすべてのModuleなどが記載されているため、簡易的に利用できるためです。
 
 ```bash
@@ -135,11 +135,11 @@ mv /etc/filebeat/filebeat..yml /etc/filebeat/filebeat.yml_origin
 mv /etc/filebeat/filebeat.reference.yml /etc/filebeat/filebeat.yml
 ```
 
-"filebeat.yml"の編集を行い、Nginxの有効化、"Output"をElasticsearchに設定を行います。
-また、起動時にKibanaのDashboardを作成するよう設定します。
+"filebeat.yml"の編集を行い、Nginxの有効化、"Output"をElasticsearchに設定を行います。  
+また、起動時にKibanaのDashboardを作成するよう設定します。   
 
-"filebeat.yml"でNginxのModuleを有効化します。
-ログのパスはデフォルトから変更してなければ、変更不要です。
+"filebeat.yml"でNginxのModuleを有効化します。  
+ログのパスはデフォルトから変更してなければ、変更不要です。  
 今回は、デフォルトから変更していないため、変更しません。
 
 ```
@@ -206,22 +206,22 @@ setup.dashboards.enabled: true
 ### Start Filebeat
 service filebeat start
 Starting filebeat: 2018-xx-xxTxx:xx:xx.140Z	INFO	instance/beat.go:468	Home path: [/usr/share/filebeat] Config path: [/etc/filebeat] Data path: [/var/lib/filebeat] Logs path: [/var/log/filebeat]
-2018-02-27T06:38:20.140Z	INFO	instance/beat.go:475	Beat UUID: e54958f0-6705-4586-8f9f-1d3599e568c0
-2018-02-27T06:38:20.140Z	INFO	instance/beat.go:213	Setup Beat: filebeat; Version: 6.2.2
-2018-02-27T06:38:20.140Z	INFO	elasticsearch/client.go:145	Elasticsearch url: http://localhost:9200
-2018-02-27T06:38:20.140Z	INFO	pipeline/module.go:76	Beat name: ip-172-31-50-36
-2018-02-27T06:38:20.141Z	INFO	beater/filebeat.go:62	Enabled modules/filesets: nginx (access, error), osquery (result),  ()
+2018-xx-xxTxx:xx:xx.xxxZ	INFO	instance/beat.go:475	Beat UUID: e54958f0-6705-4586-8f9f-1d3599e568c0
+2018-xx-xxTxx:xx:xx.xxxZ	INFO	instance/beat.go:213	Setup Beat: filebeat; Version: 6.2.2
+2018-xx-xxTxx:xx:xx.xxxZ	INFO	elasticsearch/client.go:145	Elasticsearch url: http://localhost:9200
+2018-xx-xxTxx:xx:xx.xxxZ	INFO	pipeline/module.go:76	Beat name: ip-172-31-50-36
+2018-xx-xxTxx:xx:xx.xxxZ	INFO	beater/filebeat.go:62	Enabled modules/filesets: nginx (access, error), osquery (result),  ()
 Config OK
                                                            [  OK  ]
 ```
 
-あとは、データが取り込まれているかをKibanaを開いて確認します。
+あとは、データが取り込まれているかをKibanaを開いて確認します。  
 
 ブラウザを開いてKibanaへアクセスします。
 
 > http://{Global_IP}:5601
 
-以下のトップページが開きます。
+以下のトップページが開きます。  
 左ペインにある"Management"をクリックします。
 
 [filebeat01.png]
@@ -234,19 +234,19 @@ Filebeatのインデックスパターンが登録されていることがわか
 
 [filebeat03.png]
 
-左ペインにある"Dashboard"をクリックします。
-様々なDashboardが登録されていることがわかります。
+左ペインにある"Dashboard"をクリックします。  
+様々なDashboardが登録されていることがわかります。  
 Logstashなどでログを取り込んだ場合は、Dashboardを一から作成する必要がありますが、Beatsの場合は、あらかじめ用意されてます。
 
 [filebeat04.png]
 
-今回は、Nginxの"[Filebeat Nginx] Overview"というDashboardをクリックします。
+今回は、Nginxの"[Filebeat Nginx] Overview"というDashboardをクリックします。  
 取り込んだログがDashboardに表示されていることがわかります。
 
 [filebeat05.png]
 
-いかがでしたか？
-他にも取り込みたいログがあれば、"filebeat.yml"のModuleを有効化するだけで容易にモニタリングができるようになります。
+いかがでしたか？  
+他にも取り込みたいログがあれば、"filebeat.yml"のModuleを有効化するだけで容易にモニタリングができるようになります。  
 
 次は、サーバのリソースを容易にモニタリングを可能とする"Metricbeat"についてです。
 
