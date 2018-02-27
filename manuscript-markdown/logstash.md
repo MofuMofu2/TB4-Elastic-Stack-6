@@ -108,12 +108,13 @@ elasticsearch  	0:off	1:off	2:on	3:on	4:on	5:on	6:off
 
 ## Elasticsearchの準備するよ
 
-ここからはElasticsearchの設定ファイルの編集します。
+ここからはElasticsearchの設定ファイルの編集をします。
 
 ### Elasticsearchのディレクトリ構成について
 
 Elasticsearchのディレクトリ構成は以下です。  
 elasticsearch.ymlとjvm.optionsの設定を編集します。
+ログの出力部分など編集したい場合は、log4j2.propertiesを編集してください。
 
 ```bash
 ### Elasticsearch directory structure
@@ -143,10 +144,8 @@ $ vim /etc/elasticsearch/jvm.options
 -Xmx2g
 ```
 
-### 
-
-
-> Settings the heap size: https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html
+> Settings the heap size:
+> https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html
 
 ### elasticserch.ymlの編集
 
@@ -164,7 +163,7 @@ $ network.host: 0.0.0.0
 | No. | Item                               | Content                                                                |
 |:----|:-----------------------------------|:-----------------------------------------------------------------------|
 | 1   | cluster.name: my-application       | クラスタ名の指定                                                       |
-| 2   | node.name                          | ノード名の指                                                           |
+| 2   | node.name                          | ノード名の指定                                                         |
 | 3   | network.host                       | アクセス元のネットワークアドレスを指定することで制限をかけることが可能 |
 | 4   | discovery.zen.ping.unicast.hosts   | クラスタを組む際にノードを指定                                         |
 | 5   | discovery.zen.minimum_master_nodes | 必要最低限のノード数を指定                                             |
@@ -225,7 +224,7 @@ Logstashのディレクトリ構成は以下です。
 
 ### logstash.ymlの編集
 
-今回は、logstash.ymlの編集は行いません（後述で編集します）が、このファイルでどんなことができるかをサクッと書いておきます。  
+今回は、logstash.ymlの編集は行いません（次章で編集します）が、このファイルでどんなことができるかをサクッと書いておきます。  
 logstash.ymlでは、パイプラインのバッチサイズやディレイ設定が可能です。  
 例えば、以下のように階層やフラットな構造で記載することが可能です。
 
@@ -249,10 +248,10 @@ Woker数の目安は、割り当てたいCPUコア数とイコールにするの
 pipeline.workers: 2
 ```
 
-公式に詳細が記載されているので参考にすると幸せになれるかもです。
+公式に詳細が記載されているので参考にすると幸せになれます。
 
 > Settings File:
- https://www.elastic.co/guide/en/logstash/current/logstash-settings-file.html
+> https://www.elastic.co/guide/en/logstash/current/logstash-settings-file.html
 
 ### パイプラインを実行してみる
 
@@ -273,7 +272,6 @@ output {
 }
 ```
 
-コマンドラインで実行します。
 以下のコマンドを実行し、"Pipelines running"と表示されたら任意の文字を標準入力します。
 入力した文字（ここではtest）が"message"に表示にされていることがわかります。
 
@@ -313,9 +311,10 @@ arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d
 ```
 
 このサンプルログを"/etc/logstash/"配下に配置します。
+ログのファイル名を"alb.log"にします。
 
 ```bash
-$ vim /etc/logstash/alb.logs
+$ vim /etc/logstash/alb.log
 https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57 "GET https://www.example.com:443/ HTTP/1.1" "curl/7.46.0" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067 "Root=1-58337281-1d84f3d73c47ec4e58577259" www.example.com arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012
 ```
 
@@ -339,7 +338,7 @@ output {
 }
 ```
 
-追記した部分を以下で解説します。
+追記した部分を以下で以下で説明します。
 
 | No. | Item           | Content                                                         |
 |:----|:---------------|:----------------------------------------------------------------|
@@ -367,7 +366,7 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 
 ### Filterを使ってみる
 
-"Filter"では何を行うかというと、取得したログを正規表現でパースするGrokフィルタや、、地理情報を得るためのフィルタを施すことができます。
+"Filter"では何を行うかというと、取得したログを正規表現でパースするGrokフィルタや、地理情報を得るためのGioIPフィルタを施すことができます。
 今回のALBもGrokフィルタなどを使うことで構造化することが可能です。
 
 まず、ALBのログフォーマットを把握する必要があります。
@@ -515,11 +514,11 @@ output {
 }
 ```
 
-ここでFilterで記載している内容について説明します。
+それでは、Filterで記載している内容について説明します。
 
 正規表現でパースする際にgrokフィルタを使用します。
 "patterns_dir"で外だししているパターンファイルを呼び出すことができます。
-"match"で"message"に取り込まれている値を対象に作成したGrok-Patterns(ここでいうALB_ACCESS_LOG)を適用しています。
+"match"で"message"に取り込まれている値を対象にGrok-Patterns(ここでいうALB_ACCESS_LOG)を適用しています。
 
 ```bash
 ### grok-filter
@@ -532,9 +531,6 @@ output {
 dateフィルタで"@timestamp"をgrokフィルタで抽出した"date"を置き換えます。
 また、タイムゾーンを指定することも可能です。
 
-
-
-
 ```bash
   date {
     match => [ "date", "ISO8601" ]
@@ -545,6 +541,7 @@ dateフィルタで"@timestamp"をgrokフィルタで抽出した"date"を置き
 
 geoipフォルタを使用することでIPアドレスから地理情報を取得することが可能です。
 geoipフィルタの対象とするため、"client_ip"を指定してます。
+"client_ip"を指定する意図は、どこの国からアクセスがきているかを把握するためです。
 
 ```bash
   geoip {
@@ -554,7 +551,9 @@ geoipフィルタの対象とするため、"client_ip"を指定してます。
 
 今回は使用していないですが、不要な値は、mutateで削除可能です。
 例えば、messageの値は、全てkey-valueでストアされているから不要なので削除といったことも可能です。
-個人的には、ストアされたデータで"_grokparsefailure"が発生した時の場合も踏まえると、残した方がいいと思ってます。
+個人的には、ストアされたデータで"_grokparsefailure"が発生した時の場合も踏まえると、残した方がいいと思ってます。[^1]
+
+[^1]: "_grokparsefailure"は、grokフィルタでパースできない場合に発生します
 
 messageを削除する場合は、Filterにmutateを追加します。
 
@@ -607,7 +606,7 @@ $ kill -9 32061
 これでFilterについてなんとなくわかったと思います。
 次は、いよいよ最終形態のInputをS3にして、OutputをElasticsearchにする構成をやっていきたいと思います。
 
-## 最終な設定ファイルが完成するよ
+## 最終的なパイプラインの設定ファイルが完成するよ
 
 ### Inputの編集
 
@@ -637,7 +636,7 @@ input {
 | 5   | sincedb_path |sincedbファイルの出力先を指定|
 
 今回は、AWSのアクセスキーとシークレットキーを指定せず、IAM Roleをインスタンスに割り当てています。
-オプションで指定することは可能ですが、セキュリティ面からIAM Roleで制御してます。
+オプションで指定することも可能ですが、セキュリティ面からIAM Roleで制御してます。
 
 ### Outputの編集
 
@@ -648,19 +647,17 @@ input {
 output {
   elasticsearch {
     hosts => [ "localhost:9200" ]
-    index => "alb-logs-%{+YYYYMMdd}"
   }
 }
 ```
 
 以下に各オプションについて説明します。
-インデックスは、日次で作成されるようにするため、"alb-logs-%{+YYYYMMdd}"と指定してます。
+インデックスを任意の形で指定することも可能ですが、デフォルトのままとするため、指定はしてません。
+デフォルトだと"logstash-logs-%{+YYYYMMdd}"で作成されます。
 
 | No. | Item           | Content                                                         |
 |:----|:---------------|:----------------------------------------------------------------|
 | 1   | hosts| elasticsearchの宛先を指定|
-| 2   | index| ストアする際に作られるインデックス名の指定|
-
 
 これで完成です！
 以下に最終的なパイプラインの設定ファイルを記載します。
@@ -705,15 +702,17 @@ $ initctl start logstash
 ```
 
 インデックスが取り込まれているかを確認します。
+インデックスが日付単位で取り込まれていることがわかります。
 
 ```bash
+### Index confirmation
 $ curl -XGET localhost:9200/_cat/indices/logstash*
 yellow open logstash-logs-2016xxxx SJ07jipISK-kDlpV5tiHiA 5 1 42 0 650.6kb 650.6kb
 ```
 
 ドキュメントも確認します。
 "curl -XGET localhost:9200/{index}/{type}/{id}"の形式で確認できます。
-また、"?pretty"を使用することで整形されます。
+また、"?pretty"を使用することでjsonが整形されます。
 
 ```bash
 $ curl -XGET 'localhost:9200/logstash-2016.08.10/doc/DTAU02EB00Bh04bZnyp1/?pretty'
@@ -780,4 +779,6 @@ $ curl -XGET 'localhost:9200/logstash-2016.08.10/doc/DTAU02EB00Bh04bZnyp1/?prett
 ```
 
 Elasticsearchに取り込まれたことが確認できました。
+次は、LogstashのイケてるMultiple Pipelinesについて触れていきたいと思います。
+
 
