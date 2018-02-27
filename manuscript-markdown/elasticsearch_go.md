@@ -5,6 +5,7 @@ Elasticsearchの入門の多くはREST APIを使ったものが多いですが�
 そうした際に意外と「あれ、これってどうやるんだ？」というのが多いものです。
 そこで、本章ではElasticsearchの基本操作をGo言語を通じて体験していきます。基本的な操作を中心にちょっとしたTipsについても触れていきます。
 Elasticsearchはとても多くの機能を有しています。そのため、全ての機能をカバーすることは難しいので代表的な機能について本章では記載していきます。
+また本章ではElasticsearchのAPIを主に扱うため、Elasticsearchのクラスタリング機能といった機能については最低限触れていきます。
 
 ## Elasticsearch環境の準備
 今回はElastic社が提供している公式Dockerイメージを利用します。
@@ -79,15 +80,24 @@ Elastic社の公式クライアントもあるのですが、現時点では絶�
 しかしその前に検索するデータを投入するためのIndexとTypeを作成していきましょう。
 
 ### IndexとType
-Elasticsearchで検索をおこなうために、まずIndexとTypeを作成します。
+Elasticsearchで検索をおこなうために、まずIndexとTypeを作成する必要があります。
 RDBMSで例えと以下に相当します。
 * Indexはスキーマ/データベース
 * Typeはテーブル
 
-Typeにデータを登録していきます。ここで注意が必要なのが、TypeはElasticsearch 7系より廃止が予定されています。
+と、よくこのようにRDBMSで例えられることが多いのですが、ここで注意が必要なのがTypeはElasticsearch 7系より廃止が予定されています。
 また5系までは1つのIndexに複数のTypeを作成できたのですが、6系では1つのIndexに1つのTypeのみ作れる仕様へ変わっています。
 
 > https://www.elastic.co/guide/en/elasticsearch/reference/master/removal-of-types.html
+
+本書ではElasticsearch6系を利用するため、1 Indexに1 Typeを作成します。
+また、ElasticsearchはMapping定義を作成しなくてもデータを投入することもできます。
+その際は投入したJSONデータにあわせたMappingが自動で作成されます。
+実際のアプリケーションでElasticsearchを利用する場合、Mapping定義によりデータスキーマを固めて利用することの方が多いかと思います。
+また、Mapping定義を作成することにより、各フィールド単位でより細かな検索設定をおこなえるため、本章では動的Mappingは利用せず、Mapping定義を作成し利用します。
+
+### 本章で利用するMapping定義
+本書ではChatアプリケーションを想定したIndex/Typeをもとに操作をおこなっていきます。
 
 Elasticsearchを操作するにあたり利用するMapping定義は以下の通りです。
 
@@ -350,6 +360,8 @@ Analyzerは以下の要素から構成されています。これらを組み合
   * Tokenizerによるトークン分割がされる前に施す処理を定義します。例えば検索文字列のゆらぎを吸収するために、アルファベットの大文字・小文字を全て小文字に変換したり、カタカナの全角・半角を全て半角に統一したりといった処理をトークン分割の前処理として実施します。
 * Token filters
   * Tokenizerによるトークン分割がされた後に施す処理を定義します。例えば、形態素解析のように品詞をもとにトークン分割するような場合、分割後のトークンから検索には不要そうな助詞を取り除いたりといった処理が該当します。
+
+//TODO: イメージ図をいれる
 
 ここでは先ほど作成したMapping定義をもとにAnalyzerの設定を加えてみます。
 さきほどのChat Mappingのmessageフィールドに日本語形態素解析プラグインであるKuromojiを適用してみましょう。
