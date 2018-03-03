@@ -5,15 +5,25 @@ Beatsは、シンプルなデータ取り込みツールです。
 前回の章で説明したGrokフィルダで複雑なログを取り込むことも可能ですし、"Input"のデータソースを多種多様に選択することが可能です。  
 そのため、Logstashを利用するには、学習コストもそれなりに発生するので、手軽に利用することができません。  
 
+<!-- Mofu 前回の章ってどこの章でしょうか？具体的な固有名詞をあげた方がわかりやすいです。 -->
+
+<!-- Mofu Logstashは取得できるデータが豊富かつ多機能な代わりに、学習コストが高い、的なことが言いたいように見えました。どうですか？ -->
+
 そこで、手軽にデータを取り込みたい時に利用するのがBeatsです。  
 何が手軽かというとYAMLで完結するのです。  
 しかもほぼ設定する箇所はないです。
 
+<!-- Mofu 設定箇所がLogstashよりも少ない、という表現にした方が前述の主張に沿っていて良いと思います。 -->
+
 この章ではBeatsに少しでも体験して頂ければと思います。
+
+<!-- Mofu ここは何が言いたいのかちょっとわかりにくかったです…。Beatsの操作をやってみて欲しいのでしょうか？ -->
 
 ## Beats Family
 
 冒頭の章で記載しましたが、改めてBeats Familyを以下に記載します。
+
+<!-- Mofu ここもですが、冒頭の章ではなく、章題を記載した方がわかりやすいです。 -->
 
 * Filebeat
 * Metricbeat
@@ -22,7 +32,9 @@ Beatsは、シンプルなデータ取り込みツールです。
 * Auditbeat
 * Heartbeat
 
-この中でも以下のBeatsに触れていきたいと思います。
+<!-- Mofu 各Beatsの違い・特色・ユースケースがあると良いと思います。また、今回取り上げたBeatsの選択理由も書くと良いでしょう。 -->
+
+この章では、下記のBeatsについて解説します。
 
 * Filebeat
 * Metricbeat
@@ -33,9 +45,13 @@ Beatsは、シンプルなデータ取り込みツールです。
 Filebeatを使用することで、Apache、Nginx、MySQLなどのログ収集、パースが容易にできます。  
 また、KibanaのDashboardも生成するため、すぐにモニタリングを始めることができます。
 
+<!-- Mofu FileのパースをBeatsが担ってくれる、という基本機能について説明があると良いです。また、KibanaのDashboardを生成する、は工程も含めて説明がないと初めての人にはわかりにくいと思います。 -->
+
 ### Filebeatをインストール
 
-Filebeatのインストールします。
+Filebeatをインストールします。
+
+<!-- Mofu 言葉でも過程を説明した方がわかりやすいです。 -->
 
 ```bash
 ### Install Filebeat
@@ -48,6 +64,8 @@ filebeat version 6.2.2 (amd64), libbeat 6.2.2
 ### Ingest Node Pluginをインストール
 
 UserAgent、GeoIP解析をするため、以下のプラグインをインストールします。
+
+<!-- Mofu ゴール設定をはじめに記載していた方が良いです。今回は何をどうすることが目標なのでしょうか？ -->
 
 ```bash
 ### Install ingest-user-agent
@@ -72,7 +90,9 @@ Continue with installation? [y/N]y
 -> Installed ingest-geoip
 ```
 
-問題なくインストールが完了したらElasticsearchを再起動します。
+Beatsのインストール後、Elasticsearchを再起動します。
+
+<!-- Mofu Elasticsearchは事前にセットアップができている状態でしょうか？環境についてはどこかで説明を入れた方が良いです。 -->
 
 ```bash
 $ service elasticsearch restart
@@ -83,7 +103,9 @@ Starting elasticsearch:                                    [  OK  ]
 FilebeatのNginx Moduleを使用して、どれだけ楽に構築できるかを触れたいと思います。  
 そのほかのModuleについては、以下の公式ページに記載してあります。
 
-> Filebeat Module: 
+<!-- Mofu 何と比較して楽なのでしょうか？ -->
+
+> Filebeat Module:
 > https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules.html
 
 ### Kibanaをインストール
@@ -98,6 +120,8 @@ $ yum install kibana
 Kibanaへのアクセス元の制限をしないため、"server.host"の設定を変更します。[^1]
 
 [^1]: AWSのSecurityGroup側で制限はかけているので、Kibana側では制限しないようにしています
+
+<!-- Mofu ここも環境の前提がないと、理由を説明されても理解しづらそうです。 -->
 
 ```bash
 ### Change server.host
@@ -120,6 +144,8 @@ Starting nginx:                                            [  OK  ]
 curlを実行し、アクセスログが出力されているかを確認します。  
 また、ステータスコード200が返ってきていることを確認します。
 
+Mofu 具体的にどうなっていればOKなのかを記載した方が良いです。
+
 ```bash
 ### Check access.log
 $ tail -f /var/log/nginx/access.log
@@ -131,14 +157,18 @@ $ tail -f /var/log/nginx/access.log
 Filebeatの設定ファイルを編集する前に、"filebeat.yml"のファイル置き換えとファイル名変更を行います。  
 理由は、"filebeat.reference.yml"にすべてのModuleなどが記載されているため、簡易的に利用できるためです。
 
+<!-- Mofu Moduleについての説明があった方がわかりやすいです。 -->
+
 ```bash
 ### Change file name
 mv /etc/filebeat/filebeat..yml /etc/filebeat/filebeat.yml_origin
 mv /etc/filebeat/filebeat.reference.yml /etc/filebeat/filebeat.yml
 ```
 
-"filebeat.yml"の編集を行い、Nginxの有効化、"Output"をElasticsearchに設定を行います。  
+"filebeat.yml"の編集を行い、Nginxの有効化、"Output"をElasticsearchに設定します。  
 また、起動時にKibanaのDashboardを作成するよう設定します。   
+
+<!-- Mofu ここもコンフィグのどの箇所がNginxの有効化なのか、など具体的な修正箇所・修正方法を記載した方が良いです。 -->
 
 "filebeat.yml"でNginxのModuleを有効化します。  
 ログのパスはデフォルトから変更してなければ、変更不要です。  
@@ -216,6 +246,8 @@ $ vim /etc/filebeat/filebeat.yml
 ```
 
 設定が完了したらFilebeatを起動します。
+
+<!-- Mofu どこが具体的な起動コマンドなのかを記載した方がわかりやすいです。 -->
 
 ```bash
 ### Start Filebeat
@@ -459,6 +491,9 @@ CPUやメモリ、プロセスの状態をニアリアルタイムにモニタ�
 サーバの監査としてauditdが出力する"audit.log"をモニタリングしている方は多くいるのではないでしょうか。  
 "audit.log"を保管するだけでなく、ニアリアルタイムにモニタリングするためにLogstashなどのツールを利用している方もいると思います。  
 ただ、これから"audit.log"をモニタリングしたいという人からしたらハードルが高く、モニタリングするまでに時間を要してしまいます。  
+
+<!-- Mofu なぜハードルが高いのか、事例を用いて説明するとわかりやすいです。 -->
+
 そこで、Beatsには、Auditbeatというデータシッパーがあるので容易に導入することができます。  
 ここまでFilbeatやMetricbeatを触ってきたらわかる通り、学習コストはほぼかからないでDashboardで閲覧するところまでできてしまいます。  
 
@@ -471,6 +506,8 @@ $ yum install auditbeat
 
 Auditbeatの設定ファイルは、以下を使用します。  
 既存で設定してある内容は全て上書きしてください。
+
+<!-- Mofu ここはめんどくさがらずに修正箇所・内容・理由を記載した方が良いです。 -->
 
 ```bash
 ### Create auditbeat.yml
@@ -649,4 +686,3 @@ LogstashとBeatsの両方を体験することで、ログ収集時の選択肢�
 これからもみなさんがログと素敵な時間を過ごせることを願ってます。
 
 @micci184
-
