@@ -39,29 +39,54 @@ Author: MofuMofu2 <froakie002@gmail.com>
 Date:   Sun Feb 18 15:57:54 2018 +0900
 //}
 
-一行で出力する場合は@<code>{--oneline}オプションをつけます。
+この出力形式だと、閲覧するのが大変ですね。	Gitのコミットログを1行で出力する場合、@<code>{--oneline}オプションをつけます。
+
+//list[kibana01-list02][Gitのコミットログを1行にして出力する]{
+git log --oneline
+//}
+
+コマンドを実行すると、次のように出力されます。
 
 //cmd{
-git log --oneline
 a5f089c [add] Kibanaの章を追加
 1837201 [add] 本文がないとビルドがこけるので、テストファイルを追加
 b4b18e9 [add] 著者リストを追加
 //}
 
-今回欲しい情報は次の通り
+あれ？なんだか出力内容が減っていますね。@@<code>{--oneline}オプションをつけると、コミットのハッシュ値とコミットログ（1行目）しか出力されません。
+これは少し不便です。
+
+せめて、次の情報がないといつ、だれが、どんなコミットを作成したのかわかりません。ハッシュ値は必要ありませんが、コミットの特定ができると
+変更内容を確認しやすいので情報として持っておきたいところです。
 
 * ハッシュ値（コミットの特定の為に必要）
 * Author（だれがコミットしたのか特定する為に必要）
-* Authorのメールアドレス（なくてもいいけど）
+* Authorのメールアドレス（なくてもいいけど、連絡は楽になりますよね）
 * コミット時刻（いつコミットしたのかを特定する為に必要）
 * コミットメッセージ（概要しりたいじゃん？）
 
-コミットの時刻は@<code>{iso}形式で出力しておきます。Kibanaでグラフを描画する際に、コミット時刻を横軸にしたい為です。
 
-参考URL@<href>{https://git-scm.com/docs/pretty-formats}
+これを実現するために@<code>{--pretty}オプションを利用します。@@<code>{format}の引数にどんな情報を出力するのかを指定しています。
+
+//list[kibana01-list03][Gitのコミットログを1行にし、かつ具体的な情報も出力する]{
+git log  --oneline --pretty=format:"%h, %an, %ae, %ad, %s " --date="iso"
+//}
+
+//table[kibana01-table01][--pretty:formatの引数について説明]{
+引数	意味
+----------
+%h	ハッシュ値
+%an	Author（コミットを作成したユーザー）
+%ae	Authorのメールアドレス
+%ad	Authorがコミットを作成した時刻
+%s	コミットメッセージ
+//}
+
+
+コミットの時刻は@<code>{iso}形式で出力しておきます。分と秒までわかった方が時系列を整理しやすいからです。
+ちなみに、@@<code>{--pretty}の具体的なオプションは@<href>{https://git-scm.com/docs/pretty-formats}で確認できます。
 
 //cmd{
-$ git log  --oneline --pretty=format:"%h, %an, %ae, %ad, %s " --date="iso"
 e9c1356, MofuMofu2, froakie002@gmail.com, 2018-02-18 18:00:39 +0900, [add] git logを出力する
 a5f089c, MofuMofu2, froakie002@gmail.com, 2018-02-18 17:40:29 +0900, [add] Kibanaの章を追加
 1837201, MofuMofu2, froakie002@gmail.com, 2018-02-18 16:07:47 +0900, [add] 本文がないとビルドがこけるので、テストファイルを追加
