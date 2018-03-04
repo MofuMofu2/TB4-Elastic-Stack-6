@@ -13,14 +13,15 @@
 まずは、@@<code>{git log}コマンドでGitのコミットログを標準出力してみます。
 
 もふちゃんのOSはmacOS High Serriaですが、GitさえインストールしてあればOS関係なく動くはずです。
+コマンドはGitリポジトリが存在するディレクトリで行う必要があります。
 
-//list[kibana01-list01][Gitコミットログの出力]{
+//list[kibana01-list01][Gitのコミットログを出力する]{
 git log
 //}
 
+コミットがある場合、このような形でコミットログが出力されます。
 
 //cmd{
-$ git log
 commit 18372016d051ad313f581244378470999c81d788
 Author: MofuMofu2 <froakie002@gmail.com>
 Date:   Sun Feb 18 16:07:47 2018 +0900
