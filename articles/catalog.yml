@@ -3,8 +3,6 @@ PREDEF:
   - introduciton.re
 
 CHAPS:
-  # Elastic Stack6のみどころ
-  - newcommer.re
   # Kibanaについて語り尽くす
   - Kibana-visualize.re
   # GoではじめるElasticsearch
