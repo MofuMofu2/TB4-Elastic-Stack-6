@@ -38,6 +38,8 @@ OpenJDK Runtime Environment (build 1.8.0_161-b14)
 OpenJDK 64-Bit Server VM (build 25.161-b14, mixed mode)
 ```
 
+<!-- Mofu Javaの切り替えというの、もうすこし噛み砕いて説明した方がいいです。（一回java -versionを挟んでバージョン変わってないから変更する、など）ハマる人多い気がします。 -->
+
 ### GPGキーをインポート
 
 ```bash
