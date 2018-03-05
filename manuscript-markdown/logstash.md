@@ -101,6 +101,8 @@ Version: 6.2.2, Build: 10b1edd/2018-02-16T19:01:30.685723Z, JVM: 1.8.0_161
 
 サービスの自動起動をする場合は、以下を実行してください。
 
+<!-- Mofu Logstashの自動起動設定は入れないのでしょうか？ここは合わせた方がわかりやすいと思います。 -->
+
 ```bash
 ### Auto start setting
 $ sudo chkconfig --add elasticsearch
