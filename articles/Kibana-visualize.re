@@ -131,8 +131,9 @@ $ git log  --oneline --pretty=format:"{"commit_hash":%h,"author_name":%an,"autho
 
 どうでしょうか？手書きでもjsonっぽくなりました。では、実際にこれをjsonファイルに出力してみたいと思います。
 
-@<code>{git log  --oneline --pretty=format:'{"commit_hash":"%h","author_name":"%an","author_email":"%ae","author_date":"%ad","subject":"%s"\},' --date="iso" >articles/log/gitLog.json}と記述してみましょう。
+@<code>{git log  --oneline --pretty=format:'{"commit_hash":"%h","author_name":"%an","author_email":"%ae","author_date":"%aI","subject":"%s"\},' --date="iso" >articles/log/gitLog.json}と記述してみましょう。
 
+#@# %aIにした、ISO形式で出した方があとでKibanaしたときに楽そうだよね
 
 @<code>{git-log-to-json}というnpmパッケージを利用すると@<href>{https://www.npmjs.com/package/git-log-to-json}、Node.jsを
 利用してgit logをjson形式で出力できるようです。今回は本題から外れるので扱いませんが、またどこかで記事を公開したいですねー。
