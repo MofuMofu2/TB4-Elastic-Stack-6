@@ -111,3 +111,100 @@ Sending Logstash's logs to /Users/mallow/Elastic-Stack/logstash-6.2.2/logs which
 [2018-03-07T13:50:47,620][WARN ][logstash.filters.json    ] Parsed JSON object/hash requires a target configuration option {:source=>"message", :raw=>""}
 2018-03-07T04:50:47.493Z ishiiaoi-no-MacBook-Pro.local
 2018-03-07T04:50:47.494Z ishiiaoi-no-MacBook-Pro.local  {"commit_hash":"cc97e0a","author_name":"MofuMofu2","author_email":"froakie002@gmail.com","author_date":"2018-03-07 13:11:30 +0900","subject":"[fix] gitコンフィグでちゃんとしたjsonが出力できるように調整"}
+
+
+~/Elastic-Stack/logstash-6.2.2 $ bin/logstash -f config/conf.d/gitlog-logstash.conf
+Sending Logstash's logs to /Users/mallow/Elastic-Stack/logstash-6.2.2/logs which is now configured via log4j2.properties
+[2018-03-07T16:04:29,123][INFO ][logstash.modules.scaffold] Initializing module {:module_name=>"netflow", :directory=>"/Users/mallow/Elastic-Stack/logstash-6.2.2/modules/netflow/configuration"}
+[2018-03-07T16:04:29,152][INFO ][logstash.modules.scaffold] Initializing module {:module_name=>"fb_apache", :directory=>"/Users/mallow/Elastic-Stack/logstash-6.2.2/modules/fb_apache/configuration"}
+[2018-03-07T16:04:29,559][WARN ][logstash.config.source.multilocal] Ignoring the 'pipelines.yml' file because modules or command line options are specified
+[2018-03-07T16:04:30,443][INFO ][logstash.runner          ] Starting Logstash {"logstash.version"=>"6.2.2"}
+[2018-03-07T16:04:31,157][INFO ][logstash.agent           ] Successfully started Logstash API endpoint {:port=>9600}
+[2018-03-07T16:04:35,785][INFO ][logstash.pipeline        ] Starting pipeline {:pipeline_id=>"main", "pipeline.workers"=>4, "pipeline.batch.size"=>125, "pipeline.batch.delay"=>50}
+[2018-03-07T16:04:36,310][INFO ][logstash.pipeline        ] Pipeline started succesfully {:pipeline_id=>"main", :thread=>"#<Thread:0x73d5787a run>"}
+[2018-03-07T16:04:36,529][INFO ][logstash.agent           ] Pipelines running {:count=>1, :pipelines=>["main"]}
+
+
+
+//cmd{
+input {
+		file {
+			path => "/Users/mallow/log/*.json"
+			tags => "git-log"
+		}
+}
+
+# filter {
+# 	json {
+# 		source => "message"
+#
+# 	}
+# }
+
+output {
+	stdout { codec => rubydebug }
+}
+
+//}
+
+
+{
+       "message" => " {\"commit_hash\":\"cc97e0a\",\"author_name\":\"MofuMofu2\",\"author_email\":\"froakie002@gmail.com\",\"author_date\":\"2018-03-07 13:11:30 +0900\",\"subject\":\"[fix] gitコンフィグでちゃんとしたjsonが出力できるように調整\"}",
+          "path" => "/Users/mallow/log/gitLog.json",
+      "@version" => "1",
+          "tags" => [
+        [0] "git-log"
+    ],
+    "@timestamp" => 2018-03-07T07:04:47.011Z,
+          "host" => "ishiiaoi-no-MacBook-Pro.local"
+}
+{
+       "message" => " {\"commit_hash\":\"cc97e0a\",\"author_name\":\"MofuMofu2\",\"author_email\":\"froakie002@gmail.com\",\"author_date\":\"2018-03-07 13:11:30 +0900\",\"subject\":\"[fix] gitコンフィグでちゃんとしたjsonが出力できるように調整\"}",
+          "path" => "/Users/mallow/log/gitLog.json",
+      "@version" => "1",
+          "tags" => [
+        [0] "git-log"
+    ],
+    "@timestamp" => 2018-03-07T07:04:47.084Z,
+          "host" => "ishiiaoi-no-MacBook-Pro.local"
+}
+^C[2018-03-07T16:05:02,473][WARN ][logstash.runner          ] SIGINT received. Shutting down.
+[2018-03-07T16:05:03,446][INFO ][logstash.pipeline        ] Pipeline has terminated {:pipeline_id=>"main", :thread=>"#<Thread:0x73d5787a run>"}
+
+
+コンフィグをrubydebugにしておかないと、field表示ない
+これめちょっくわかりにくくね？ってかどんなときにjsonするのか謎
+
+
+_failureみたいなはなし
+//cmd{
+{
+            "tags" => [
+        [0] "git-log"
+    ],
+    "author_email" => "froakie002@gmail.com",
+     "author_name" => "MofuMofu2",
+         "subject" => "[fix] gitコンフィグでちゃんとしたjsonが出力できるように調整",
+            "host" => "ishiiaoi-no-MacBook-Pro.local",
+         "message" => " {\"commit_hash\":\"cc97e0a\",\"author_name\":\"MofuMofu2\",\"author_email\":\"froakie002@gmail.com\",\"author_date\":\"2018-03-07T13:11:30+09:00\",\"subject\":\"[fix] gitコンフィグでちゃんとしたjsonが出力できるように調整\"}",
+     "author_date" => "2018-03-07T13:11:30+09:00",
+        "@version" => "1",
+     "commit_hash" => "cc97e0a",
+      "@timestamp" => 2018-03-07T07:36:51.297Z,
+            "path" => "/Users/mallow/log/gitLog.json"
+}
+//}
+
+//cmd{
+{
+      "@version" => "1",
+          "tags" => [
+        [0] "git-log",
+        [1] "_jsonparsefailure"
+    ],
+    "@timestamp" => 2018-03-07T07:36:51.297Z,
+          "path" => "/Users/mallow/log/gitLog.json",
+          "host" => "ishiiaoi-no-MacBook-Pro.local",
+       "message" => " {\"commit_hash\":\"1a397cb\",\"author_name\":\"MofuMofu2\",\"author_email\":\"froakie002@gmail.com\",\"author_date\":\"2018-03-07T14:08:27+09:00\",\"subject\":\"[fix] 解消が間違ってたので修正\"},"
+}
+//}
