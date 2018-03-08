@@ -69,7 +69,7 @@ b4b18e9 [add] 著者リストを追加
 これを実現するために@<code>{--pretty=format}オプションを利用します。@@<code>{format}の引数にどんな情報を出力するのかを指定しています。
 
 //list[kibana01-list03][Gitのコミットログを1行にし、かつ具体的な情報も出力する]{
-git log  --oneline --pretty=format:"%h, %an, %ae, %ad, %s " --date="iso"
+git log  --oneline --pretty=format:"%h, %an, %ae, %ad, %f, %s " --date="iso"
 //}
 
 //table[kibana01-table01][--pretty:formatの引数について説明]{
