@@ -69,7 +69,7 @@ b4b18e9 [add] 著者リストを追加
 これを実現するために@<code>{--pretty=format}オプションを利用します。@<code>{format}の引数にどんな情報を出力するのかを指定しています。
 
 //list[kibana01-list03][Gitのコミットログを1行にし、かつ具体的な情報も出力する]{
-git log  --oneline --pretty=format:"%h, %an, %aI, %f, %s " --date="iso"
+git log  --oneline --pretty=format:"%h, %an, %aI, %f, %s "
 //}
 
 //table[kibana01-table01][--pretty:formatの引数について説明]{
@@ -104,7 +104,7 @@ Gitのコミットログをファイルに出力するには、gitコマンド�
 それではGitのコミットログをファイルに出力してみます。
 
 //list[kibana01-list04][Gitのコミットログをファイルに出力する]{
-git log  --oneline --pretty=format:"%h, %an, %aI, %f, %s " --date="iso" >gitlog.json
+git log  --oneline --pretty=format:"%h, %an, %aI, %f, %s " >gitlog.json
 //}
 
 ファイルの出力先を指定したい場合、@<code>{git log オプションいろいろ >articles/log/gitlog.json}のように記述します。
@@ -129,24 +129,36 @@ c0a1712, MofuMofu2, 2018-02-18T19:10:17+09:00, add-npm-git-log-json, [add] npm�
 Authorのメールアドレスを書いておくと、他の2人から怒られそうなのでオプションから取りました。こうしてみると、それぞれ個性あるコミットログを書きますね。
 では、これを本物のjsonっぽく整形していきたいと思います。
 
-@<code>{--pretty=format}
+@<code>{--pretty=format}オプションの引数には、文字のベタ打ちも指定することが可能です…といっても、何をいってるのかわかりませんね。
+実際の出力結果をみるとわかりやすいと思うので、まずは@<list>{kibana01-list05}を実行してみましょう。
 
-@<code>{git log  --oneline --pretty=format:'{"commit_hash":"%h","author_name":"%an","author_email":"%ae","author_date":"%aI","subject":"%s"\},' --date="iso" >articles/log/gitLog.json}と記述してみましょう。
+//list[kibana01-list05][Gitのコミットログをjsonっぽく整形する]{
+git log  --oneline --pretty=format:'{"commit_hash":"%h","author_name":"%an","author_date":"%aI","change_summary":"%f","subject":"%s"}' >gitlog.json
+//}
 
-#@# %aIにした、ISO形式で出した方があとでKibanaしたときに楽そうだよね
+実行すると、下記のようなファイルが生成されます。
+
+//cmd{
+{"commit_hash":"fd7fef2","author_name":"MofuMofu2","author_date":"2018-03-04T20:49:57+09:00","change_summary":"update","subject":"[update] コマンドと出力結果の見せ方をわけた"}
+{"commit_hash":"ee03ea3","author_name":"MofuMofu2","author_date":"2018-03-04T20:49:14+09:00","change_summary":"update-list","subject":"[update] コマンドをlistにした"}
+{"commit_hash":"6ca8d4d","author_name":"MofuMofu2","author_date":"2018-03-04T20:33:41+09:00","change_summary":"add","subject":"[add] この章の目的を追加して、補足を入れた"}
+{"commit_hash":"89b032d","author_name":"MofuMofu2","author_date":"2018-03-04T20:23:50+09:00","change_summary":"add-Elastic-Stack","subject":"[add] Elastic Stackの基本機能を説明する章を追加"}
+{"commit_hash":"d39b109","author_name":"MofuMofu2","author_date":"2018-03-04T20:23:25+09:00","change_summary":"delete","subject":"[delete] テストファイルを削除"}
+{"commit_hash":"85c9d7b","author_name":"micci184","author_date":"2018-02-28T05:58:00+09:00","change_summary":"fix-logstash_beats.re","subject":"[fix]logstash_beats.re"}
+{"commit_hash":"663f1c1","author_name":"micci184","author_date":"2018-02-28T05:54:22+09:00","change_summary":"fix-logstash_beats.re","subject":"[fix]logstash_beats.re"}
+{"commit_hash":"f4e953c","author_name":"micci184","author_date":"2018-02-28T05:29:31+09:00","change_summary":"add-catalog.yml","subject":"[add]catalog.yml"}
+{"commit_hash":"0d54c49","author_name":"micci184","author_date":"2018-02-28T05:25:47+09:00","change_summary":"Convert-md-to-Re-VIEW","subject":"Convert md to Re:VIEW"}
+{"commit_hash":"05cb0dc","author_name":"micci184","author_date":"2018-02-28T05:20:03+09:00","change_summary":"typo","subject":"typo"}
+{"commit_hash":"7f806cb","author_name":"micci184","author_date":"2018-02-28T04:43:48+09:00","change_summary":"add-capture","subject":"[add]capture"}
+//}
+
+jsonっぽいですね！これをKibanaで利用するサンプルデータとしたいと思います。
 
 @<code>{git-log-to-json}というnpmパッケージを利用すると@<href>{https://www.npmjs.com/package/git-log-to-json}、Node.jsを
 利用してgit logをjson形式で出力できるようです。今回は本題から外れるので扱いませんが、またどこかで記事を公開したいですねー。
 
-@<code>{pretty}オプションの引数ですが、git logの情報は決められた形式以外にも普通の文字列を指定することができます。
-そして、標準出力をファイル出力する場合、オプションの1番最後に@<code>{> ファイル名}とすると出力することができます。
-#@#こういうのなんていうんだろうね、%aみたいなやつ
+== Elastic Stackの環境構築
 
-なので、今回はこのようなgitコマンドを利用して、git logの情報をjsonファイルに出力しました。
-@<code>{--pretty=format}の引数で自分の欲しいjsonファイルを整形しておけば、Elasticsearchにデータを簡単に投入することができます。
-こうしておけば、LogstashやBeatsを介さなくてもすぐにKibanaをお試しできるってもんです@<fn>{kibana01-fn01}。
-
-//footnote[kibana01-fn01][別にLogstashやBeatsがいらない子とは言っていないぞ！]
 
 ダウンロードzipで落としてきた
 
