@@ -66,7 +66,7 @@ b4b18e9 [add] 著者リストを追加
 * コミットメッセージ（概要しりたいじゃん？）
 
 
-これを実現するために@<code>{--pretty}オプションを利用します。@@<code>{format}の引数にどんな情報を出力するのかを指定しています。
+これを実現するために@<code>{--pretty=format}オプションを利用します。@@<code>{format}の引数にどんな情報を出力するのかを指定しています。
 
 //list[kibana01-list03][Gitのコミットログを1行にし、かつ具体的な情報も出力する]{
 git log  --oneline --pretty=format:"%h, %an, %ae, %ad, %s " --date="iso"
@@ -76,15 +76,15 @@ git log  --oneline --pretty=format:"%h, %an, %ae, %ad, %s " --date="iso"
 引数	意味
 ----------
 %h	ハッシュ値
-%an	Author（コミットを作成したユーザー）
+%an	Author（オリジナルの成果物を作成したユーザー）
 %ae	Authorのメールアドレス
 %ad	Authorがコミットを作成した時刻
 %s	コミットメッセージ
 //}
 
+ちなみにコミットを作った人を出力したい場合、@@<code>{%cn}のオプションを利用します。@<code>{--pretty}の具体的なオプションは@<href>{https://git-scm.com/docs/pretty-formats}で確認してください。
 
 コミットの時刻は@<code>{iso}形式で出力しておきます。分と秒までわかった方が時系列を整理しやすいからです。
-ちなみに、@@<code>{--pretty}の具体的なオプションは@<href>{https://git-scm.com/docs/pretty-formats}で確認できます。
 
 //cmd{
 e9c1356, MofuMofu2, froakie002@gmail.com, 2018-02-18 18:00:39 +0900, [add] git logを出力する
