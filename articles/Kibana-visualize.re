@@ -10,7 +10,7 @@
 == コミットログを標準出力してみる
 
 とはいえ、まずはGitのコミットログをファイルに出力しないことには始まりません。
-まずは、@@<code>{git log}コマンドでGitのコミットログを標準出力してみます。
+まずは、@<code>{git log}コマンドでGitのコミットログを標準出力してみます。
 
 もふちゃんのOSはmacOS High Serriaですが、GitさえインストールしてあればOS関係なく動くはずです。
 コマンドはGitリポジトリが存在するディレクトリで行う必要があります。
@@ -53,7 +53,7 @@ a5f089c [add] Kibanaの章を追加
 b4b18e9 [add] 著者リストを追加
 //}
 
-あれ？なんだか出力内容が減っていますね。@@<code>{--oneline}オプションをつけると、コミットのハッシュ値とコミットログ（1行目）しか出力されません。
+あれ？なんだか出力内容が減っていますね。@<code>{--oneline}オプションをつけると、コミットのハッシュ値とコミットログ（1行目）しか出力されません。
 これは少し不便です。
 
 せめて、次の情報がないといつ、だれが、どんなコミットを作成したのかわかりません。ハッシュ値は必要ありませんが、コミットの特定ができると
@@ -66,7 +66,7 @@ b4b18e9 [add] 著者リストを追加
 * コミットメッセージ（概要しりたいじゃん？）
 
 
-これを実現するために@<code>{--pretty=format}オプションを利用します。@@<code>{format}の引数にどんな情報を出力するのかを指定しています。
+これを実現するために@<code>{--pretty=format}オプションを利用します。@<code>{format}の引数にどんな情報を出力するのかを指定しています。
 
 //list[kibana01-list03][Gitのコミットログを1行にし、かつ具体的な情報も出力する]{
 git log  --oneline --pretty=format:"%h, %an, %aI, %f, %s " --date="iso"
@@ -83,10 +83,10 @@ git log  --oneline --pretty=format:"%h, %an, %aI, %f, %s " --date="iso"
 %s	コミットメッセージ
 //}
 
-ちなみにコミットを作った人を出力したい場合、@@<code>{%cn}のオプションを利用します。@<code>{--pretty}の具体的なオプションは@<href>{https://git-scm.com/docs/pretty-formats}で確認してください。
+ちなみにコミットを作った人を出力したい場合、@<code>{%cn}のオプションを利用します。@<code>{--pretty}の具体的なオプションは@<href>{https://git-scm.com/docs/pretty-formats}で確認してください。
 
 コミットの時刻は@<code>{ISO}形式で出力しておきます。分と秒までわかった方が時系列を整理しやすいからです。
-@@<code>{git log}を実行した例を記載します。
+@<code>{git log}を実行した例を記載します。
 
 //cmd{
 bcbf2e4, MofuMofu2, froakie002@gmail.com, 2018-02-18 19:16:24 +0900, add-pretty, [add] prettyオプションを利用してテストデータを作成する
@@ -129,7 +129,7 @@ c0a1712, MofuMofu2, 2018-02-18T19:10:17+09:00, add-npm-git-log-json, [add] npm�
 Authorのメールアドレスを書いておくと、他の2人から怒られそうなのでオプションから取りました。こうしてみると、それぞれ個性あるコミットログを書きますね。
 では、これを本物のjsonっぽく整形していきたいと思います。
 
-@@<code>{--pretty=format}
+@<code>{--pretty=format}
 
 @<code>{git log  --oneline --pretty=format:'{"commit_hash":"%h","author_name":"%an","author_email":"%ae","author_date":"%aI","subject":"%s"\},' --date="iso" >articles/log/gitLog.json}と記述してみましょう。
 
