@@ -89,18 +89,10 @@ git log  --oneline --pretty=format:"%h, %an, %ae, %ad, %f, %s " --date="iso"
 @@<code>{git log}を実行した例を記載します。
 
 //cmd{
-6d352ee, micci184, micci184@gmail.com, 2018-02-24 11:25:58 +0900, add, [add]プロダクト紹介追加
-9605c33, micci184, micci184@gmail.com, 2018-02-21 13:13:08 +0900, add, [add]はじめにを追加
-834051a, keigodasu, keigodasu0524@yahoo.co.jp, 2018-02-20 19:50:06 +0900, Writing, Writing
-3d29902, keigodasu, keigodasu0524@yahoo.co.jp, 2018-02-20 19:44:29 +0900, Writing, Writing
-178d741, keigodasu, keigodasu0524@yahoo.co.jp, 2018-02-20 19:32:10 +0900, Writing, Writing
-a0f7254, keigodasu, keigodasu0524@yahoo.co.jp, 2018-02-20 19:18:38 +0900, Writing, Writing
 bcbf2e4, MofuMofu2, froakie002@gmail.com, 2018-02-18 19:16:24 +0900, add-pretty, [add] prettyオプションを利用してテストデータを作成する
 //}
 
-人によって個性があるコミットログですね。
-
-…というのは置いておいて、これ見づらくないですか？辛くないですか？なんかグラフとか作りたくないですか？作りたいよね？
+…これ見づらくないですか？辛くないですか？なんかグラフとか作りたくないですか？作りたいよね？
 というわけで、Kibanaでこのコミットログをグラフにしてみたいと思います。なんたってこの章はKibanaの機能について解説する章だからな！
 
 == Gitのコミットログをファイルに出力して、データの準備をする
