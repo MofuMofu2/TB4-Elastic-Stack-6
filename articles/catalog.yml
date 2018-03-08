@@ -3,8 +3,8 @@ PREDEF:
   - introduciton.re
 
 CHAPS:
-  # Elastic Stack6のみどころ
-  - newcommer.re
+  # Elastic Stackとは？
+  - introduciton-Elastic_Stack.re
   # Kibanaについて語り尽くす
   - Kibana-visualize.re
   # GoではじめるElasticsearch

@@ -1,0 +1,1 @@
+git log  --oneline --pretty=format:'{"commit_hash":"%h","author_name":"%an","author_email":"%ae","author_date":"%ad","subject":"%s"},' --date="iso" >articles/log/gitLog.json
