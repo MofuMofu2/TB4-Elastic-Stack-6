@@ -192,3 +192,63 @@ output {
 	stdout { codec => json }
 }
 //}
+
+
+Elasticsearchにデータを投入するから向け先を変更
+
+CSVインポートなくなったんだもんしょうがないでしょうそういうのちゃんというといてクレメンスって感じ
+
+Elasticserch起動
+
+//cmd{
+~/Elastic-Stack/elasticsearch-6.2.2 $ bin/elasticsearch
+[2018-03-07T17:17:49,092][INFO ][o.e.n.Node               ] [] initializing ...
+[2018-03-07T17:17:49,220][INFO ][o.e.e.NodeEnvironment    ] [m3LWuZ2] using [1] data paths, mounts [[/ (/dev/disk1s1)]], net usable_space [81.9gb], net total_space [232.9gb], types [apfs]
+[2018-03-07T17:17:49,221][INFO ][o.e.e.NodeEnvironment    ] [m3LWuZ2] heap size [990.7mb], compressed ordinary object pointers [true]
+[2018-03-07T17:17:49,223][INFO ][o.e.n.Node               ] node name [m3LWuZ2] derived from node ID [m3LWuZ2UTR6nTATQyRi_vg]; set [node.name] to override
+[2018-03-07T17:17:49,223][INFO ][o.e.n.Node               ] version[6.2.2], pid[14049], build[10b1edd/2018-02-16T19:01:30.685723Z], OS[Mac OS X/10.13.3/x86_64], JVM[Oracle Corporation/Java HotSpot(TM) 64-Bit Server VM/1.8.0_45/25.45-b02]
+[2018-03-07T17:17:49,224][INFO ][o.e.n.Node               ] JVM arguments [-Xms1g, -Xmx1g, -XX:+UseConcMarkSweepGC, -XX:CMSInitiatingOccupancyFraction=75, -XX:+UseCMSInitiatingOccupancyOnly, -XX:+AlwaysPreTouch, -Xss1m, -Djava.awt.headless=true, -Dfile.encoding=UTF-8, -Djna.nosys=true, -XX:-OmitStackTraceInFastThrow, -Dio.netty.noUnsafe=true, -Dio.netty.noKeySetOptimization=true, -Dio.netty.recycler.maxCapacityPerThread=0, -Dlog4j.shutdownHookEnabled=false, -Dlog4j2.disable.jmx=true, -Djava.io.tmpdir=/var/folders/5z/1qmk32x17pn9zv80fk26bvsw0000gn/T/elasticsearch.bvcXHDjg, -XX:+HeapDumpOnOutOfMemoryError, -XX:+PrintGCDetails, -XX:+PrintGCDateStamps, -XX:+PrintTenuringDistribution, -XX:+PrintGCApplicationStoppedTime, -Xloggc:logs/gc.log, -XX:+UseGCLogFileRotation, -XX:NumberOfGCLogFiles=32, -XX:GCLogFileSize=64m, -Des.path.home=/Users/mallow/Elastic-Stack/elasticsearch-6.2.2, -Des.path.conf=/Users/mallow/Elastic-Stack/elasticsearch-6.2.2/config]
+[2018-03-07T17:17:50,813][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [aggs-matrix-stats]
+[2018-03-07T17:17:50,813][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [analysis-common]
+[2018-03-07T17:17:50,813][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [ingest-common]
+[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [lang-expression]
+[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [lang-mustache]
+[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [lang-painless]
+[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [mapper-extras]
+[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [parent-join]
+[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [percolator]
+[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [rank-eval]
+[2018-03-07T17:17:50,815][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [reindex]
+[2018-03-07T17:17:50,815][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [repository-url]
+[2018-03-07T17:17:50,815][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [transport-netty4]
+[2018-03-07T17:17:50,815][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [tribe]
+[2018-03-07T17:17:50,816][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] no plugins loaded
+[2018-03-07T17:17:55,806][INFO ][o.e.d.DiscoveryModule    ] [m3LWuZ2] using discovery type [zen]
+[2018-03-07T17:17:56,654][INFO ][o.e.n.Node               ] initialized
+[2018-03-07T17:17:56,654][INFO ][o.e.n.Node               ] [m3LWuZ2] starting ...
+[2018-03-07T17:17:56,986][INFO ][o.e.t.TransportService   ] [m3LWuZ2] publish_address {127.0.0.1:9300}, bound_addresses {[::1]:9300}, {127.0.0.1:9300}
+[2018-03-07T17:18:00,133][INFO ][o.e.c.s.MasterService    ] [m3LWuZ2] zen-disco-elected-as-master ([0] nodes joined), reason: new_master {m3LWuZ2}{m3LWuZ2UTR6nTATQyRi_vg}{cbEG0uFuRpWyWagkgCvI9A}{127.0.0.1}{127.0.0.1:9300}
+[2018-03-07T17:18:00,139][INFO ][o.e.c.s.ClusterApplierService] [m3LWuZ2] new_master {m3LWuZ2}{m3LWuZ2UTR6nTATQyRi_vg}{cbEG0uFuRpWyWagkgCvI9A}{127.0.0.1}{127.0.0.1:9300}, reason: apply cluster state (from master [master {m3LWuZ2}{m3LWuZ2UTR6nTATQyRi_vg}{cbEG0uFuRpWyWagkgCvI9A}{127.0.0.1}{127.0.0.1:9300} committed version [1] source [zen-disco-elected-as-master ([0] nodes joined)]])
+[2018-03-07T17:18:00,174][INFO ][o.e.h.n.Netty4HttpServerTransport] [m3LWuZ2] publish_address {127.0.0.1:9200}, bound_addresses {[::1]:9200}, {127.0.0.1:9200}
+[2018-03-07T17:18:00,174][INFO ][o.e.n.Node               ] [m3LWuZ2] started
+[2018-03-07T17:18:00,194][INFO ][o.e.g.GatewayService     ] [m3LWuZ2] recovered [0] indices into cluster_state
+[2018-03-07T17:20:57,666][INFO ][o.e.c.m.MetaDataCreateIndexService] [m3LWuZ2] [logstash-2018.03.07] creating index, cause [auto(bulk api)], templates [logstash], shards [5]/[1], mappings [_default_]
+[2018-03-07T17:20:58,218][INFO ][o.e.c.m.MetaDataMappingService] [m3LWuZ2] [logstash-2018.03.07/WBFN2jXwR16CDprJIlIq-w] create_mapping [doc]
+//}
+
+
+Kibana起動
+
+//cmd{
+Last login: Wed Mar  7 17:17:30 on ttys000
+~ $ cd Elastic-Stack/
+~/Elastic-Stack $ cd kibana-6.2.2-darwin-x86_64/
+~/Elastic-Stack/kibana-6.2.2-darwin-x86_64 $ bin/kibana
+  log   [08:19:01.911] [info][status][plugin:kibana@6.2.2] Status changed from uninitialized to green - Ready
+  log   [08:19:02.045] [info][status][plugin:elasticsearch@6.2.2] Status changed from uninitialized to yellow - Waiting for Elasticsearch
+  log   [08:19:02.623] [info][status][plugin:timelion@6.2.2] Status changed from uninitialized to green - Ready
+  log   [08:19:02.632] [info][status][plugin:console@6.2.2] Status changed from uninitialized to green - Ready
+  log   [08:19:02.652] [info][status][plugin:metrics@6.2.2] Status changed from uninitialized to green - Ready
+  log   [08:19:02.725] [info][listening] Server running at http://localhost:5601
+  log   [08:19:02.823] [info][status][plugin:elasticsearch@6.2.2] Status changed from yellow to green - Ready
+//}
