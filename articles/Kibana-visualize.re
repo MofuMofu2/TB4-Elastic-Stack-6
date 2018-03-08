@@ -79,30 +79,34 @@ git log  --oneline --pretty=format:"%h, %an, %ae, %ad, %f, %s " --date="iso"
 %an	Author（オリジナルの成果物を作成したユーザー）
 %ae	Authorのメールアドレス
 %ad	Authorがコミットを作成した時刻
+%f	変更点の概要（変更ファイル名・修正、追加など）
 %s	コミットメッセージ
 //}
 
 ちなみにコミットを作った人を出力したい場合、@@<code>{%cn}のオプションを利用します。@<code>{--pretty}の具体的なオプションは@<href>{https://git-scm.com/docs/pretty-formats}で確認してください。
 
 コミットの時刻は@<code>{iso}形式で出力しておきます。分と秒までわかった方が時系列を整理しやすいからです。
+@@<code>{git log}を実行した例を記載します。
 
 //cmd{
-e9c1356, MofuMofu2, froakie002@gmail.com, 2018-02-18 18:00:39 +0900, [add] git logを出力する
-a5f089c, MofuMofu2, froakie002@gmail.com, 2018-02-18 17:40:29 +0900, [add] Kibanaの章を追加
-1837201, MofuMofu2, froakie002@gmail.com, 2018-02-18 16:07:47 +0900, [add] 本文がないとビルドがこけるので、テストファイルを追加
-b4b18e9, MofuMofu2, froakie002@gmail.com, 2018-02-18 16:00:23 +0900, [add] 著者リストを追加
-14b98b2, MofuMofu2, froakie002@gmail.com, 2018-02-18 15:57:54 +0900, [fix] ファイル名をwercker出力名に合わせる
-c201d78, MofuMofu2, froakie002@gmail.com, 2018-02-18 15:56:35 +0900, ひつようなファイルをコミットだよ
-4e62dae, MofuMofu2, froakie002@gmail.com, 2018-02-18 15:30:47 +0900, [fix] reviewファイルの前に半角ハイフンがなかったので修正
+6d352ee, micci184, micci184@gmail.com, 2018-02-24 11:25:58 +0900, add, [add]プロダクト紹介追加
+9605c33, micci184, micci184@gmail.com, 2018-02-21 13:13:08 +0900, add, [add]はじめにを追加
+834051a, keigodasu, keigodasu0524@yahoo.co.jp, 2018-02-20 19:50:06 +0900, Writing, Writing
+3d29902, keigodasu, keigodasu0524@yahoo.co.jp, 2018-02-20 19:44:29 +0900, Writing, Writing
+178d741, keigodasu, keigodasu0524@yahoo.co.jp, 2018-02-20 19:32:10 +0900, Writing, Writing
+a0f7254, keigodasu, keigodasu0524@yahoo.co.jp, 2018-02-20 19:18:38 +0900, Writing, Writing
+bcbf2e4, MofuMofu2, froakie002@gmail.com, 2018-02-18 19:16:24 +0900, add-pretty, [add] prettyオプションを利用してテストデータを作成する
 //}
 
-…これ、見づらくないですか？辛くないですか？なんかグラフとか作りたくないですか？作りたいよね？
+人によって個性があるコミットログですね。
+
+…というのは置いておいて、これ見づらくないですか？辛くないですか？なんかグラフとか作りたくないですか？作りたいよね？
 というわけで、Kibanaでこのコミットログをグラフにしてみたいと思います。なんたってこの章はKibanaの機能について解説する章だからな！
 
-=== コミットログをファイルに出力して、データの準備をする
+== Gitのコミットログをファイルに出力して、データの準備をする
 
-というわけで、GitのコミットログをKibanaで閲覧してみます。もふちゃんはKibanaとElasticsearchのzipファイルを展開して
-環境を作りました。環境の作成方法は@@<b>{Elastic Stackとは}の章を参考にしてください。あ、もふちゃんの商業本（技術書典シリーズから出てるやつ）を買うてもええんやで！（しつこいくらいのすてま）
+というわけで、GitのコミットログをKibanaで閲覧してみます。まずはGitのコミットログをファイルに出力します。
+そのファイルをElasticsearchに投入してKibanaでグラフを作っていきたいですからね。
 
 Gitのコミットログをファイルに出力するには、gitコマンドの最後に@<code>{>（ファイル名）.（拡張子）}をつけます。オプションの後に半角スペースを入れてください。
 しかし、このままファイル出力を行うとElasticsearchにデータを投入する前にLogstashで加工が必要です。
