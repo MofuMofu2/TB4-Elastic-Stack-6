@@ -69,7 +69,7 @@ b4b18e9 [add] 著者リストを追加
 これを実現するために@<code>{--pretty=format}オプションを利用します。@@<code>{format}の引数にどんな情報を出力するのかを指定しています。
 
 //list[kibana01-list03][Gitのコミットログを1行にし、かつ具体的な情報も出力する]{
-git log  --oneline --pretty=format:"%h, %an, %ae, %ad, %f, %s " --date="iso"
+git log  --oneline --pretty=format:"%h, %an, %aI, %f, %s " --date="iso"
 //}
 
 //table[kibana01-table01][--pretty:formatの引数について説明]{
@@ -78,14 +78,14 @@ git log  --oneline --pretty=format:"%h, %an, %ae, %ad, %f, %s " --date="iso"
 %h	ハッシュ値
 %an	Author（オリジナルの成果物を作成したユーザー）
 %ae	Authorのメールアドレス
-%ad	Authorがコミットを作成した時刻
+%aI	Authorがコミットを作成した時刻（ISO形式）
 %f	変更点の概要（変更ファイル名・修正、追加など）
 %s	コミットメッセージ
 //}
 
 ちなみにコミットを作った人を出力したい場合、@@<code>{%cn}のオプションを利用します。@<code>{--pretty}の具体的なオプションは@<href>{https://git-scm.com/docs/pretty-formats}で確認してください。
 
-コミットの時刻は@<code>{iso}形式で出力しておきます。分と秒までわかった方が時系列を整理しやすいからです。
+コミットの時刻は@<code>{ISO}形式で出力しておきます。分と秒までわかった方が時系列を整理しやすいからです。
 @@<code>{git log}を実行した例を記載します。
 
 //cmd{
@@ -101,31 +101,35 @@ bcbf2e4, MofuMofu2, froakie002@gmail.com, 2018-02-18 19:16:24 +0900, add-pretty,
 そのファイルをElasticsearchに投入してKibanaでグラフを作っていきたいですからね。
 
 Gitのコミットログをファイルに出力するには、gitコマンドの最後に@<code>{>（ファイル名）.（拡張子）}をつけます。オプションの後に半角スペースを入れてください。
-しかし、このままファイル出力を行うとElasticsearchにデータを投入する前にLogstashで加工が必要です。
+それではGitのコミットログをファイルに出力してみます。
 
-
-Kibanaを手っ取り早く試したいのに、わざわざデータを加工するのはしんどいですよね。なので、コミットログをjsonで出力してみたいと思います。
-まずはコミットログをjsonっぽく出力してみます。@<code>{pretty}オプションは普通の文字ベタ打ちと組み合わせて利用することができます。
-
-
-//cmd{
-$ git log  --oneline --pretty=format:"{"commit_hash":%h,"author_name":%an,"author_email":%ae,"author_date":%ad,"subject":%s} " --date="iso"
-{commit_hash:020670e,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-26 21:15:22 +0900,subject:edited alias part}
-{commit_hash:1ebe8d1,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-26 20:56:47 +0900,subject:writing error handling}
-{commit_hash:0cffae6,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-26 20:37:14 +0900,subject:writing}
-{commit_hash:b39f3d6,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-26 20:02:50 +0900,subject:writing}
-{commit_hash:90a97d2,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-26 19:48:56 +0900,subject:writing}
-{commit_hash:934ef39,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-26 18:58:41 +0900,subject:writing}
-{commit_hash:52ce336,author_name:micci184,author_email:micci184@gmail.com,author_date:2018-02-26 10:24:54 +0900,subject:[add]logstash.md}
-{commit_hash:03850a1,author_name:micci184,author_email:micci184@gmail.com,author_date:2018-02-26 10:21:50 +0900,subject:Merge branch 'master' of https://github.com/MofuMofu2/TB4-Elastic-Stack-6}
-{commit_hash:7067f94,author_name:micci184,author_email:micci184@gmail.com,author_date:2018-02-26 10:19:54 +0900,subject:[add]logstash.md}
-{commit_hash:33937bc,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-25 13:25:53 +0900,subject:add deleting sammple}
-{commit_hash:22efb5a,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-25 13:17:55 +0900,subject:add indexing sammple}
-{commit_hash:1d2701d,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-25 12:57:22 +0900,subject:writing}
-{commit_hash:c57d160,author_name:keigodasu,author_email:keigodasu0524@yahoo.co.jp,author_date:2018-02-25 12:03:37 +0900,subject:add description of data types}
+//list[kibana01-list04][Gitのコミットログをファイルに出力する]{
+git log  --oneline --pretty=format:"%h, %an, %aI, %f, %s " --date="iso" >gitlog.json
 //}
 
-どうでしょうか？手書きでもjsonっぽくなりました。では、実際にこれをjsonファイルに出力してみたいと思います。
+ファイルの出力先を指定したい場合、@<code>{git log オプションいろいろ >articles/log/gitlog.json}のように記述します。
+
+@<list>{kibana01-list04}を実行すると、コミットログがファイルに出力されます。
+出力結果例を下記に記載します。
+
+//cmd{
+cdbfc69, keigodasu, 2018-02-25T11:21:26+09:00, delete-unnecessary-file, delete unnecessary file
+e39b32e, keigodasu, 2018-02-25T11:19:48+09:00, writing, writing
+4aef633, keigodasu, 2018-02-24T13:05:42+09:00, add-sameple-source-directory, add sameple source directory
+6d352ee, micci184, 2018-02-24T11:25:58+09:00, add, [add]プロダクト紹介追加
+9605c33, micci184, 2018-02-21T13:13:08+09:00, add, [add]はじめにを追加
+834051a, keigodasu, 2018-02-20T19:50:06+09:00, Writing, Writing
+3d29902, keigodasu, 2018-02-20T19:44:29+09:00, Writing, Writing
+178d741, keigodasu, 2018-02-20T19:32:10+09:00, Writing, Writing
+a0f7254, keigodasu, 2018-02-20T19:18:38+09:00, Writing, Writing
+bcbf2e4, MofuMofu2, 2018-02-18T19:16:24+09:00, add-pretty, [add] prettyオプションを利用してテストデータを作成する
+c0a1712, MofuMofu2, 2018-02-18T19:10:17+09:00, add-npm-git-log-json, [add] npmプラグインを利用すると、git logをjson形式で出力するやつをサーバーのお仕事にできそう
+//}
+
+Authorのメールアドレスを書いておくと、他の2人から怒られそうなのでオプションから取りました。こうしてみると、それぞれ個性あるコミットログを書きますね。
+では、これを本物のjsonっぽく整形していきたいと思います。
+
+@@<code>{--pretty=format}
 
 @<code>{git log  --oneline --pretty=format:'{"commit_hash":"%h","author_name":"%an","author_email":"%ae","author_date":"%aI","subject":"%s"\},' --date="iso" >articles/log/gitLog.json}と記述してみましょう。
 
