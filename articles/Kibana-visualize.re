@@ -159,8 +159,19 @@ jsonっぽいですね！これをKibanaで利用するサンプルデータと�
 
 == Elastic Stackの環境構築
 
+テストデータが準備できたので、いよいよKibanaを起動しましょう。
+本章のElastic Stack環境は全てzipファイルをダウンロード＆展開して構築しています。
 
-ダウンロードzipで落としてきた
+詳細な構築方法は@<b>{Elastic Stackとは}の章を参考にしてください。
+もふもふちゃんはMacに@@<code>{Elastic-Stack}という名前でディレクトリを作成し、その中に各プロダクトを配置しました。
+
+//emlist[もふもふちゃんのElastic-Stack実行環境]{
+Elastic-Stack--logstash-6.2.2
+							|
+							-elasticsearch-6.2.2
+							|
+							-kibana-6.2.2-darwin-x86_64
+//}
 
 //cmd{
 ~/Elastic-Stack $ ls -al
