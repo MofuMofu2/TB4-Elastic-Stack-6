@@ -159,58 +159,38 @@ jsonっぽいですね！これをKibanaで利用するサンプルデータと�
 
 == Elastic Stackの環境構築
 
+テストデータが準備できたので、いよいよKibanaを起動しましょう。
+本章のElastic Stack環境は全てzipファイルをダウンロード＆展開して構築しています。
 
-ダウンロードzipで落としてきた
+詳細な構築方法は@<b>{Elastic Stackとは}の章を参考にしてください。
+もふもふちゃんはMacに@<code>{Elastic-Stack}という名前でディレクトリを作成し、その中に各プロダクトを配置しました。
+
+//emlist[もふもふちゃんのElastic-Stack実行環境]{
+Elastic-Stack--logstash-6.2.2
+							|
+							-elasticsearch-6.2.2
+							|
+							-kibana-6.2.2-darwin-x86_64
+//}
+
+@<code>{ls}コマンドで確認した結果も参考として載せておきます。
 
 //cmd{
 ~/Elastic-Stack $ ls -al
 total 0
-drwxr-xr-x   6 mallow  staff   192  3  7 11:00 .
-drwxr-xr-x+ 50 mallow  staff  1600  3  7 10:54 ..
-drwxr-xr-x@ 11 mallow  staff   352  2 16 19:03 elasticsearch-6.2.2
-drwxr-xr-x@ 13 mallow  staff   416  2 17 03:47 filebeat-6.2.2-darwin-x86_64
-drwxr-xr-x@ 16 mallow  staff   512  2 17 04:20 kibana-6.2.2-darwin-x86_64
-drwxr-xr-x@ 16 mallow  staff   512  3  7 10:51 logstash-6.2.2
-//}
-
-Logstashでうまく出力できた時
-
-//cmd{
-~/Elastic-Stack/logstash-6.2.2 $ bin/logstash -f config/conf.d/gitlog-logstash.conf
-Sending Logstash's logs to /Users/mallow/Elastic-Stack/logstash-6.2.2/logs which is now configured via log4j2.properties
-[2018-03-07T13:09:28,580][INFO ][logstash.modules.scaffold] Initializing module {:module_name=>"netflow", :directory=>"/Users/mallow/Elastic-Stack/logstash-6.2.2/modules/netflow/configuration"}
-[2018-03-07T13:09:28,609][INFO ][logstash.modules.scaffold] Initializing module {:module_name=>"fb_apache", :directory=>"/Users/mallow/Elastic-Stack/logstash-6.2.2/modules/fb_apache/configuration"}
-[2018-03-07T13:09:29,016][WARN ][logstash.config.source.multilocal] Ignoring the 'pipelines.yml' file because modules or command line options are specified
-[2018-03-07T13:09:30,030][INFO ][logstash.runner          ] Starting Logstash {"logstash.version"=>"6.2.2"}
-[2018-03-07T13:09:30,683][INFO ][logstash.agent           ] Successfully started Logstash API endpoint {:port=>9600}
-[2018-03-07T13:09:33,792][INFO ][logstash.pipeline        ] Starting pipeline {:pipeline_id=>"main", "pipeline.workers"=>4, "pipeline.batch.size"=>125, "pipeline.batch.delay"=>50}
-[2018-03-07T13:09:34,713][INFO ][logstash.inputs.beats    ] Beats inputs: Starting input listener {:address=>"0.0.0.0:5044"}
-[2018-03-07T13:09:34,878][INFO ][logstash.pipeline        ] Pipeline started succesfully {:pipeline_id=>"main", :thread=>"#<Thread:0x28402278 run>"}
-[2018-03-07T13:09:35,164][INFO ][org.logstash.beats.Server] Starting server on port: 5044
-[2018-03-07T13:09:35,372][INFO ][logstash.agent           ] Pipelines running {:count=>1, :pipelines=>["main"]}
-//}
-
-Logstashでデータを取得（詳しい解説は別章をみてやでい）
-
-//cmd{
-input {
-		file {
-			path => "Users/mallow/Google ドライブ/TB4-Elastic-Stack-6/articles/log/*.json"
-			tags => "git-log"
-		}
-}
-
-output {
-	stdout { codec => json }
-}
+drwxr-xr-x   6 mofumofu  staff   192  3  7 11:00 .
+drwxr-xr-x+ 50 mofumofu  staff  1600  3  7 10:54 ..
+drwxr-xr-x@ 11 mofumofu  staff   352  2 16 19:03 elasticsearch-6.2.2
+drwxr-xr-x@ 16 mofumofu  staff   512  2 17 04:20 kibana-6.2.2-darwin-x86_64
+drwxr-xr-x@ 16 mofumofu  staff   512  3  7 10:51 logstash-6.2.2
 //}
 
 
-Elasticsearchにデータを投入するから向け先を変更
+=== Elasticserchの起動
 
-CSVインポートなくなったんだもんしょうがないでしょうそういうのちゃんというといてクレメンスって感じ
+@<code>{elasticsearch-6.2.2}ディレクトリに移動した後、@<code>{bin/elasticsearch}でElasticsearchを起動しました。
 
-Elasticserch起動
+これも、出力結果を載せておきます。ここは本題ではありませんので、解説や特別な設定は行いません。
 
 //cmd{
 ~/Elastic-Stack/elasticsearch-6.2.2 $ bin/elasticsearch
@@ -219,7 +199,7 @@ Elasticserch起動
 [2018-03-07T17:17:49,221][INFO ][o.e.e.NodeEnvironment    ] [m3LWuZ2] heap size [990.7mb], compressed ordinary object pointers [true]
 [2018-03-07T17:17:49,223][INFO ][o.e.n.Node               ] node name [m3LWuZ2] derived from node ID [m3LWuZ2UTR6nTATQyRi_vg]; set [node.name] to override
 [2018-03-07T17:17:49,223][INFO ][o.e.n.Node               ] version[6.2.2], pid[14049], build[10b1edd/2018-02-16T19:01:30.685723Z], OS[Mac OS X/10.13.3/x86_64], JVM[Oracle Corporation/Java HotSpot(TM) 64-Bit Server VM/1.8.0_45/25.45-b02]
-[2018-03-07T17:17:49,224][INFO ][o.e.n.Node               ] JVM arguments [-Xms1g, -Xmx1g, -XX:+UseConcMarkSweepGC, -XX:CMSInitiatingOccupancyFraction=75, -XX:+UseCMSInitiatingOccupancyOnly, -XX:+AlwaysPreTouch, -Xss1m, -Djava.awt.headless=true, -Dfile.encoding=UTF-8, -Djna.nosys=true, -XX:-OmitStackTraceInFastThrow, -Dio.netty.noUnsafe=true, -Dio.netty.noKeySetOptimization=true, -Dio.netty.recycler.maxCapacityPerThread=0, -Dlog4j.shutdownHookEnabled=false, -Dlog4j2.disable.jmx=true, -Djava.io.tmpdir=/var/folders/5z/1qmk32x17pn9zv80fk26bvsw0000gn/T/elasticsearch.bvcXHDjg, -XX:+HeapDumpOnOutOfMemoryError, -XX:+PrintGCDetails, -XX:+PrintGCDateStamps, -XX:+PrintTenuringDistribution, -XX:+PrintGCApplicationStoppedTime, -Xloggc:logs/gc.log, -XX:+UseGCLogFileRotation, -XX:NumberOfGCLogFiles=32, -XX:GCLogFileSize=64m, -Des.path.home=/Users/mallow/Elastic-Stack/elasticsearch-6.2.2, -Des.path.conf=/Users/mallow/Elastic-Stack/elasticsearch-6.2.2/config]
+[2018-03-07T17:17:49,224][INFO ][o.e.n.Node               ] JVM arguments [-Xms1g, -Xmx1g, -XX:+UseConcMarkSweepGC, -XX:CMSInitiatingOccupancyFraction=75, -XX:+UseCMSInitiatingOccupancyOnly, -XX:+AlwaysPreTouch, -Xss1m, -Djava.awt.headless=true, -Dfile.encoding=UTF-8, -Djna.nosys=true, -XX:-OmitStackTraceInFastThrow, -Dio.netty.noUnsafe=true, -Dio.netty.noKeySetOptimization=true, -Dio.netty.recycler.maxCapacityPerThread=0, -Dlog4j.shutdownHookEnabled=false, -Dlog4j2.disable.jmx=true, -Djava.io.tmpdir=/var/folders/5z/1qmk32x17pn9zv80fk26bvsw0000gn/T/elasticsearch.bvcXHDjg, -XX:+HeapDumpOnOutOfMemoryError, -XX:+PrintGCDetails, -XX:+PrintGCDateStamps, -XX:+PrintTenuringDistribution, -XX:+PrintGCApplicationStoppedTime, -Xloggc:logs/gc.log, -XX:+UseGCLogFileRotation, -XX:NumberOfGCLogFiles=32, -XX:GCLogFileSize=64m, -Des.path.home=/Users/mofumofu/Elastic-Stack/elasticsearch-6.2.2, -Des.path.conf=/Users/mofumofu/Elastic-Stack/elasticsearch-6.2.2/config]
 [2018-03-07T17:17:50,813][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [aggs-matrix-stats]
 [2018-03-07T17:17:50,813][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [analysis-common]
 [2018-03-07T17:17:50,813][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [ingest-common]
@@ -247,6 +227,79 @@ Elasticserch起動
 [2018-03-07T17:20:57,666][INFO ][o.e.c.m.MetaDataCreateIndexService] [m3LWuZ2] [logstash-2018.03.07] creating index, cause [auto(bulk api)], templates [logstash], shards [5]/[1], mappings [_default_]
 [2018-03-07T17:20:58,218][INFO ][o.e.c.m.MetaDataMappingService] [m3LWuZ2] [logstash-2018.03.07/WBFN2jXwR16CDprJIlIq-w] create_mapping [doc]
 //}
+
+
+=== Logstashの起動
+
+Kibanaで閲覧するGitのコミットログをElasticsearchに投入するため、Logstashを利用します。
+Kibana5.4（beta版）ではKibanaのUIからCSVをElasticsearchに投入できる機能があったのですが、いつの間にか廃止されていました…。なので、
+（仕方なく）Logstashを利用します。この辺はこだわりがありませんので、何らかの形でElasticsearchにデータを投入しましょう。
+
+もふもふちゃんは@<code>{config/conf.d}フォルダに@<code>{gitlog-logstash.conf}を作成しました。
+
+//list[kibana01-list06][gitlog-logstash.conf]{
+input {
+		file {
+			path => "/Users/mofumofu/log/*.json"
+			tags => "git-log"
+		}
+}
+
+filter {
+	json {
+		source => "message"
+	}
+}
+
+output {
+	stdout { codec => rubydebug }
+	elasticsearch { }
+}
+//}
+
+解説するほどの設定はありませんが、いくつか補足します。
+
+動作確認をしたかったので、念のため@<code>{stdout}で標準出力をするように設定しています。
+また、Elasticserchはローカル環境で起動したものを利用するため、IPアドレスなどは設定していません。
+デフォルトの設定は@<code>{localhost}のElasticsearchを参照するようになっているからです。
+
+//cmd{
+~/Elastic-Stack/logstash-6.2.2 $ bin/logstash -f config/conf.d/gitlog-logstash.conf
+Sending Logstash's logs to /Users/mofumofu/Elastic-Stack/logstash-6.2.2/logs which is now configured via log4j2.properties
+[2018-03-07T13:09:28,580][INFO ][logstash.modules.scaffold] Initializing module {:module_name=>"netflow", :directory=>"/Users/mofumofu/Elastic-Stack/logstash-6.2.2/modules/netflow/configuration"}
+[2018-03-07T13:09:28,609][INFO ][logstash.modules.scaffold] Initializing module {:module_name=>"fb_apache", :directory=>"/Users/mofumofu/Elastic-Stack/logstash-6.2.2/modules/fb_apache/configuration"}
+[2018-03-07T13:09:29,016][WARN ][logstash.config.source.multilocal] Ignoring the 'pipelines.yml' file because modules or command line options are specified
+[2018-03-07T13:09:30,030][INFO ][logstash.runner          ] Starting Logstash {"logstash.version"=>"6.2.2"}
+[2018-03-07T13:09:30,683][INFO ][logstash.agent           ] Successfully started Logstash API endpoint {:port=>9600}
+[2018-03-07T13:09:33,792][INFO ][logstash.pipeline        ] Starting pipeline {:pipeline_id=>"main", "pipeline.workers"=>4, "pipeline.batch.size"=>125, "pipeline.batch.delay"=>50}
+[2018-03-07T13:09:34,713][INFO ][logstash.inputs.beats    ] Beats inputs: Starting input listener {:address=>"0.0.0.0:5044"}
+[2018-03-07T13:09:34,878][INFO ][logstash.pipeline        ] Pipeline started succesfully {:pipeline_id=>"main", :thread=>"#<Thread:0x28402278 run>"}
+[2018-03-07T13:09:35,164][INFO ][org.logstash.beats.Server] Starting server on port: 5044
+[2018-03-07T13:09:35,372][INFO ][logstash.agent           ] Pipelines running {:count=>1, :pipelines=>["main"]}
+//}
+
+Logstashでデータを取得（詳しい解説は別章をみてやでい）
+
+//cmd{
+input {
+		file {
+			path => "Users/mofumofu/Google ドライブ/TB4-Elastic-Stack-6/articles/log/*.json"
+			tags => "git-log"
+		}
+}
+
+output {
+	stdout { codec => json }
+}
+//}
+
+
+Elasticsearchにデータを投入するから向け先を変更
+
+CSVインポートなくなったんだもんしょうがないでしょうそういうのちゃんというといてクレメンスって感じ
+
+Elasticserch起動
+
 
 
 Kibana起動
