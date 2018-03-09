@@ -229,7 +229,39 @@ drwxr-xr-x@ 16 mofumofu  staff   512  3  7 10:51 logstash-6.2.2
 //}
 
 
-Logstashでうまく出力できた時
+=== Logstashの起動
+
+Kibanaで閲覧するGitのコミットログをElasticsearchに投入するため、Logstashを利用します。
+Kibana5.4（beta版）ではKibanaのUIからCSVをElasticsearchに投入できる機能があったのですが、いつの間にか廃止されていました…。なので、
+（仕方なく）Logstashを利用します。この辺はこだわりがありませんので、何らかの形でElasticsearchにデータを投入しましょう。
+
+もふもふちゃんは@@<code>{config/conf.d}フォルダに@@<code>{gitlog-logstash.conf}を作成しました。
+
+//list[kibana01-list06][gitlog-logstash.conf]{
+input {
+		file {
+			path => "/Users/mofumofu/log/*.json"
+			tags => "git-log"
+		}
+}
+
+filter {
+	json {
+		source => "message"
+	}
+}
+
+output {
+	stdout { codec => rubydebug }
+	elasticsearch { }
+}
+//}
+
+解説するほどの設定はありませんが、いくつか補足します。
+
+動作確認をしたかったので、念のため@@<code>{stdout}で標準出力をするように設定しています。
+また、Elasticserchはローカル環境で起動したものを利用するため、IPアドレスなどは設定していません。
+デフォルトの設定は@@<code>{localhost}のElasticsearchを参照するようになっているからです。
 
 //cmd{
 ~/Elastic-Stack/logstash-6.2.2 $ bin/logstash -f config/conf.d/gitlog-logstash.conf
