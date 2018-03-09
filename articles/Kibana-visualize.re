@@ -163,7 +163,7 @@ jsonっぽいですね！これをKibanaで利用するサンプルデータと�
 本章のElastic Stack環境は全てzipファイルをダウンロード＆展開して構築しています。
 
 詳細な構築方法は@<b>{Elastic Stackとは}の章を参考にしてください。
-もふもふちゃんはMacに@@<code>{Elastic-Stack}という名前でディレクトリを作成し、その中に各プロダクトを配置しました。
+もふもふちゃんはMacに@<code>{Elastic-Stack}という名前でディレクトリを作成し、その中に各プロダクトを配置しました。
 
 //emlist[もふもふちゃんのElastic-Stack実行環境]{
 Elastic-Stack--logstash-6.2.2
@@ -173,7 +173,7 @@ Elastic-Stack--logstash-6.2.2
 							-kibana-6.2.2-darwin-x86_64
 //}
 
-@@<code>{ls}コマンドで確認した結果も参考として載せておきます。
+@<code>{ls}コマンドで確認した結果も参考として載せておきます。
 
 //cmd{
 ~/Elastic-Stack $ ls -al
@@ -188,7 +188,7 @@ drwxr-xr-x@ 16 mofumofu  staff   512  3  7 10:51 logstash-6.2.2
 
 === Elasticserchの起動
 
-@<code>{elasticsearch-6.2.2}ディレクトリに移動した後、@@<code>{bin/elasticsearch}でElasticsearchを起動しました。
+@<code>{elasticsearch-6.2.2}ディレクトリに移動した後、@<code>{bin/elasticsearch}でElasticsearchを起動しました。
 
 これも、出力結果を載せておきます。ここは本題ではありませんので、解説や特別な設定は行いません。
 
@@ -235,7 +235,7 @@ Kibanaで閲覧するGitのコミットログをElasticsearchに投入するた�
 Kibana5.4（beta版）ではKibanaのUIからCSVをElasticsearchに投入できる機能があったのですが、いつの間にか廃止されていました…。なので、
 （仕方なく）Logstashを利用します。この辺はこだわりがありませんので、何らかの形でElasticsearchにデータを投入しましょう。
 
-もふもふちゃんは@@<code>{config/conf.d}フォルダに@@<code>{gitlog-logstash.conf}を作成しました。
+もふもふちゃんは@<code>{config/conf.d}フォルダに@<code>{gitlog-logstash.conf}を作成しました。
 
 //list[kibana01-list06][gitlog-logstash.conf]{
 input {
@@ -259,9 +259,9 @@ output {
 
 解説するほどの設定はありませんが、いくつか補足します。
 
-動作確認をしたかったので、念のため@@<code>{stdout}で標準出力をするように設定しています。
+動作確認をしたかったので、念のため@<code>{stdout}で標準出力をするように設定しています。
 また、Elasticserchはローカル環境で起動したものを利用するため、IPアドレスなどは設定していません。
-デフォルトの設定は@@<code>{localhost}のElasticsearchを参照するようになっているからです。
+デフォルトの設定は@<code>{localhost}のElasticsearchを参照するようになっているからです。
 
 //cmd{
 ~/Elastic-Stack/logstash-6.2.2 $ bin/logstash -f config/conf.d/gitlog-logstash.conf
