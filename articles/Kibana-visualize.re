@@ -272,9 +272,25 @@ output {
 
 //cmd{
 ~/Elastic-Stack/logstash-6.2.2 $ bin/logstash -f config/conf.d/gitlog-logstash.conf
+Sending Logstash's logs to /Users/mallow/Elastic-Stack/logstash-6.2.2/logs which is now configured via log4j2.properties
+[2018-03-09T23:04:07,107][INFO ][logstash.modules.scaffold] Initializing module {:module_name=>"netflow", :directory=>"/Users/mallow/Elastic-Stack/logstash-6.2.2/modules/netflow/configuration"}
+[2018-03-09T23:04:07,145][INFO ][logstash.modules.scaffold] Initializing module {:module_name=>"fb_apache", :directory=>"/Users/mallow/Elastic-Stack/logstash-6.2.2/modules/fb_apache/configuration"}
+[2018-03-09T23:04:07,538][WARN ][logstash.config.source.multilocal] Ignoring the 'pipelines.yml' file because modules or command line options are specified
+[2018-03-09T23:04:08,400][INFO ][logstash.runner          ] Starting Logstash {"logstash.version"=>"6.2.2"}
+[2018-03-09T23:04:08,970][INFO ][logstash.agent           ] Successfully started Logstash API endpoint {:port=>9600}
+[2018-03-09T23:04:14,181][INFO ][logstash.pipeline        ] Starting pipeline {:pipeline_id=>"main", "pipeline.workers"=>4, "pipeline.batch.size"=>125, "pipeline.batch.delay"=>50}
+[2018-03-09T23:04:15,035][INFO ][logstash.outputs.elasticsearch] Elasticsearch pool URLs updated {:changes=>{:removed=>[], :added=>[http://127.0.0.1:9200/]}}
+[2018-03-09T23:04:15,047][INFO ][logstash.outputs.elasticsearch] Running health check to see if an Elasticsearch connection is working {:healthcheck_url=>http://127.0.0.1:9200/, :path=>"/"}
+[2018-03-09T23:04:15,576][WARN ][logstash.outputs.elasticsearch] Restored connection to ES instance {:url=>"http://127.0.0.1:9200/"}
+[2018-03-09T23:04:15,738][INFO ][logstash.outputs.elasticsearch] ES Output version determined {:es_version=>nil}
+[2018-03-09T23:04:15,745][WARN ][logstash.outputs.elasticsearch] Detected a 6.x and above cluster: the `type` event field won't be used to determine the document _type {:es_version=>6}
+[2018-03-09T23:04:15,781][INFO ][logstash.outputs.elasticsearch] Using mapping template from {:path=>nil}
+[2018-03-09T23:04:15,815][INFO ][logstash.outputs.elasticsearch] Attempting to install template {:manage_template=>{"template"=>"logstash-*", "version"=>60001, "settings"=>{"index.refresh_interval"=>"5s"}, "mappings"=>{"_default_"=>{"dynamic_templates"=>[{"message_field"=>{"path_match"=>"message", "match_mapping_type"=>"string", "mapping"=>{"type"=>"text", "norms"=>false}}}, {"string_fields"=>{"match"=>"*", "match_mapping_type"=>"string", "mapping"=>{"type"=>"text", "norms"=>false, "fields"=>{"keyword"=>{"type"=>"keyword", "ignore_above"=>256}}}}}], "properties"=>{"@timestamp"=>{"type"=>"date"}, "@version"=>{"type"=>"keyword"}, "geoip"=>{"dynamic"=>true, "properties"=>{"ip"=>{"type"=>"ip"}, "location"=>{"type"=>"geo_point"}, "latitude"=>{"type"=>"half_float"}, "longitude"=>{"type"=>"half_float"}}}}}}}}
+[2018-03-09T23:04:15,894][INFO ][logstash.outputs.elasticsearch] New Elasticsearch output {:class=>"LogStash::Outputs::ElasticSearch", :hosts=>["//127.0.0.1"]}
+[2018-03-09T23:04:16,397][INFO ][logstash.pipeline        ] Pipeline started succesfully {:pipeline_id=>"main", :thread=>"#<Thread:0x2620d55d run>"}
+[2018-03-09T23:04:16,585][INFO ][logstash.agent           ] Pipelines running {:count=>1, :pipelines=>["main"]}
 //}
 
-#@#標準出力結果入れる
 
 === Kibanaの起動
 
@@ -288,11 +304,11 @@ output {
 ~ $ cd Elastic-Stack/
 ~/Elastic-Stack $ cd kibana-6.2.2-darwin-x86_64/
 ~/Elastic-Stack/kibana-6.2.2-darwin-x86_64 $ bin/kibana
-  log   [08:19:01.911] [info][status][plugin:kibana@6.2.2] Status changed from uninitialized to green - Ready
-  log   [08:19:02.045] [info][status][plugin:elasticsearch@6.2.2] Status changed from uninitialized to yellow - Waiting for Elasticsearch
-  log   [08:19:02.623] [info][status][plugin:timelion@6.2.2] Status changed from uninitialized to green - Ready
-  log   [08:19:02.632] [info][status][plugin:console@6.2.2] Status changed from uninitialized to green - Ready
-  log   [08:19:02.652] [info][status][plugin:metrics@6.2.2] Status changed from uninitialized to green - Ready
-  log   [08:19:02.725] [info][listening] Server running at http://localhost:5601
-  log   [08:19:02.823] [info][status][plugin:elasticsearch@6.2.2] Status changed from yellow to green - Ready
+log   [08:19:01.911] [info][status][plugin:kibana@6.2.2] Status changed from uninitialized to green - Ready
+log   [08:19:02.045] [info][status][plugin:elasticsearch@6.2.2] Status changed from uninitialized to yellow - Waiting for Elasticsearch
+log   [08:19:02.623] [info][status][plugin:timelion@6.2.2] Status changed from uninitialized to green - Ready
+log   [08:19:02.632] [info][status][plugin:console@6.2.2] Status changed from uninitialized to green - Ready
+log   [08:19:02.652] [info][status][plugin:metrics@6.2.2] Status changed from uninitialized to green - Ready
+log   [08:19:02.725] [info][listening] Server running at http://localhost:5601
+log   [08:19:02.823] [info][status][plugin:elasticsearch@6.2.2] Status changed from yellow to green - Ready
 //}
