@@ -263,49 +263,28 @@ output {
 また、Elasticserchはローカル環境で起動したものを利用するため、IPアドレスなどは設定していません。
 デフォルトの設定は@<code>{localhost}のElasticsearchを参照するようになっているからです。
 
+@<code>{logstash.conf}を配置後、@<code>{bin/logstash -f config/conf.d/gitlog-logstash.conf}でLogstashを起動します。
+このとき、Elasticsearchと同様に@<code>{logstash-6.2.2}ディレクトリに移動してからコマンドを実行します。もふちゃんはiTerm2を利用しているので、別タブを開いて起動しました。
+@<code>{-f コンフィグの配置場所}でちゃんとファイルパス、ファイル名を指定しないと「configがないよーん」とエラーになりLogstashを起動できません。
+そこはトラブルになりやすいので気をつけたらいいと思います。
+
+これも参考として、出力結果を載せておきます。
+
 //cmd{
 ~/Elastic-Stack/logstash-6.2.2 $ bin/logstash -f config/conf.d/gitlog-logstash.conf
-Sending Logstash's logs to /Users/mofumofu/Elastic-Stack/logstash-6.2.2/logs which is now configured via log4j2.properties
-[2018-03-07T13:09:28,580][INFO ][logstash.modules.scaffold] Initializing module {:module_name=>"netflow", :directory=>"/Users/mofumofu/Elastic-Stack/logstash-6.2.2/modules/netflow/configuration"}
-[2018-03-07T13:09:28,609][INFO ][logstash.modules.scaffold] Initializing module {:module_name=>"fb_apache", :directory=>"/Users/mofumofu/Elastic-Stack/logstash-6.2.2/modules/fb_apache/configuration"}
-[2018-03-07T13:09:29,016][WARN ][logstash.config.source.multilocal] Ignoring the 'pipelines.yml' file because modules or command line options are specified
-[2018-03-07T13:09:30,030][INFO ][logstash.runner          ] Starting Logstash {"logstash.version"=>"6.2.2"}
-[2018-03-07T13:09:30,683][INFO ][logstash.agent           ] Successfully started Logstash API endpoint {:port=>9600}
-[2018-03-07T13:09:33,792][INFO ][logstash.pipeline        ] Starting pipeline {:pipeline_id=>"main", "pipeline.workers"=>4, "pipeline.batch.size"=>125, "pipeline.batch.delay"=>50}
-[2018-03-07T13:09:34,713][INFO ][logstash.inputs.beats    ] Beats inputs: Starting input listener {:address=>"0.0.0.0:5044"}
-[2018-03-07T13:09:34,878][INFO ][logstash.pipeline        ] Pipeline started succesfully {:pipeline_id=>"main", :thread=>"#<Thread:0x28402278 run>"}
-[2018-03-07T13:09:35,164][INFO ][org.logstash.beats.Server] Starting server on port: 5044
-[2018-03-07T13:09:35,372][INFO ][logstash.agent           ] Pipelines running {:count=>1, :pipelines=>["main"]}
 //}
 
-Logstashでデータを取得（詳しい解説は別章をみてやでい）
+#@#標準出力結果入れる
+
+=== Kibanaの起動
+
+データがElasticsearchに投入できたので、最後にKibanaを起動します。
+これも他2プロダクトと同様に、@<code>{kibana-6.2.2-darwin-x86_64}ディレクトリに移動後、@<code>{bin/kibana}でKibanaを起動します。
+@<code>{Server running at http://kibana.ymlで記載したIPアドレス:ポート番号}と出力されれば、正常に起動できています。
+
+もふちゃんは@<code>{kibana.yml}を修正していないため、@<code>{localhost:5601}でKibanaは起動します。
 
 //cmd{
-input {
-		file {
-			path => "Users/mofumofu/Google ドライブ/TB4-Elastic-Stack-6/articles/log/*.json"
-			tags => "git-log"
-		}
-}
-
-output {
-	stdout { codec => json }
-}
-//}
-
-
-Elasticsearchにデータを投入するから向け先を変更
-
-CSVインポートなくなったんだもんしょうがないでしょうそういうのちゃんというといてクレメンスって感じ
-
-Elasticserch起動
-
-
-
-Kibana起動
-
-//cmd{
-Last login: Wed Mar  7 17:17:30 on ttys000
 ~ $ cd Elastic-Stack/
 ~/Elastic-Stack $ cd kibana-6.2.2-darwin-x86_64/
 ~/Elastic-Stack/kibana-6.2.2-darwin-x86_64 $ bin/kibana
