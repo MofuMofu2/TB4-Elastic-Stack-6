@@ -191,6 +191,7 @@ drwxr-xr-x@ 16 mofumofu  staff   512  3  7 10:51 logstash-6.2.2
 @<code>{elasticsearch-6.2.2}ディレクトリに移動した後、@<code>{bin/elasticsearch}でElasticsearchを起動しました。
 
 これも、出力結果を載せておきます。ここは本題ではありませんので、解説や特別な設定は行いません。
+#@#文章できたらリンクを貼る
 
 //cmd{
 ~/Elastic-Stack/elasticsearch-6.2.2 $ bin/elasticsearch
