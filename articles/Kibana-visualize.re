@@ -352,8 +352,8 @@ Elastic Stackを色々な人に使ってもらいたいという心意気って�
 
 === 楽々ぽんのDashboardセットアップ
 
-で、次に特徴的なのは@@<code>{APM}や@@<code>{Logging}の文字ですね。これは@@<code>{Modules}というElastic Stackの新機能です。
-micci184の章でも触れていますが、専用の@@<code>{Beats Modules}を起動すると、Elasticsearchに自動で接続・KibanaのDashboardまで作成してもらえます。
+で、次に特徴的なのは@<code>{APM}や@<code>{Logging}の文字ですね。これは@<code>{Modules}というElastic Stackの新機能です。
+micci184の章でも触れていますが、専用の@<code>{Beats Modules}を起動すると、Elasticsearchに自動で接続・KibanaのDashboardまで作成してもらえます。
 あら便利！ヘル○オ並みの便利さです。
 
 #@#章決まったら章題入れる
@@ -377,8 +377,8 @@ Elastic Stack6.2の時点で利用できるModulesは次の通りです。（Kib
 * システムログ
 * システムのメトリクス
 
-@@<code>{Netflow}はCisco社が開発したネットワークトラフィックの詳細情報を収集するための技術です。
-@@<code>{Redis}はNoSQLデータベースの1種です。
+@<code>{Netflow}はCisco社が開発したネットワークトラフィックの詳細情報を収集するための技術です。
+@<code>{Redis}はNoSQLデータベースの1種です。
 
 となると、このラインナップを見る限りWeb系をメインターゲットとして置いてるように見えますね。
 やはりWebサービスは性能命ですから、性能やサービス監視は簡単に構築したいものです、って需要をうまく組んでますなあって気持ちになります。
