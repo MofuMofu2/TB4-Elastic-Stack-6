@@ -229,6 +229,7 @@ drwxr-xr-x@ 16 mofumofu  staff   512  3  7 10:51 logstash-6.2.2
 [2018-03-07T17:20:58,218][INFO ][o.e.c.m.MetaDataMappingService] [m3LWuZ2] [logstash-2018.03.07/WBFN2jXwR16CDprJIlIq-w] create_mapping [doc]
 //}
 
+#@#標準出力はいれるか要相談
 
 === Logstashの起動
 
@@ -313,3 +314,10 @@ log   [08:19:02.652] [info][status][plugin:metrics@6.2.2] Status changed from un
 log   [08:19:02.725] [info][listening] Server running at http://localhost:5601
 log   [08:19:02.823] [info][status][plugin:elasticsearch@6.2.2] Status changed from yellow to green - Ready
 //}
+
+この状態でブラウザから@<herf>{http://localhost:5601/}にアクセスすると、@@<img>{kibana01-img01}のような画面が見えているはずです。
+
+//image[kibana01-img01][Kibana6.0の画面]{
+//}
+
+これで準備はできました。
