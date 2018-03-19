@@ -1,8 +1,30 @@
 = Elastic Stackとは
 
+Elastic StackとはElastic社が開発しているプロダクト群です。
+
+* Elasticserch
+* Logstash
+* Beats
+* Kibana
+
+この辺りが有名どころ、かつOSSとして利用できるプロダクトですね。特に検索エンジンとしてのElasticsearchは競合がいないのでは？というくらい
+よく使われているミドルウェアです。
+
+やりたいことに合わせて柔軟に答えていけるだけのカスタマイズ性の高さ、より利便性を求めてアップデートをかけていく姿勢が魅力です。
+まるでメタモンですね。メタモンはアップデートかからないけどね。
+
 
 
 == 主要プロダクト
+
+=== Elasticsearch
+
+=== Logstash
+
+=== Beats
+
+=== Kibana
+
 
 == 今後のElastic Stack6のみどころだよ
 
