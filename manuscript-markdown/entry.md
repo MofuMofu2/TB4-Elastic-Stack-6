@@ -47,7 +47,7 @@ Elastic Stackは、Elasticsearch社が提供するプロダクトです。
 * Beats
 
 どんな用途で使われているのかを説明していきます。  
-ザックリとした説明なので、"ふーん"って、レベルで読み進めてもらえればと思います。
+ザックリとした説明なので、なんとなーく言っている意味がわかるレベルで読み進めてもらえればと思います。
 
 ### Elasticsearch
 
@@ -120,26 +120,7 @@ ICMPでサーバの稼働状況を把握することも可能ですし、HTTPで
 具体的には、ログの取り込み部分のLogstashとBeatsの二つのプロダクトを通じて、ログの取り込み方法の理解を深めたいと思います。  
 主に以下についての理解を深めていけるようにします。  
 
-* Logstashの使い方
-* Beatsの使い方
-* LogstashとBeatsの違い
+* Logstashの使い方を知る
+* Beatsの使い方を知る
+* LogstashとBeatsの違いを知る
 
-### 実行環境について
-
-Elastic Stackのバージョンは、以下を使用します。  
-
-* Elasticsearch 6.2.2
-* Logstash 6.2.2
-* Kibana 6.2.2
-* Metricbeat 6.2.2
-* Auditbeat 6.2.2
-* Packetbeat 6.2.2
-
-> Download Elastic Stack  
-> https://www.elastic.co/jp/products
-
-サーバは、AWSのEC2を利用します。  
-OSは、AmazonLinuxを利用し、インスタンスタイプは最低限必要なリソースを積んだものにします。
-
-* Amazon Linux AMI 2017.09.1 (HVM), SSD Volume Type - ami-97785bed
-* t2.medium(vCPU: 2,Mem: 4)

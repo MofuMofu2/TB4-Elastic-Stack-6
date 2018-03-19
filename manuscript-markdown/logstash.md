@@ -1,5 +1,210 @@
 # Logstashを使ってみる
 
+## 目的
+
+この章では、ALB(AWSのアプリケーションロードバランサ)のログをLogstashでElasticsearchにストアできるようになる。  
+合わせて、取り込んだログをKibanaで確認するところまでやります。  
+
+## 実行環境を準備する
+
+Logstashの使い方を知る前に、実行環境を整える必要があります。  
+サーバは、AWSのEC2を利用しおり、OSは、AmazonLinuxで構築していきます。  
+インスタンスタイプは、最低限必要なリソースを積んだものを選択しています。  
+そのため、OS差異によって、発行するコマンドが変わってくるので、その辺は公式HPをみて頂ければと思います。
+
+* Amazon Linux AMI 2017.09.1 (HVM), SSD Volume Type - ami-97785bed
+* t2.medium(vCPU: 2,Mem: 4)
+
+今回導入するプロダクトのバージョンは以下です。
+
+* Elasticsearch 6.2.2
+* Logstash 6.2.2
+* Kibana 6.2.2
+* Metricbeat 6.2.2
+* Auditbeat 6.2.2
+* Packetbeat 6.2.2
+
+[Download Elastic Stack](https://www.elastic.co/jp/products)
+
+### こんな環境を構築するよ
+
+[図を入れる]
+
+### ALBのログを準備する
+
+ALBのログを出力するには、ALB自体のロギングの設定を有効化する必要があります。  
+有効化するとALBのログをS3のバケットにログを出力することができます。  
+
+設定方法について説明はしないので、以下のAWSの公式HPを参考に実施して頂ければと思います。  
+
+## プロダクトのインストールするよ
+
+以下の流れでインストールしていきます。
+
+1. Java 8インストール
+2. Elasticsearchインストール
+3. Kibanaをインストール
+
+### Java 8インストール
+
+Elasticsearch、Logstashを実行するにあたって、Java 8が必要なため、インストールします。  
+Javaの切り替えにalternativesコマンドを使用して変更します。
+
+まずは、Javaがインストールされているかとバージョンを確認します。
+
+```bash
+$ java -version
+xx
+```
+
+AmazonLinuxの場合は、Javaが最初からインストールされています。  
+ただし、バージョンが、Java 7であることがわかります。  
+そのため、Java 8をインストールしていきます。
+
+```bash
+### Install Java 8
+$ sudo yum -y install java-1.8.0-openjdk-devel
+```
+
+Java 8のインストールが完了したので、再度バージョンを確認します。
+
+```bash
+$ java -version
+xx
+```
+
+あれ？あれれ？  
+バージョンが変わってないですね。。  
+
+実は、Javaをインストールしただけでは切り替わらないため、alternativesコマンドを発行する必要があります。  
+alternativesコマンドを発行すると対話形式でJavaの選択ができので、Java 8を選択します。  
+
+```bash
+$ sudo alternatives --config java
+
+There are 2 programs which provide 'java'.
+
+  Selection    Command
+-----------------------------------------------
+*+ 1           /usr/lib/jvm/jre-1.7.0-openjdk.x86_64/bin/java
+   2           /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
+
+Enter to keep the current selection[+], or type selection number: 2
+```
+
+それでは、再度バージョンを確認してみましょう。  
+今度は、Java 8になっていることがわかりますね。
+
+```bash
+$ java -version
+openjdk version "1.8.0_161"
+OpenJDK Runtime Environment (build 1.8.0_161-b14)
+OpenJDK 64-Bit Server VM (build 25.161-b14, mixed mode)
+```
+
+<!-- Mofu Javaの切り替えというの、もうすこし噛み砕いて説明した方がいいです。（一回java -versionを挟んでバージョン変わってないから変更する、など）ハマる人多い気がします。 -->
+
+### Elasticsaerchインストール
+
+ここからは、Elastic Stackのプロダクトのインストールを実施していきます。  
+ちなみに、公式HPをみるとわかりますが、英語ドキュメントです。  
+やはり英語だと抵抗感を抱く人がいると思うので、できる限りわかりやすく日本語で書きます。  
+正直、英語ぐらいわかるわー！って人は、飛ばしちゃってください。  
+
+[Install Logstash](https://www.elastic.co/guide/en/logstash/current/installing-logstash.html)
+
+てことで、Elasticsearchなどのパッケージをダウンロードするため、GPGキーをインポートします。
+
+```bash
+### Import GPG-Key
+$ rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+```
+
+キーの登録が完了したので、YUMリポジトリを追加します。  
+"/etc/yum.repo/"配下に"elasticstack.repo"というファイルを作成します。  
+公式では、logstash.repoとなっておりますが、今回はElasticsearchなどもインストールするため、Elastic Stackという名前にしました。  
+要はファイル名は、任意で問題ないということです。
+
+```bash
+### Add elastic.repo
+$ sudo vim /etc/yum.repos.d/elasticstack.repo
+[elasticstack-6.x]
+name=Elastic repository for 6.x packages
+baseurl=https://artifacts.elastic.co/packages/6.x/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+autorefresh=1
+type=rpm-md
+```
+
+### Elasticsearchをインストール
+
+Output先としてElasticsearchを利用するため、Elasticsearchをインストールします。
+
+```bash
+### Install Elasticsearch
+$ sudo yum install elasticsearch
+```
+
+インストールが完了したので、バージョンを確認します。
+
+```bash
+$ /usr/share/elasticsearch/bin/elasticsearch --version
+Version: 6.2.2, Build: 10b1edd/2018-02-16T19:01:30.685723Z, JVM: 1.8.0_161
+```
+
+Elasticsearchのサービス自動起動の設定をします。
+
+```bash
+### Auto start setting
+$ sudo chkconfig --add elasticsearch
+$ chkconfig --list | grep elasticsearch
+elasticsearch  	0:off	1:off	2:on	3:on	4:on	5:on	6:off
+```
+
+<!-- Mofu Logstashの自動起動設定は入れないのでしょうか？ここは合わせた方がわかりやすいと思います。 -->
+
+### Logstashをインストール
+
+ログを取り込むのに必要なLogstashをインストールします。
+
+```bash
+### Install Logstash
+$ sudo yum install logstash
+```
+
+インストールが完了したので、バージョンを確認します。
+
+```bash
+$ /usr/share/logstash/bin/logstash --version
+logstash 6.2.2
+```
+
+今回は、ログのInput先がAWSのS3のため、プラグインをインストールする必要があります。  
+それでは、"S3 Input Plugin"をインストールします。
+
+[S3 Input Plugin](https://www.elastic.co/guide/en/logstash/current/plugins-inputs-s3.html)
+
+```bash
+### Install S3 Input Plugin
+$ /usr/share/logstash/bin/logstash-plugin install logstash-input-s3
+Validating logstash-input-s3
+Installing logstash-input-s3
+Installation successful
+```
+
+LogstashもElasticsearchと同様にサービス自動起動の設定をします。  
+
+```bash
+hogehoge
+```
+
+### Kibanaをインストール
+
+
+Logstashは
+
 Logstashは、"Input""Filter""Output"の構成で記述します。  
 Inputでログのソースを指定し、Filterで必要な要素に分解します。最後のOutputで出力先を指定します。  
 今回は、AWS環境なので、Inputは、S3からログを取得して、OutputでElasticsearchにストアさせます。  
@@ -13,39 +218,6 @@ Logstashのインストールは以下の公式でも記載されてるのです
 正直、英語ぐらいわかるわー！って人は、飛ばしちゃってください。  
 
 > Install Logstash: https://www.elastic.co/guide/en/logstash/current/installing-logstash.html
-
-### Java 8インストール
-
-Logstashをインストールするにあたり、Java 8が必要なので、インストールします。
-Javaの切り替えにalternativesコマンドを使用して変更します。
-
-```bash
-### Install Java 8
-$ sudo yum -y install java-1.8.0-openjdk-devel
-$ sudo alternatives --config java
-
-There are 2 programs which provide 'java'.
-
-  Selection    Command
------------------------------------------------
-*+ 1           /usr/lib/jvm/jre-1.7.0-openjdk.x86_64/bin/java
-   2           /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
-
-Enter to keep the current selection[+], or type selection number: 2
-$ java -version
-openjdk version "1.8.0_161"
-OpenJDK Runtime Environment (build 1.8.0_161-b14)
-OpenJDK 64-Bit Server VM (build 25.161-b14, mixed mode)
-```
-
-<!-- Mofu Javaの切り替えというの、もうすこし噛み砕いて説明した方がいいです。（一回java -versionを挟んでバージョン変わってないから変更する、など）ハマる人多い気がします。 -->
-
-### GPGキーをインポート
-
-```bash
-### Import GPG-Key
-$ rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
-```
 
 ### YUMリポジトリの追加
 
