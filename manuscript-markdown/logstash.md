@@ -1,9 +1,17 @@
 # Logstashを使ってみる
 
-## 目的
+## この章でやること
 
-この章では、ALB(AWSのアプリケーションロードバランサ)のログをLogstashでElasticsearchにストアできるようになる。  
-合わせて、取り込んだログをKibanaで確認するところまでやります。  
+AWSでWebサイトを運営していて、ELBのログからどこの国からアクセスされているのかや、UserAgentを知りたいと行った時に、  
+CloudWatchではモニタリングできないものがあります。  
+でも大丈夫です！  
+ELBはログを出力しているので、そのログをよしなに取り込んで、ビジュアライズすればいいだけなのです！  
+ちなみに、ELBといっているけど、今回はALB（Application loadbalancer）を対象にするよ。
+
+それでは、この章でやることです！
+
+* ALB(AWSのアプリケーションロードバランサ)のログをLogstashでElasticsearchにストアできるになる
+* 取り込んだログをKibanaでビジュアライズできる
 
 ## 実行環境を準備する
 
@@ -15,7 +23,7 @@ Logstashの使い方を知る前に、実行環境を整える必要がありま
 * Amazon Linux AMI 2017.09.1 (HVM), SSD Volume Type - ami-97785bed
 * t2.medium(vCPU: 2,Mem: 4)
 
-今回導入するプロダクトのバージョンは以下です。
+今回導入するミドルウェアのバージョンは以下です。
 
 * Elasticsearch 6.2.2
 * Logstash 6.2.2
@@ -37,13 +45,14 @@ ALBのログを出力するには、ALB自体のロギングの設定を有効�
 
 設定方法について説明はしないので、以下のAWSの公式HPを参考に実施して頂ければと思います。  
 
-## プロダクトのインストールするよ
+## ミドルウェアのインストールするよ
 
 以下の流れでインストールしていきます。
 
 1. Java 8インストール
 2. Elasticsearchインストール
-3. Kibanaをインストール
+3. Logstashインストール
+4. Kibanaインストール
 
 ### Java 8インストール
 
@@ -106,7 +115,7 @@ OpenJDK 64-Bit Server VM (build 25.161-b14, mixed mode)
 
 ### Elasticsaerchインストール
 
-ここからは、Elastic Stackのプロダクトのインストールを実施していきます。  
+ここからは、Elastic Stackのミドルウェアのインストールを実施していきます。  
 ちなみに、公式HPをみるとわかりますが、英語ドキュメントです。  
 やはり英語だと抵抗感を抱く人がいると思うので、できる限りわかりやすく日本語で書きます。  
 正直、英語ぐらいわかるわー！って人は、飛ばしちゃってください。  
@@ -202,95 +211,36 @@ hogehoge
 
 ### Kibanaをインストール
 
-
-Logstashは
-
-Logstashは、"Input""Filter""Output"の構成で記述します。  
-Inputでログのソースを指定し、Filterで必要な要素に分解します。最後のOutputで出力先を指定します。  
-今回は、AWS環境なので、Inputは、S3からログを取得して、OutputでElasticsearchにストアさせます。  
-
-それでは、ここから実際にLogstashをインストールして、どのようなことを行うかを見ていきたいと思います。  
-
-##  実行環境を準備するよ
-
-Logstashのインストールは以下の公式でも記載されてるのですが、英語です。  
-やはり抵抗感を覚える人もいると思うので、できる限りわかりやすく日本語で書きます。  
-正直、英語ぐらいわかるわー！って人は、飛ばしちゃってください。  
-
-> Install Logstash: https://www.elastic.co/guide/en/logstash/current/installing-logstash.html
-
-### YUMリポジトリの追加
-
-logstashのパッケージを取得するため、YUMリポジトリを追加します。  
-"/etc/yum.repo/"配下に"elasticstack.repo"というファイルを作成します。  
-公式では、logstash.repoとなっておりますが、今回はElasticsearchなどもインストールするため、汎用的な名前にしました。要は任意で問題ないということです。
+ビジュアライズするためにKibanaをインストールします。
 
 ```bash
-### Add elastic.repo
-$ sudo vim /etc/yum.repos.d/elasticstack.repo
-[elasticstack-6.x]
-name=Elastic repository for 6.x packages
-baseurl=https://artifacts.elastic.co/packages/6.x/yum
-gpgcheck=1
-gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
-enabled=1
-autorefresh=1
-type=rpm-md
+### Install Kibana
+$ yum install kibana
 ```
 
-### Logstashをインストール
-
-最後にLogstashをインストールします。
-
-```bash
-### Install Logstash
-$ sudo yum install logstash
-$ /usr/share/logstash/bin/logstash --version
-logstash 6.2.2
-```
-
-S3をデータソースにするため、"S3 Input Plugin"をインストールします。
-
-> S3 Input Plugin: https://www.elastic.co/guide/en/logstash/current/plugins-inputs-s3.html
-
-```bash
-$ /usr/share/logstash/bin/logstash-plugin install logstash-input-s3
-Validating logstash-input-s3
-Installing logstash-input-s3
-Installation successful
-```
-
-### Elasticsearchをインストール
-
-Output先としてElasticsearchを利用するため、Elasticsearchをインストールします。
-
-```bash
-### Install Elasticsearch
-$ sudo yum install elasticsearch
-$ /usr/share/elasticsearch/bin/elasticsearch --version
-Version: 6.2.2, Build: 10b1edd/2018-02-16T19:01:30.685723Z, JVM: 1.8.0_161
-``` 
-
-サービスの自動起動をする場合は、以下を実行してください。
-
-<!-- Mofu Logstashの自動起動設定は入れないのでしょうか？ここは合わせた方がわかりやすいと思います。 -->
+Kibanaも自動起動設定をします。
 
 ```bash
 ### Auto start setting
-$ sudo chkconfig --add elasticsearch
-$ chkconfig --list | grep elasticsearch
-elasticsearch  	0:off	1:off	2:on	3:on	4:on	5:on	6:off
+$ sudo chkconfig --add kibana
+$ chkconfig --list | grep kibana
+kibana  	0:off	1:off	2:on	3:on	4:on	5:on	6:off
 ```
 
-## Elasticsearchの準備するよ
+これで全てインストールが完了しました。  
 
-ここからはElasticsearchの設定ファイルの編集をします。
+## ミドルウェアの設定
 
-### Elasticsearchのディレクトリ構成について
+ここから必要な設定を実施していきます。  
 
-Elasticsearchのディレクトリ構成は以下です。  
-elasticsearch.ymlとjvm.optionsの設定を編集します。
-ログの出力部分など編集したい場合は、log4j2.propertiesを編集してください。
+以下の流れでミドルウェアの設定をしていきます。
+
+1. Elastcisearchの設定
+2. 
+
+### Elasticsearchの設定について
+
+設定変更する前に、Elasticsaerchの設定ファイルが構成されているディレクトリを見ていきたいと思います。  
 
 ```bash
 ### Elasticsearch directory structure
@@ -300,18 +250,27 @@ elasticsearch.ymlとjvm.optionsの設定を編集します。
  ┗ log4j2.properties
 ```
 
-### jvm.optionsの編集
+"/etc/elasticserch/"配下に3つのファイルが配置されてます。  
+Elasticsearchを構成する際にjvm.optionsとelasticsearch.ymlを主に設定します。  
+log4j2.propertiesは、ログの出力形式など変更が必要な際に設定してください。
 
-jvm.optionsからヒープサイズを変更することが可能で、"Xms(minimum heap size)"と"Xmx(maximum heap size) "を変更します。  
-Elasticsearch社の公式に書かれている設定アドバイスは以下です。
+今回、設定変更するのは、jvm.optionsとelasticserch.ymlです。  
+この二つの設定ファイルの変更と設定についての考慮点などを記載したいと思います。
+
+#### jvm.optionsという設定ファイルについて
+
+Elasticsaerchのヒープサイズを変更したい！ってなった時は、jvm.optionsで設定変更ができます。   
+例えば、ヒープサイズの最大と最小を設定する場合は、"Xms(minimum heap size)"と"Xmx(maximum heap size) "を変更します。  
+じゃあ、いくつに設定すればいいの？と思う方もいるかと思いますが、要件によって変わってくる項目です。  
+しかし、Elasticsaerch社の公式HPで掲載されているので、その内容を以下に記載するので参考に設定して頂ければ良いかと思います。  
 
 * 最小ヒープサイズ(Xms)と最大ヒープサイズ(Xmx)の値を等しくする
 * ヒープサイズを上げすぎるとGCの休止をまねく可能性がある
 * Xmxは、物理メモリの50%を割り当てて、ファイルシステム側にも十分に残すようにする
 * 割り当てるメモリは、32GB以下にする
 
-上記を踏まえて"jvm.options"の設定をします。
-インスタンスのメモリは、4GBなので2GBを割り当てます。
+今回のサーバは、メモリを4GB搭載しているので2GBをわりあてるかたちでいいかと思います。  
+以下のように設定します。
 
 ```bash
 ### Heap size change
@@ -320,13 +279,15 @@ $ vim /etc/elasticsearch/jvm.options
 -Xmx2g
 ```
 
-> Settings the heap size:
-> https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html
+[Settings the heap size:](https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html)
 
-### elasticserch.ymlの編集
+#### elasticserch.ymlという設定ファイルについて
 
-elasticsearch.ymlでノード名や、クラスタ名の編集が可能ですが、デフォルト値とします。  
-今回は、どこからでもアクセス可能とするため、"network.host"のみを編集します。
+Elasticsaerchでクラスタ構成をする場合などに設定するファイルです。  
+今回は、クラスタ構成はしないので、以下のアクセス元制限の設定のみを行います。  
+
+実際に変更します。  
+この設定は、どこからでもアクセス可能とするため、"network.host"のみを編集します。
 "0.0.0.0"と設定することで、どこからでもアクセス可能となります。
 
 ```bash
@@ -334,7 +295,8 @@ elasticsearch.ymlでノード名や、クラスタ名の編集が可能ですが
 $ network.host: 0.0.0.0
 ```
 
-参考までに実運用では必要となりうる"elasticserch.yml"の設定値について記載します。
+以下にelasticsearch.ymlの設定項目について表に記載しています。  
+ご興味がある方は、参考にして頂ければと思います。
 
 | No. | Item                               | Content                                                                |
 |:----|:-----------------------------------|:-----------------------------------------------------------------------|
@@ -344,13 +306,22 @@ $ network.host: 0.0.0.0
 | 4   | discovery.zen.ping.unicast.hosts   | クラスタを組む際にノードを指定                                         |
 | 5   | discovery.zen.minimum_master_nodes | 必要最低限のノード数を指定                                             |
 
+
+#### Elasticsaerchサービス起動
+
 Elasticsearchを起動し、動作確認をします。
-curlで実行し、レスポンスが返ってくれば問題なく起動してます。
 
 ```bash
 ### Service activation
 $ service elasticsearch start
 Starting elasticsearch:                                    [  OK  ]
+```
+
+動作確認としてELasticsearchに対して、curlします。  
+Elasticsearchは、ローカル環境に構築しているので、"localhost"にcurlします。  
+デフォルトのポートは、"9200"のため、ポート指定します。
+
+```bash
 ### Check the operation of elasticsearch
 $ curl localhost:9200
 {
@@ -370,11 +341,12 @@ $ curl localhost:9200
 }
 ```
 
-これでElasticsearchの準備が完了です。
+Elasticsaerchからレスポンスが返ってきましたね。  
+これでElasticsearchの設定完了です。
 
-## Logstashの設定ファイルを触ってみる
+## Logstashの設定について
 
-Logstashのディレクトリ構成は以下です。
+Elasticsearchの時と同様にLogstashもディレクトリ構成をみていきたいと思います。  
 
 ```bash
 ### Elasticsearch directory structure
@@ -398,11 +370,17 @@ Logstashのディレクトリ構成は以下です。
 | 5   | pipelines.yml     | パイプラインを複数実行する際に定義するファイル                |
 | 6   | startup.options   | Logstash起動時に利用されるファイル                            |
 
+ここから個々のファイルについてと説明と設定を行なっていきます。  
+細かい設定などがありますが、ちょっと頑張ってもらえればと思います。
+
 ### logstash.ymlの編集
 
-今回は、logstash.ymlの編集は行いませんが、このファイルでどんなことができるかをサクッと書いておきます。  
+今回は、logstash.ymlの編集は行いません。  
+なので、飛ばしても大丈夫ですし、ご興味のある方は、読み進めてもらえればと思います。
+
 logstash.ymlでは、パイプラインのバッチサイズやディレイ設定が可能です。  
-例えば、以下のように階層やフラットな構造で記載することが可能です。
+要は、Logstashの動作についてのハンドリングを施すことが可能な設定ファイルです。  
+ymlファイルのため、以下のように階層やフラットな構成で記載することが可能です。
 
 ```bash
 ### hierarchical form
@@ -415,27 +393,28 @@ pipeline.batch.size: 125
 pipeline.batch.delay: 50
 ```
 
-また、パイプラインを実行するWoker数を変更することも可能です。
-変更する際は、"pipeline.workers"の数を変更します。
-Woker数の目安は、割り当てたいCPUコア数とイコールにするのが良いです。
+そもそも、パイプラインってなんぞ？って人がいると思うので説明しますね。  
+そもそもですが、Logstashは、"Input"、"Filter"、"Output"の3つで構成されています。  
+どんな役割かを以下に記載します。
 
-```bash
-### Change Woker
-pipeline.workers: 2
-```
+* Input: データソースを指定し、アクセスし、ログを取得します
+* Filter: 取得したログを構造化するため、Grokでキーバリューに分割したり、地理情報などを付与したり様々なフィルタを施します
+* Output: データの取り込み先を指定します（今回はElasticsearchを指定しています）
 
-公式に詳細が記載されているので参考にすると幸せになれます。
+Logstashに構成されている"Input"、"Filter"、"Output"の一連をパイプラインと言っております。  
+また、この定義するためのファイルが、パイプラインファイルです。
 
-> Settings File:
-> https://www.elastic.co/guide/en/logstash/current/logstash-settings-file.html
+### Logstashを動かす
 
-### パイプラインを実行してみる
+実際にLogstashを動かすためにパイプラインファイルを設定して、動かしていきたいと思います。  
+Logstashの起動方法は、"コマンド起動"と"サービス起動"の二つの方法があります。  
+最終的には、"サービス起動"で動かしますが、初めは慣れるためにも"コマンド起動"で行なっていきます。
 
-ここからLogstashのパイプラインを動かしていきたいと思います。  
-まずは、単純にコマンドラインからLogstashを実行したいと思います。
+#### Logstashはじめの一歩
 
-パイプラインの設定ファイルを作成します。  
-このパイプラインは、単純に標準入力から標準出力するものです。
+早速ですが、パイプラインファイルを作成します。  
+このパイプラインは、単純に標準入力から標準出力するものです。  
+そのため、"Input"と"Output"のみの構成としています。
 
 ```bash
 ### Cleate pipeline
@@ -448,8 +427,9 @@ output {
 }
 ```
 
-以下のコマンドを実行し、"Pipelines running"と表示されたら任意の文字を標準入力します。
-入力した文字（ここではtest）が"message"に表示にされていることがわかります。
+"test.conf"ができましたね。  
+以下のコマンドを実行し、"Pipelines running"と表示されたら任意の文字を標準入力します。  
+入力した文字（ここではtest）が"message"に表示にされていることがわかります。  
 
 ```bash
 ### Run Pipeline
@@ -468,15 +448,20 @@ test
 }
 ```
 
-### さらにパイプラインを実行してみる
+気づいた方もいるかと思いますが、パイプラインファイルに"Filter"を記載していません。  
+"Filter"を記載せず、"Input"と"Output"のみで構成することが可能なのです。  
+ただし、"Filter"がないため、入力データが何も加工されず、出力されます。
 
-ここからは実際のログを利用してパイプラインを扱っていきたいと思います。
+#### ALBのログをLogstashで取り込む
+
+ここからは実際のログを利用してパイプラインを扱っていきたいと思います。  
 対象のログとして、AWSのALBログを利用します。
 
-AWS公式ページに記載されているサンプルログを利用します。
+ALBのログは、AWS公式ページに記載されているサンプルログを利用します。
 
-> Access Logs for Your Application Load Balancer: 
-> https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html
+[Access Logs for Your Application Load Balancer:](https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html)
+
+以下がサンプルログです。
 
 ```
 https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188 
@@ -486,19 +471,19 @@ arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d
 "Root=1-58337281-1d84f3d73c47ec4e58577259" www.example.com arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012
 ```
 
-このサンプルログを"/etc/logstash/"配下に配置します。
-ログのファイル名を"alb.log"にします。
+このサンプルログを"/etc/logstash/"配下に配置します。  
+ファイル名は任意でいいのですが、今回は、"alb.log"にします。
 
 ```bash
 $ vim /etc/logstash/alb.log
 https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57 "GET https://www.example.com:443/ HTTP/1.1" "curl/7.46.0" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067 "Root=1-58337281-1d84f3d73c47ec4e58577259" www.example.com arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012
 ```
 
-パイプラインの設定ファイルを作成します。
-先程までは、"Input"を標準入力としてましたが、ファイルを取り込むので"File input plugin"を使用します。
-標準でインストールされているので、インストールは不要です。
+ログファイルの準備が整ったので、パイプラインファイルを新しく作成します。  
+先程作成したtest.confは、"Input"を標準入力としてましたが、ファイルを取り込むので"File input plugin"を使用します。  
+"File input plugin"は、標準でインストールされているので、インストールは不要です。
 
-それでは、新しく"alb.conf"という設定ファイルを作成します。
+それでは、"alb.conf"という設定ファイルを作成します。
 
 ```bash
 $ vim /etc/logstash/conf.d/alb.conf
@@ -514,7 +499,7 @@ output {
 }
 ```
 
-追記した部分を以下で以下で説明します。
+追記した部分をについて表で説明します。
 
 | No. | Item           | Content                                                         |
 |:----|:---------------|:----------------------------------------------------------------|
@@ -536,23 +521,25 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 }
 ```
 
-標準入力で実行した時と同様に"message"に取り込んだログが出力されていることがわかります。
-ただ、これでは構造化した形でElasticsearchにストアされないため、検索性が損なわれます。
-その解決方法として"Filter"を利用します。
+標準入力で実行した時と同様に"message"に取り込んだログが出力されていることがわかります。  
+ただ、これでは構造化した形でElasticsearchにストアされないため、検索性が損なわれます。（"message"というキーに全てのログの全てのデータが入ってしまっているので、意味をなしていないということです）  
+そこで、解決方法として"Filter"を利用します。
 
-### Filterを使ってみる
+### LogstashのFilterを使ってみる
 
-"Filter"では何を行うかというと、取得したログを正規表現でパースするGrokフィルタや、地理情報を得るためのGioIPフィルタを施すことができます。
-今回のALBもGrokフィルタなどを使うことで構造化することが可能です。
+"Filter"では、取得したログを正規表現でパースするGrokフィルタや、地理情報を得るためのGeoIPフィルタを施すことができます。  
+今回のALBもGrokフィルタなどを使うことで構造化することが可能です。  
 
-まず、ALBのログフォーマットを把握する必要があります。
-以下に記載します。
+とはいえ、どのように構造化すればいいのかということもあるので、まずはALBのログフォーマットを把握する必要があります。  
+以下にALBのログフォーマットを記載します。
 
 ```bash
 type timestamp elb client:port target:port request_processing_time target_processing_time response_processing_time elb_status_code target_status_code received_bytes sent_bytes "request" "user_agent" ssl_cipher ssl_protocol target_group_arn trace_id domain_name chosen_cert_arn
 ```
 
-各フィールドについて以下に記載します。  
+各フィールドを表にまとめると以下になります。  
+このようにログを取り込む前にログフォーマットを確認し、フィールド名を定義します。  
+また、"Type"で各フィールドの型を定義します。  
 
 | Log                      | Field                    | Type   |
 |:-------------------------|:-------------------------|:-------|
@@ -577,11 +564,12 @@ type timestamp elb client:port target:port request_processing_time target_proces
 | target_group_arn         | target_group_arn         | string |
 | trace_id                 | trace_id                 | string |
 
-このフィールド単位でフィルタをかけられるようkey-valueにGrokフィルタで分解します。  
-ALB用の"grok-patterns"を記載したパターンファイルを作成します。  
+定義したフィールド単位で分割されるようにGrokフィルタを利用し、分割します。  
+ちなみにですが、Grokフィルタは、様々なログに合わせて正規表現でkey-value形式に加工することが可能です。  
+Grokフィルタするためのパターンファイルを作成します。
 
-が、その前にパターンファイルを格納するディレクトリを作成します。
-パイプラインの設定ファイルにGrokフィルタを記載するでもいいのですが、可読性を上げるため外だしにしてます。
+が、その前にパターンファイルを格納するディレクトリを作成します。  
+パターンファイルを作成せずにパイプラインファイルのFilter内にGrokフィルタを記載することも可能ですが、可読性や管理がしやすくするためパターンファイルを外出ししています。
 
 ```bash
 ### Create directory
@@ -590,9 +578,13 @@ $ ll | grep patterns
 drwxr-xr-x 2 root root 4096 xxx xx xx:xx patterns
 ```
 
-patternsディレクトリ配下にALBのパターンファイルを作成します。  
+patternsディレクトリが作成できたので、配下にALBのパターンファイルを作成します。  
 中身については、闇深いのでここでは説明しません。。無邪気に貼っつけてください。  
-また、Typeは、インデックステンプレートで作成するのが一般的かと思いますが、今回は、パターンファイルの中で指定します。
+また、Typeは、インデックステンプレートで作成するのが一般的かと思いますが、今回は、パターンファイルの中で指定します（いろんなやり方があるんだよという意味で）
+
+あ、後述で"grok-filter"の説明でもありますが、このパターンファイルを呼び出す時は、ファイル名の指定だけでなく、Grok-Patternsの指定も必要になります。  
+ここでいう"Grok-Patterns"は、"ALB_ACCESS_LOG"に当ります。  
+この"ALB_ACCESS_LOG"は、任意の名前を指定できます。
 
 ```bash
 $ sudo vim /etc/logstash/patterns/alb_patterns
@@ -600,7 +592,7 @@ $ sudo vim /etc/logstash/patterns/alb_patterns
 ALB_ACCESS_LOG %{NOTSPACE:class} %{TIMESTAMP_ISO8601:date} %{NOTSPACE:elb}  (?:%{IP:client_ip}:%{INT:client_port:int}) (?:%{IP:backend_ip}:%{INT:backend_port:int}|-) (:?%{NUMBER:request_processing_time:float}|-1) (?:%{NUMBER:target_processing_time:float}|-1) (?:%{NUMBER:response_processing_time:float}|-1) (?:%{INT:elb_status_code}|-) (?:%{INT:target_status_code:int}|-) %{INT:received_bytes:int} %{INT:sent_bytes:int} \"%{ELB_REQUEST_LINE}\" \"(?:%{DATA:user_agent}|-)\" (?:%{NOTSPACE:ssl_cipher}|-) (?:%{NOTSPACE:ssl_protocol}|-)  %{NOTSPACE:target_group_arn} \"%{NOTSPACE:trace_id}\"
 ```
 
-alb.confに"Fiter"を追加します。
+パターンファイルが準備できましたので、パイプライファイルの"alb.conf"に"Filter"を追加します。
 
 ```bash
 ### update alb.conf
@@ -631,10 +623,12 @@ output {
 }
 ```
 
-更新できたら実行します。
-いい感じにkey-valueのかたちになっていることがわかります。
+更新できたら実行します。  
+設定内容については、後述で説明しますので、無邪気に実行してみてください。  
+先ほど実行した時と違って、いい感じにkey-valueのかたちになっていることがわかります。
 
 ```bash
+$ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 {
                         "verb" => "GET",
      "request_processing_time" => 0.086,
@@ -690,11 +684,18 @@ output {
 }
 ```
 
-それでは、Filterで記載している内容について説明します。
+それでは、Filterで記載している内容について説明します。  
+今回使用しているフィルタは、以下の3つです。
 
-正規表現でパースする際にgrokフィルタを使用します。
-"patterns_dir"で外だししているパターンファイルを呼び出すことができます。
-"match"で"message"に取り込まれている値を対象にGrok-Patterns(ここでいうALB_ACCESS_LOG)を適用しています。
+1. grok-filter
+2. date-filter
+3. geoip-filter
+
+1. grok-filter
+
+"grok-filter"についてですが、先ほども説明した通り正規表現でパースする際に使用します。  
+"patterns_dir"で外だししているパターンファイルを呼び出すことができます。  
+また、"match"で"message"に取り込まれている値を対象にGrok-Patterns(ここでいうALB_ACCESS_LOG)を適用しています。
 
 ```bash
 ### grok-filter
@@ -704,8 +705,11 @@ output {
   }
 ```
 
-dateフィルタで"@timestamp"をgrokフィルタで抽出した"date"を置き換えます。
-また、タイムゾーンを指定することも可能です。
+2. date-filter
+
+"date-filter"で"実際のログが出力された時間を"@timestamp"に置き換えています。  
+置き換えないとLogstashが取り込んだ時刻が"@timestamp"に記録されてしまうからです。そのため、@timestamp"を"grok-filter"で抽出した"date"で置き換えます。
+また、タイムゾーンを日本にしたいため、"Asia/Tokyo"を指定しています。
 
 ```bash
   date {
@@ -715,9 +719,18 @@ dateフィルタで"@timestamp"をgrokフィルタで抽出した"date"を置き
   }
 ```
 
-geoipフォルタを使用することでIPアドレスから地理情報を取得することが可能です。
-geoipフィルタの対象とするため、"client_ip"を指定してます。
-"client_ip"を指定する意図は、どこの国からアクセスがきているかを把握するためです。
+3. geoip-filter
+
+"geoip-filter"を使用することでIPアドレスから地理情報を取得することが可能です。  
+例えば、どこかのグローバルIPアドレスからWhoisでどこの国からのアクセスかな？って調べる時があると思います。  
+その動作を一つひとつのログに対してやっていたら死んでしまいます。。なので、"geoip-filter"を使用すれば、自動で地理情報を付与してくれるのです。  
+ちなみにですが、地理情報は、Logstashが内部で保持しているデータベースを照合して地理情報を付与してくれています[^1]
+
+[^1]: 地理情報の精度を上げたい場合は、有料版のデータをインポートする必要があります
+
+"geoip-filter"を適用するフィールドを指定します。  
+今回は、クライアントのIPアドレを元にどこからアクセスされているかを知りたいため、フィールド名の"client_ip"を指定します。  
+設定方法は、以下です。
 
 ```bash
   geoip {
@@ -725,11 +738,12 @@ geoipフィルタの対象とするため、"client_ip"を指定してます。
   }
 ```
 
-今回は使用していないですが、不要な値は、mutateで削除可能です。
-例えば、messageの値は、全てkey-valueでストアされているから不要なので削除といったことも可能です。
-個人的には、ストアされたデータで"_grokparsefailure"が発生した時の場合も踏まえると、残した方がいいと思ってます。[^1]
+他にも"Filter"でやれることはたくさんあります。  
+"mutate-filter"を使用すれば、不要なフィールドの削除を行ったりもできます。  
+例えば、messageの値は、全てkey-valueで分割されてストアされています。そのため、無駄なリソースを使いたくない場合は、削除といったことも可能です。  
+個人的には、ストアされたデータで"_grokparsefailure"が発生した時の場合も踏まえると、残した方がいいと思ってます。[^2]
 
-[^1]: "_grokparsefailure"は、grokフィルタでパースできない場合に発生します
+[^2]: "_grokparsefailure"は、grokフィルタでパースできない場合に発生します
 
 messageを削除する場合は、Filterにmutateを追加します。
 
@@ -957,4 +971,13 @@ $ curl -XGET 'localhost:9200/logstash-2016.08.10/doc/DTAU02EB00Bh04bZnyp1/?prett
 Elasticsearchに取り込まれたことが確認できました。
 次は、LogstashのイケてるMultiple Pipelinesについて触れていきたいと思います。
 
+
+また、パイプラインを実行するWoker数を変更することも可能です。
+変更する際は、"pipeline.workers"の数を変更します。
+Woker数の目安は、割り当てたいCPUコア数とイコールにするのが良いです。
+
+```bash
+### Change Woker
+pipeline.workers: 2
+```
 
