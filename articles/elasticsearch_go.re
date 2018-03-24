@@ -33,7 +33,7 @@ Elasticsearchはとても多くの機能を有しています。そのため、�
 
 起動に成功するとプロンプト上に起動ログが出力されます。
 ポートマッピングで指定している9200ポートはElasticsearchへのAPIを実行するためのエンドポイントです。
-Elastic者のDockerイメージはDocker起動時に環境変数経由で設定を変更できます。
+Elastic社のDockerイメージはDocker起動時に環境変数経由で設定を変更できます。
 本章で指定しているオプションは以下の通りです。
 
 //table[tbl1][]{
@@ -177,7 +177,7 @@ Elasticsearchを操作するにあたり利用するMapping定義は以下の通
 
 
 今回はchatというTypeへドキュメントを登録していきます。propertiesにフィールドの項目を設定していきます。
-フィールド名とそのデータ型を"tyep"で指定していきます。今回指定しているデータ型は以下の通りです。
+フィールド名とそのデータ型を"type"で指定していきます。今回指定しているデータ型は以下の通りです。
 
 //table[tbl2][]{
 データ型	説明
@@ -206,7 +206,7 @@ https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.ht
 
 
 それでGoを使ってElasticsearchを触っていきましょう。
-まずはさきほどDockerで起動したElasticsearchへの接続確認も確認も兼ねて、Elasticsearchのバージョン情報などを取得してみましょう。
+まずはさきほどDockerで起動したElasticsearchへの接続確認も兼ねて、Elasticsearchのバージョン情報などを取得してみましょう。
 
 
 //emlist[][Go]{
@@ -246,7 +246,7 @@ Elasticsearchのバージョン情報といったシステム情報を取得す�
 === 単純なCRUD操作
 
 
-それでは先ほど作成したIndexを対象に基本的なCRUDE操作をおこなってみましょう。
+それでは先ほど作成したIndexを対象に基本的なCRUD操作をおこなってみましょう。
 操作を始めるために、まずはクライアントのオブジェクトを作成します。
 
 
@@ -419,7 +419,7 @@ func main() {
 === 検索の基本操作
 
 
-さて、基本的なCRUTを通じてElasticsearchの基本をおさえたところで、いよいよ検索処理について見ていきましょう。
+さて、基本的なCRUDを通じてElasticsearchの基本をおさえたところで、いよいよ検索処理について見ていきましょう。
 Elasticsearchは多くの検索機能をサポートしていますが、本章ではその中でも代表的な以下についてみていきます。
 
  * Match Query
@@ -510,6 +510,8 @@ Analyzerの設定はMapping定義のanalysisでおこないます。tokenizerで
 
  * アナライザ名
  ** kuromoji_analyzer
+ * 適用Tokenizer
+ ** kuromoji_tokenizer: xxxxxxxxxxx
  * 適用Filter
  ** kuromoji_base: xxxxxxxxxxx
  ** kuromoji@<b>{part}of_speech: xxxxxxxxxxx
