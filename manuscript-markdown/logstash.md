@@ -45,7 +45,7 @@ ALBのログを出力するには、ALB自体のロギングの設定を有効�
 
 設定方法について説明はしないので、以下のAWSの公式HPを参考に実施して頂ければと思います。  
 
-## ミドルウェアのインストールするよ
+## ミドルウェアのインストール
 
 以下の流れでインストールしていきます。
 
@@ -54,7 +54,7 @@ ALBのログを出力するには、ALB自体のロギングの設定を有効�
 3. Logstashインストール
 4. Kibanaインストール
 
-### Java 8インストール
+### Java 8のインストール
 
 Elasticsearch、Logstashを実行するにあたって、Java 8が必要なため、インストールします。  
 Javaの切り替えにalternativesコマンドを使用して変更します。
@@ -111,9 +111,7 @@ OpenJDK Runtime Environment (build 1.8.0_161-b14)
 OpenJDK 64-Bit Server VM (build 25.161-b14, mixed mode)
 ```
 
-<!-- Mofu Javaの切り替えというの、もうすこし噛み砕いて説明した方がいいです。（一回java -versionを挟んでバージョン変わってないから変更する、など）ハマる人多い気がします。 -->
-
-### Elasticsaerchインストール
+### Elasticsaerchのインストール
 
 ここからは、Elastic Stackのミドルウェアのインストールを実施していきます。  
 ちなみに、公式HPをみるとわかりますが、英語ドキュメントです。  
@@ -147,8 +145,6 @@ autorefresh=1
 type=rpm-md
 ```
 
-### Elasticsearchをインストール
-
 Output先としてElasticsearchを利用するため、Elasticsearchをインストールします。
 
 ```bash
@@ -174,7 +170,7 @@ elasticsearch  	0:off	1:off	2:on	3:on	4:on	5:on	6:off
 
 <!-- Mofu Logstashの自動起動設定は入れないのでしょうか？ここは合わせた方がわかりやすいと思います。 -->
 
-### Logstashをインストール
+### Logstashのインストール
 
 ログを取り込むのに必要なLogstashをインストールします。
 
@@ -209,7 +205,7 @@ LogstashもElasticsearchと同様にサービス自動起動の設定をしま�
 hogehoge
 ```
 
-### Kibanaをインストール
+### Kibanaのインストール
 
 ビジュアライズするためにKibanaをインストールします。
 
@@ -231,14 +227,15 @@ kibana  	0:off	1:off	2:on	3:on	4:on	5:on	6:off
 
 ## ミドルウェアの設定
 
-ここから必要な設定を実施していきます。  
-
+ここからミドルウェアに対して、必要な設定を実施していきます。  
 以下の流れでミドルウェアの設定をしていきます。
 
 1. Elastcisearchの設定
-2. 
+2. Logstshの設定
+3. Kibanaの設定
+4. 
 
-### Elasticsearchの設定について
+### Elasticsearchの環境準備
 
 設定変更する前に、Elasticsaerchの設定ファイルが構成されているディレクトリを見ていきたいと思います。  
 
@@ -344,7 +341,7 @@ $ curl localhost:9200
 Elasticsaerchからレスポンスが返ってきましたね。  
 これでElasticsearchの設定完了です。
 
-## Logstashの設定について
+### Logstashの環境準備
 
 Elasticsearchの時と同様にLogstashもディレクトリ構成をみていきたいと思います。  
 
@@ -373,7 +370,7 @@ Elasticsearchの時と同様にLogstashもディレクトリ構成をみてい�
 ここから個々のファイルについてと説明と設定を行なっていきます。  
 細かい設定などがありますが、ちょっと頑張ってもらえればと思います。
 
-### logstash.ymlの編集
+#### logstash.ymlの編集
 
 今回は、logstash.ymlの編集は行いません。  
 なので、飛ばしても大丈夫ですし、ご興味のある方は、読み進めてもらえればと思います。
@@ -404,13 +401,11 @@ pipeline.batch.delay: 50
 Logstashに構成されている"Input"、"Filter"、"Output"の一連をパイプラインと言っております。  
 また、この定義するためのファイルが、パイプラインファイルです。
 
-### Logstashを動かす
+#### Logstashのパイプラインを実行する
 
 実際にLogstashを動かすためにパイプラインファイルを設定して、動かしていきたいと思います。  
 Logstashの起動方法は、"コマンド起動"と"サービス起動"の二つの方法があります。  
 最終的には、"サービス起動"で動かしますが、初めは慣れるためにも"コマンド起動"で行なっていきます。
-
-#### Logstashはじめの一歩
 
 早速ですが、パイプラインファイルを作成します。  
 このパイプラインは、単純に標準入力から標準出力するものです。  
@@ -525,7 +520,7 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 ただ、これでは構造化した形でElasticsearchにストアされないため、検索性が損なわれます。（"message"というキーに全てのログの全てのデータが入ってしまっているので、意味をなしていないということです）  
 そこで、解決方法として"Filter"を利用します。
 
-### LogstashのFilterを使ってみる
+#### LogstashのFilterを使ってみる
 
 "Filter"では、取得したログを正規表現でパースするGrokフィルタや、地理情報を得るためのGeoIPフィルタを施すことができます。  
 今回のALBもGrokフィルタなどを使うことで構造化することが可能です。  
@@ -768,6 +763,8 @@ filter {
 }
 ```
 
+#### 実行時のエラーが発生した場合
+
 補足ですが、コマンドラインで実行している際に以下のようなエラーが発生した場合は、Logstashのプロセスがすでに立ち上がっている時に発生します。
 
 ```bash
@@ -794,16 +791,19 @@ $ kill -9 32061
 ```
 
 これでFilterについてなんとなくわかったと思います。
-次は、いよいよ最終形態のInputをS3にして、OutputをElasticsearchにする構成をやっていきたいと思います。
+次は、いよいよ最終形態の"Input"をS3にして、"Output"をElasticsearchにする構成をやっていきたいと思います。
 
-## 最終的なパイプラインの設定ファイルが完成するよ
+#### "Input"と"Output"を変更する
 
-### Inputの編集
+現在の設定は、"Input"をローカルファイル指定しており、"Output"が標準出力にしてあります。  
+ここからは、"Input"をS3に変更し、"Output"をElasticsearchに変更します。  
+まずは、"Input"から編集します。
 
-"Input"部分が、現状だとファイル取り込みになっているので、S3に変更します。
-以下を記載します。
+##### "Input"の編集
 
 ```bash
+### update alb.conf
+$ vim /etc/logstash/conf.d/alb.conf
 input {
   s3 {
     region => "ap-northeast-1"
@@ -825,12 +825,13 @@ input {
 | 4   | interval     | バケットからログを取り込む間隔を指定(sec) |
 | 5   | sincedb_path | sincedbファイルの出力先を指定             |
 
-今回は、AWSのアクセスキーとシークレットキーを指定せず、IAM Roleをインスタンスに割り当てています。
-オプションで指定することも可能ですが、セキュリティ面からIAM Roleで制御してます。
+今回は、AWSのアクセスキーとシークレットキーを指定せず、IAM Roleをインスタンスに割り当てています。  
+オプションで指定することも可能ですが、セキュリティ面からIAM Roleで制御してます。  
 
-### Outputの編集
+[IAM Role](https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html)
 
-やっとここまできましたね！
+##### "Output"の編集
+
 最後に"Output"を標準出力からElasticsearchに変更します。
 
 ```bash
@@ -884,6 +885,8 @@ output {
 }
 ```
 
+#### Logstashサービス起動
+
 それでは実行させるのですが、今までコマンドライン実行だったので、最後は、サービスで動かしたいと思います。
 
 ```bash
@@ -902,7 +905,7 @@ yellow open logstash-logs-2016xxxx SJ07jipISK-kDlpV5tiHiA 5 1 42 0 650.6kb 650.6
 
 ドキュメントも確認します。
 "curl -XGET localhost:9200/{index}/{type}/{id}"の形式で確認できます。
-また、"?pretty"を使用することでjsonが整形されます。
+また、"?pretty"を使用することで"json"が整形されます。
 
 ```bash
 $ curl -XGET 'localhost:9200/logstash-2016.08.10/doc/DTAU02EB00Bh04bZnyp1/?pretty'
@@ -969,15 +972,47 @@ $ curl -XGET 'localhost:9200/logstash-2016.08.10/doc/DTAU02EB00Bh04bZnyp1/?prett
 ```
 
 Elasticsearchに取り込まれたことが確認できました。
-次は、LogstashのイケてるMultiple Pipelinesについて触れていきたいと思います。
 
+### Kibanaの環境準備するよ
 
-また、パイプラインを実行するWoker数を変更することも可能です。
-変更する際は、"pipeline.workers"の数を変更します。
-Woker数の目安は、割り当てたいCPUコア数とイコールにするのが良いです。
+Kibanaのディレクトリ構成は以下です。
 
 ```bash
-### Change Woker
-pipeline.workers: 2
+### kibana directory structure
+/etc/kibana/
+ ┗ kibana.yml
 ```
+
+#### kibana.ymlの編集
+
+Kibanaは、フロント部分のためアクセス元を絞ったり、参照するElasticsearchの指定などが可能です。  
+今回の設定は、アクセス元の制限はしない設定にします。制限方法は、IPアドレスによる制限になります。  
+そのため、どこからでもアクセスできるように設定するため、"0.0.0.0"のデフォルトルート設定とします（絞りたい場合は、厳密にIPアドレスを指定することで制限をかけることが可能です）
+
+```bash
+### Change server.host
+$ vim /etc/kibana/kibana.yml
+server.host: 0.0.0.0
+```
+
+これで設定は完了です。  
+参照先のElasticsearchの指定は、デフォルトのままとします。デフォルトの設定が、ローカルホストを指定しているためです。
+
+#### Kibanaサービス起動
+
+Kibanaを起動し、動作確認をします。
+
+```bash
+### Service activation
+$ service kibana start
+Starting kibana:                                    [  OK  ]
+```
+
+ブラウザからKibanaにアクセスし、動作確認を行います。  
+
+[図入れる]
+
+#### Kibanaでインデックスパターンの設定をする
+
+[図入れる]
 
