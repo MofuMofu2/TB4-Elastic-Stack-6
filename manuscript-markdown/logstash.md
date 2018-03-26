@@ -34,9 +34,12 @@ Logstashの使い方を知る前に、実行環境を整える必要がありま
 
 [Download Elastic Stack](https://www.elastic.co/jp/products)
 
-### こんな環境を構築するよ
+### こんな環境を想定しているよ
 
-[図を入れる]
+ユーザがWebサイトにアクセスした際にALBで出力したアクセスログをS3に保存します。  
+S3に保存されたアクセスログをLogstashが定期的に取得する構成です。
+
+[logstash01.png]
 
 ### ALBのログを準備する
 
@@ -167,8 +170,6 @@ $ sudo chkconfig --add elasticsearch
 $ chkconfig --list | grep elasticsearch
 elasticsearch  	0:off	1:off	2:on	3:on	4:on	5:on	6:off
 ```
-
-<!-- Mofu Logstashの自動起動設定は入れないのでしょうか？ここは合わせた方がわかりやすいと思います。 -->
 
 ### Logstashのインストール
 
@@ -986,7 +987,8 @@ Kibanaのディレクトリ構成は以下です。
 #### kibana.ymlの編集
 
 Kibanaは、フロント部分のためアクセス元を絞ったり、参照するElasticsearchの指定などが可能です。  
-今回の設定は、アクセス元の制限はしない設定にします。制限方法は、IPアドレスによる制限になります。  
+今回の設定は、アクセス元の制限はしない設定にします。制限方
+法は、IPアドレスによる制限になります。  
 そのため、どこからでもアクセスできるように設定するため、"0.0.0.0"のデフォルトルート設定とします（絞りたい場合は、厳密にIPアドレスを指定することで制限をかけることが可能です）
 
 ```bash
@@ -996,7 +998,12 @@ server.host: 0.0.0.0
 ```
 
 これで設定は完了です。  
-参照先のElasticsearchの指定は、デフォルトのままとします。デフォルトの設定が、ローカルホストを指定しているためです。
+参照先のElasticsearchの指定は、デフォルトのままとします。デフォルトの設定が、ローカルホストを指定しているためです。  
+もしリモートにElasticsearchがある場合は、以下のコメントアウトを外し、IPアドレスを指定してください。
+
+```bash
+#elasticsearch.url: "http://localhost:9200"
+```
 
 #### Kibanaサービス起動
 
@@ -1008,11 +1015,56 @@ $ service kibana start
 Starting kibana:                                    [  OK  ]
 ```
 
-ブラウザからKibanaにアクセスし、動作確認を行います。  
+#### Kibanaで取り込んだログをビジュアライズ
 
-[図入れる]
+Kibanaにアクセスするため、ブラウザを起動し、以下のIPアドレスを入力します。  
+"Globa_IP"については、AWSから払い出されたグローバルIPアドレスを入力してください。
 
-#### Kibanaでインデックスパターンの設定をする
+* http:"Globa_IP":5601
 
-[図入れる]
+Kibanaのトップページが開きますので、左ペインの"Management"をクリックしてください。
+また、"Collapse"をクリックすることで、サイドバーを縮小することができます。
 
+[kibana01.png]
+
+"Index Patterns"をクリックします。
+
+[kibana02.png]
+
+インデックスパターンを指定せずにElasticsearchに取り込んでいるため、"logstash-YYYY.MM.DD"のパターンで取り込まれます。  
+そのため、"Define index pattern"の欄に"logstash-*"と入力します。  
+
+[kibana03.png]
+
+"logstash-*"を入力すると" Success!  Your index pattern matches 1 index."と表示されたことを確認し、"Next step"をクリックします。 
+
+[kibana04.png]
+
+"Time Filter field name"に"@timestamp"を選択し、"Create index pattern"をクリックします。
+
+[kibana05.png]
+
+これでインデックスパターンの登録が完了したので、KibanaからElasticsearchのインデックスをビジュアライズする準備が整いました。
+左ペインの"Discover"をクリックします。
+
+[kibana06.png]
+
+あれ？"No results found"と画面に表示されており、取り込んだログがビジュアライズされてないですね。  
+なぜかと言うと、今回取り込んだログの時刻が"2016-08-10T23:39:43"のため、該当する時間でサーチをかける必要があります。  
+また、時刻のデフォルト設定は、"Last 15 minutes"のため、現在時刻から15分前までの時間がサーチ対象となっています。  
+
+[kibana07.png]
+
+それでは、"2016-08-10T23:39:43"が該当する時間に変更をしたいため、"Last 15 minutes"をクリックします。  
+クリックすると、"Time Range"が表示されるので、"Absolute"をクリックし、以下を入力します。
+
+* From: 2016-08-11 00:00:00.000
+* To: 2016-08-11 23:59:59.999
+
+[kibana08.png]
+
+先ほどの"No results found"画面ではなく、バーが表示されていることがわかるかと思います。  
+これで取り込んだログをKibanaから確認することができました。  
+"Visualize"でグラフや、世界地図などにマッピングすることで好みのダッシュボードが作成できます。
+
+[kibana09.png]
