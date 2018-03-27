@@ -7,7 +7,7 @@ ElasticsearchにインデクシングされたデータをKibanaでビジュア�
 ## 複数データソースを取り扱うための準備
 
 データソースを二つ取得している環境を想定します。  
-ALBのアクセスログとApacheのアクセスログの二つを取り込むケースです。ALBのアクセスログは、5章と同様にS3をデータソースとし、Apacheは、ローカルファイルとします。  
+例えば、ALBのアクセスろぐとApacheのアクセスログの二つです。ALBのアクセスログは、5章と同様にS3をデータソースとし、Apacheは、ローカルファイルとします。  
 以下にディレクトリ構成を記載します。
 
 ```bash
@@ -30,7 +30,7 @@ ALBのアクセスログとApacheのアクセスログの二つを取り込む�
 パイプラインファイルを"alb_httpd.conf"というファイル名にします。また、Apacheのアクセスログは、"/etc/logstash/log/"配下に"httpd_access.log"を配置している前提とします。  
 実際にパイプラインファイルの中身を見ていきたいと思います。
 
-```bash
+```ruby
 ### Sample pipeline_file
 $ vim /etc/logstash/conf/alb_httpd.conf
 input {
@@ -52,17 +52,25 @@ input {
 filter {
   if "alb" in [tags] {
     grok {
-      patterns_dir => ["/etc/logstash/patterns/alb_patterns"]
+      patterns_dir => ["/etc/logstash/patterns/cloudfront_patterns"]
       match => { "message" => "%{ALB_ACCESS}" }
       add_field => { "date" => "%{date01} %{time}" }
     }
     date {
-      match => [ "date", "ISO8601" ]
-      timezone => "Asia/Tokyo"
+      match => [ "date", "yy-MM-dd HH:mm:ss" ]
+      locale => "en"
       target => "@timestamp"
     }
     geoip {
-      source => "client_ip"
+      source => "c_ip"
+    }
+    useragent {
+      source => "User_Agent"
+      target => "useragent"
+    }
+    mutate {
+      convert => [ "time_taken", "float" ]
+      remove_field => [ "message" ]
     }
   else if "httpd" in [tags] {
     grok {
@@ -98,7 +106,7 @@ output {
 }
 ```
 
-今までのパイプラインファイルより、少し複雑になってますね。  
+今までのパイプラインファイルより、少し長くなってますね。  
 どのような処理がされているかを"Input"、"Filter"、"Output"に分けて説明していきます。
 
 ### Input処理内容について
@@ -107,7 +115,7 @@ Inputは、データソースの取り込み部分の定義箇所ですね。
 今回は、S3とローカルファイルのため、"S3 input plugin"と"File input pulgin"を使用します。  
 "File input pulgin"は、デフォルトインストールされているので、すぐに使えます。
 
-```bash
+```ruby
 input {
   s3 {
     tags => "alb"
@@ -136,15 +144,15 @@ input {
 | 4   | sincedb_path   | sincedbファイルの出力先を指定                            |
 
 
-"S3"にも"File"にも共通して、"tags"を定義していることがわかります。この"tags"の値を元にif文で分岐させることができます。  
+"S3"にも"File"にも共通して、"tags"を定義していることがわかります。この"tags"の値を元に"Filter"のif文で分岐させることができます。  
 ここでは、ALBのアクセスログのため、"alb"という値を"tags"に与えます。また、Apacheのアクセスログは、"httpd"という値を与えます。
 
 ### Filter処理内容について
 
 "Filter"では、様々なフィルタをかけられることを5章で体験したかと思います。今回は、タグをベースにif文による分岐を行なっています。  
-if文の文法は、bashに則ったかたちです。
+if文の文法は、rubyに則ったかたちです。
 
-```bash
+```ruby
 filter {
   if "alb" in [tags] {
     grok {
@@ -186,7 +194,7 @@ filter {
 
 ここで新たにApache用のパターンファイルを準備できていないので、作成します。  
 
-```bash
+```ruby
 $ vim /etc/logstash/patterns/httpd_patterns
 # Access_log
 HTTPDUSER %{EMAILADDRESS}|%{USER}
@@ -203,7 +211,7 @@ HTTPD_COMBINED_LOG %{HTTPD_COMMONLOG} %{QS:referrer} %{QS:agent}
 "grok-filter"をかけると、"agent"のフィールドにユーザエージェントのデータがあるので、このフィールドに対してフィルタをかけています。  
 また、元データもとっておくため、"target"指定で別フィールドの"useragent"に出力しています。
 
-```bash
+```ruby
 useragent {
 source => "agent"
 target => "useragent"
@@ -215,7 +223,7 @@ target => "useragent"
 5章で"mutate-filter"を利用すれば、不要なフィールドの削除ができるという説明をしています。  
 実際にフィールド削除を行なう場合は、以下のように記載します。今回は、"path"、"host"、"date"を削除対象としています。
 
-```bash
+```ruby
 mutate {
   remove_field => [ "path", "host", "date" ]
 }
@@ -223,11 +231,11 @@ mutate {
 
 ### Output処理内容について
 
-5章では、インデックスをデフォルト（"logstash-YYYY.MM.DD"）にしていましたが、複数の場合は、個々でインデックスを指定する必要があります。  
+5章では、インデックスパターンをデフォルト（"logstash-YYYY.MM.DD"）にしていましたが、複数の場合は、個々でインデックスパターンを指定する必要があります。  
 理由は、別々の用途で利用するログのため、インデックスを分ける必要があるためです。  
-本来は、一つのログしか取り扱わない場合でもインデックスを指定する方がいいです（Logstashというインデックス名だと、どのような用途のインデックスがわかりにくいため）  
+本来は、一つのログしか取り扱わない場合でもインデックスパターンを指定する方がいいです（Logstashというインデックス名だと、どのような用途のインデックスがわかりにくいため）  
 
-```bash
+```ruby
 output {
   if "alb" in [tags] {
     elasticsearch {
@@ -244,28 +252,28 @@ output {
 ```
 
 "output"でも、if文によるタグ分岐をすることで、出力先を指定することが可能です。  
-"alb"タグが付与されているデータは、"alb-logs-%{+YYYYMMdd}"でインデクシングされます。また、"httpd"タグが付与されている場合は、"httpd-logs-%{+YYYYMMdd}"でインデクシングされます。  
+"alb"タグが付与されているデータは、"alb-logs-%{+YYYYMMdd}"というかたちでインデクシングされます。また、"httpd"タグ付与されている場合は、"httpd-logs-%{+YYYYMMdd}"というかたちでインデクシングされます。  
 
 ### 準備が整ったので実行するよ
 
 複数のログファイルを取り込める準備が整ったので、Logstashを再起動します。
 
-```bash
+```ruby
 ### Restart logstash service
 $ initctl restart logstash
 ```
 
 ここまでやって如何でしたか？これで複数のログを取り込むことができるようになりました。  
 お気付きになった方もいるかと思いますが、更にログが増えた場合に、どんどんif文が増えて、可読性が悪くなっていきます。これは、ツラミでしかないです。  
-また、ログは、種類によってログ量やフィルタの内容も異なってきます。そのため、使用するリソースもバラバラとなります。しかし、5系までのLogstashでは、柔軟にリソースの振り分けを行うことができませんでした。
-でも大丈夫です！Logstashの6系からできるようになりました！  
-てことで、ここから、イケてる"Multiple Pipelines"について説明していきます。
+また、ログの種類によって、ログ量やフィルタの内容も異なるので、リソースは柔軟に対応したいのですが、柔軟にできないです。  
+でも、Logstashの6系からできるようになりました！てことで、ここから、イケてる"Multiple Pipelines"について説明していきます。
 
 ## Multiple Pipelinesについて
 
-先程まで、一つのファイルにパイプラインファイルを記載していました。  
+先ほどまで、一つのファイルにパイプラインファイルを記載していました。  
 しかし、"Multiple Pipelines"を使用することで、データソース毎にパイプラインファイルを分けて定義することができます。  
-また、リソースの配分もログの種類毎にできます。それでは、具体的にどのような設定をする必要があるかを見ていきます。
+また、リソースの配分もデータソースでできます。それでは、具体的にどのような設定をする必要があるかを見ていきます。
+
 
 ### Multiple Pipelinesの定義をしてみる
 
@@ -273,7 +281,7 @@ $ initctl restart logstash
 "pipelines.yml"にパイプラインファイルを指定するだけです。その際に、リソースの指定もできます。
 それでは、"pipelines.yml"に、ALBとApacheのアクセスログを取り込むパイプラインファイルを設定したいと思います。
 
-```bash
+```ruby
 ### pipelines.yml
 vim /etc/logstash/pipelines.yml
 - pipeline.id: alb
@@ -297,109 +305,70 @@ vim /etc/logstash/pipelines.yml
 
 [オプションについて](https://www.elastic.co/guide/en/logstash/6.x/logstash-settings-file.html)
 
-これで"Multiple Pipelines"の定義は完了です。  
-ただ、これでは動かないので"Multiple Pipelines"への対応として、パイプラインファイルの分割とファイル名（拡張子）を変更します。
 
-### パイプラインファイルの分割
 
-パイプラインファイルの"alb_httpd.conf"を分割します。  
-まず、ALB用のパイプラインファイルとして、"alb.cfg"にします。  
-拡張子を"conf"から"cfg"に変更します。拡張子を"conf"のままでも問題ないのですが、公式ドキュメントに則って"cfg"にします。
 
-以下のように"alb.cfg"を作成します。  
-特に中身は変わらず、"httpd"の部分とif文を削除しただけですね。
+前回の章で説明したLogstashのオプションを個別で設定することができます。
+そのため、"pipeline.workers"で割り当てるWorker数を指定することが可能です。
+
+logstash.ymlでは、"path.config"の指定を以下のように一律で行なっていました。
+
+> path.config: /etc/logstash/conf.d/*.conf
+
+pipelines.ymlでは、以下のように個別に指定します。
+拡張子は、"cfg"とします。
+
+> path.config: /etc/logstash/conf.d/*.cfg
+
+"pipeline.id"は、任意の名前で記載します。
+
+これでMulti Pipelinesの設定は完了です。
+あとは、conf.d配下のファイル名をcfgの拡張子に変更するだけです。
+
+実際にALBの設定ファイルを用いて起動までやりたいと思います。
+
+pipelines.ymlを作成します。
 
 ```bash
-### pipeline_file
-$ vim /etc/logstash/conf/alb.cfg
-input {
-  s3 {
-    tags => "alb"
-    bucket => "hoge"
-    region => "ap-northeast-1"
-    prefix => "hoge/"
-    interval => "60"
-    sincedb_path => "/var/lib/logstash/sincedb_alb"
-  }
-}
-filter {
-  grok {
-    patterns_dir => ["/etc/logstash/patterns/alb_patterns"]
-    match => { "message" => "%{ALB_ACCESS_LOG}" }
-  }
-  date {
-    match => [ "date", "ISO8601" ]
-    timezone => "Asia/Tokyo"
-    target => "@timestamp"
-  }
-  geoip {
-    source => "client_ip"
-  }
-}
-output {
-  elasticsearch {
-    hosts => [ "localhost:9200" ]
-    index => "alb-logs-%{+YYYYMMdd}"
-  }
-}
+### create pipelines.yml
+vim /etc/logstash/pipelines.yml
+- pipeline.id: alb
+  pipeline.batch.size: 125
+  path.config: "/etc/logstash/conf.d/alb.cfg"
+  pipeline.workers: 1
 ```
 
-あわせて"httpd.cfg"も作成します。
+"alb.conf"のファイル名を"alb.cfg"に変更します。
 
 ```bash
-### pipeline_file
-$ vim /etc/logstash/conf/httpd.cfg
-input {
-  file {
-    path => "/etc/logstash/log/httpd_access.log"
-    tags => "httpd"
-    start_position => "beginning"
-    sincedb_path => "/var/lib/logstash/sincedb_httpd"
-  }
-}
-filter {
-  grok {
-    patterns_dir => ["/etc/logstash/patterns/httpd_patterns"]
-    match => { "message" => "%{HTTPD_COMMON_LOG}" }
-  }
-  geoip {
-    source => "clientip"
-  }
-  date {
-    match => [ "date", "dd/MMM/YYYY:HH:mm:ss Z" ]
-    locale => "en"
-    target => "timestamp"
-  }
-  mutate {
-    remove_field => [ "message", "path", "host", "date" ]
-  }
-}
-output {
-  elasticsearch {
-    hosts => [ "localhost:9200" ]
-    index => "httpd-logs-%{+YYYYMMdd}"
-  }
-}
+### Change extension
+mv /etc/logstash/conf.d/alb.conf /etc/logstash/conf.d/alb.cfg 
 ```
 
-これで分割とファイル名の変更が完了しましたので、Logstashを再起動します。
+それでは起動します。
 
 ```bash
-### Restart logstash service
-$ initctl restart logstash
+### Start logstash service
+$ initctl start logstash
 ```
 
-### ログの確認
-
-Logstashがうまく動いてくれないなどがある場合は、ログを見ましょう。
-ログは、"/var/log/logstash/"配下に出力されます。したがいまして、Logstashを起動した時に"tail"で起動がうまくいっているかの確認をすると良いです。
+起動時にエラーが発生していないかをログで確認します。
+"ERROR"が発生していないかを確認し、"Pipelines running"であることを確認します。
 
 ```bash
-### Check Log
+###
 $ tail -f /var/log/logstash/logstash-plain.log
 [2018-xx-xxTxx:xx:xx,xxx][INFO ][logstash.agent           ] Pipelines running {:count=>1, :pipelines=>["alb"]}
 ```
 
-いかがでしたか？
-ここまで動かせたらLogstashをかなり理解できたのではと思います。
-次の章では、Logstashより簡易にログを取り込んで、ビジュアライズまでやりたいというニーズに応えることができるBeatsというプロダクトを説明していきます。
+これからは、Multiple Pipelinsを使いましょう！
+
+
+
+
+
+## Multiple Pipelinesについて
+
+5章で作成したパイプラインは、一つのデータソースに対してのみを取り込んでいました。しかし、実際の運用では、たくさんのデータソースを取り扱うかと思います。  
+そんな時に、どのような対応を今までとってきかと言うと、タグを付与して、if文で分岐させて処理させるようにしていました。  
+具体的にどのような構成になるか見ていきたいと思います。
