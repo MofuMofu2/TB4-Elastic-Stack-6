@@ -35,6 +35,12 @@ Elasticsearchは、Javaで作られている分散処理型の検索エンジン
 
 //footnote[introES-fn01][技術書典シリーズって名前で察した方も多いかと思いますが、これは技術書典2でもふもふちゃんがElastic Stack5の同人誌を書いたらインプレスR&Dさんが商業本にしてくれました。KindleでElasticて打つと検索トップに出てくるからびびるんだけど。]
 
+昔は自分たちでElasticsearchを構築・運用するか、AWSの機能として@@<code>{Amazon Elasticserch Service}（@<href>{https://aws.amazon.com/jp/elasticsearch-service/}）を利用するしかありませんでした。
+しかし、Elastic Stack5からはElastic社が提供するクラウドサービス@@<code>{Elastic Cloud}（@@<href>{https://www.elastic.co/jp/cloud}）を利用することでElasticsearchの管理・バージョンアップ・
+データのバックアップなども柔軟に行うことができるようになりました。基盤の持ち方の選択肢が増えるのはありがたいですよね。
+
+Elasticserchは独自のクエリを使用してデータの問い合わせをおこなうことが特徴です。が、今後のアップデートでSQLを利用してデータの問い合わせをできるようになることが発表されています@@<href>{https://www.elastic.co/jp/elasticon/conf/2017/sf/elasticsearch-sql}。
+SQLの方が普及率も高いので、さらにElasticsearchを便利に利用することができそうです。
 
 === Logstash
 
