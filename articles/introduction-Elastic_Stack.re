@@ -25,6 +25,17 @@ Elastic Stackが今の形になったのは2016年です。Elastic Stack5まで�
 
 === Elasticsearch
 
+@<code>{Elastic Stackで作るBI環境 誰でもできるデータ分析入門 (技術書典シリーズ(NextPublishing)) }（@<href>{https://www.amazon.co.jp/Elastic-Stackで作るBI環境-誰でもできるデータ分析入門-技術書典シリーズ-NextPublishing/dp/484439780X}）によると
+
+//quote{
+Elasticsearchは、Javaで作られている分散処理型の検索エンジンです。クラスタ構成を組むことができるのが特徴なので、大規模な環境で検索エンジンとして利用されることがあります。
+//}
+
+と説明されています@<fn>{introES-fn01}。
+
+//footnote[introES-fn01][技術書典シリーズって名前で察した方も多いかと思いますが、これは技術書典2でもふもふちゃんがElastic Stack5の同人誌を書いたらインプレスR&Dさんが商業本にしてくれました。KindleでElasticて打つと検索トップに出てくるからびびるんだけど。]
+
+
 === Logstash
 
 === Beats
