@@ -1031,7 +1031,7 @@ Kibanaのトップページが開きますので、左ペインの"Management"�
 
 [kibana02.png]
 
-インデックスパターンを指定せずにElasticsearchに取り込んでいるため、"logstash-YYYY.MM.DD"のパターンで取り込まれます。  
+インデックスを指定せずにElasticsearchに取り込んでいるため、"logstash-YYYY.MM.DD"のインデックスで取り込まれます。  
 そのため、"Define index pattern"の欄に"logstash-*"と入力します。  
 
 [kibana03.png]
@@ -1044,7 +1044,7 @@ Kibanaのトップページが開きますので、左ペインの"Management"�
 
 [kibana05.png]
 
-これでインデックスパターンの登録が完了したので、KibanaからElasticsearchのインデックスをビジュアライズする準備が整いました。
+これでインデックスの登録が完了したので、KibanaからElasticsearchのインデックスをビジュアライズする準備が整いました。
 左ペインの"Discover"をクリックします。
 
 [kibana06.png]
