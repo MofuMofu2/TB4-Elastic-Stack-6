@@ -59,10 +59,10 @@ Logstashプロセスを2つ作ることができます。片方のプロセス�
 
 === Beats
 
-Beatsは用途に合わせてデータを簡単に送ることができる軽量データシッパーです。Go言語で作成されており、動作に必要なリソースが他プロダクトと比較して少ないことが特徴です。
+Beatsは用途に合わせてデータを簡単に送ることができる軽量データシッパーです@<fn>{introES-fn03}。Go言語で作成されており、動作に必要なリソースが他プロダクトと比較して少ないことが特徴です。
 用途に合わせてXXBeatsというように、名前が異なります。ドキュメントを参照するときは注意したようが良いです。
 
-#@#HPのURLリンク貼る
+//footnote[introES-fn03][https://www.elastic.co/guide/en/beats/libbeat/current/beats-reference.html]
 
 Elastic Stack6からは@<code>{Modules}という機能が追加されました。Modulesを利用すると、Elasticsearchへのデータ連携とKibanaのグラフ作成を自動で行ってくれます。
 Apacheのaccess.logなど、利用できるデータは限られています。公式ドキュメント、またはKibanaのGUIで確認してください。
