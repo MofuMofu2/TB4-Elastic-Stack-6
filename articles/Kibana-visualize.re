@@ -193,44 +193,6 @@ drwxr-xr-x@ 16 mofumofu  staff   512  3  7 10:51 logstash-6.2.2
 これも、出力結果を載せておきます。ここは本題ではありませんので、解説や特別な設定は行いません。
 #@#文章できたらリンクを貼る
 
-//cmd{
-~/Elastic-Stack/elasticsearch-6.2.2 $ bin/elasticsearch
-[2018-03-07T17:17:49,092][INFO ][o.e.n.Node               ] [] initializing ...
-[2018-03-07T17:17:49,220][INFO ][o.e.e.NodeEnvironment    ] [m3LWuZ2] using [1] data paths, mounts [[/ (/dev/disk1s1)]], net usable_space [81.9gb], net total_space [232.9gb], types [apfs]
-[2018-03-07T17:17:49,221][INFO ][o.e.e.NodeEnvironment    ] [m3LWuZ2] heap size [990.7mb], compressed ordinary object pointers [true]
-[2018-03-07T17:17:49,223][INFO ][o.e.n.Node               ] node name [m3LWuZ2] derived from node ID [m3LWuZ2UTR6nTATQyRi_vg]; set [node.name] to override
-[2018-03-07T17:17:49,223][INFO ][o.e.n.Node               ] version[6.2.2], pid[14049], build[10b1edd/2018-02-16T19:01:30.685723Z], OS[Mac OS X/10.13.3/x86_64], JVM[Oracle Corporation/Java HotSpot(TM) 64-Bit Server VM/1.8.0_45/25.45-b02]
-[2018-03-07T17:17:49,224][INFO ][o.e.n.Node               ] JVM arguments [-Xms1g, -Xmx1g, -XX:+UseConcMarkSweepGC, -XX:CMSInitiatingOccupancyFraction=75, -XX:+UseCMSInitiatingOccupancyOnly, -XX:+AlwaysPreTouch, -Xss1m, -Djava.awt.headless=true, -Dfile.encoding=UTF-8, -Djna.nosys=true, -XX:-OmitStackTraceInFastThrow, -Dio.netty.noUnsafe=true, -Dio.netty.noKeySetOptimization=true, -Dio.netty.recycler.maxCapacityPerThread=0, -Dlog4j.shutdownHookEnabled=false, -Dlog4j2.disable.jmx=true, -Djava.io.tmpdir=/var/folders/5z/1qmk32x17pn9zv80fk26bvsw0000gn/T/elasticsearch.bvcXHDjg, -XX:+HeapDumpOnOutOfMemoryError, -XX:+PrintGCDetails, -XX:+PrintGCDateStamps, -XX:+PrintTenuringDistribution, -XX:+PrintGCApplicationStoppedTime, -Xloggc:logs/gc.log, -XX:+UseGCLogFileRotation, -XX:NumberOfGCLogFiles=32, -XX:GCLogFileSize=64m, -Des.path.home=/Users/mofumofu/Elastic-Stack/elasticsearch-6.2.2, -Des.path.conf=/Users/mofumofu/Elastic-Stack/elasticsearch-6.2.2/config]
-[2018-03-07T17:17:50,813][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [aggs-matrix-stats]
-[2018-03-07T17:17:50,813][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [analysis-common]
-[2018-03-07T17:17:50,813][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [ingest-common]
-[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [lang-expression]
-[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [lang-mustache]
-[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [lang-painless]
-[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [mapper-extras]
-[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [parent-join]
-[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [percolator]
-[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [rank-eval]
-[2018-03-07T17:17:50,815][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [reindex]
-[2018-03-07T17:17:50,815][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [repository-url]
-[2018-03-07T17:17:50,815][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [transport-netty4]
-[2018-03-07T17:17:50,815][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [tribe]
-[2018-03-07T17:17:50,816][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] no plugins loaded
-[2018-03-07T17:17:55,806][INFO ][o.e.d.DiscoveryModule    ] [m3LWuZ2] using discovery type [zen]
-[2018-03-07T17:17:56,654][INFO ][o.e.n.Node               ] initialized
-[2018-03-07T17:17:56,654][INFO ][o.e.n.Node               ] [m3LWuZ2] starting ...
-[2018-03-07T17:17:56,986][INFO ][o.e.t.TransportService   ] [m3LWuZ2] publish_address {127.0.0.1:9300}, bound_addresses {[::1]:9300}, {127.0.0.1:9300}
-[2018-03-07T17:18:00,133][INFO ][o.e.c.s.MasterService    ] [m3LWuZ2] zen-disco-elected-as-master ([0] nodes joined), reason: new_master {m3LWuZ2}{m3LWuZ2UTR6nTATQyRi_vg}{cbEG0uFuRpWyWagkgCvI9A}{127.0.0.1}{127.0.0.1:9300}
-[2018-03-07T17:18:00,139][INFO ][o.e.c.s.ClusterApplierService] [m3LWuZ2] new_master {m3LWuZ2}{m3LWuZ2UTR6nTATQyRi_vg}{cbEG0uFuRpWyWagkgCvI9A}{127.0.0.1}{127.0.0.1:9300}, reason: apply cluster state (from master [master {m3LWuZ2}{m3LWuZ2UTR6nTATQyRi_vg}{cbEG0uFuRpWyWagkgCvI9A}{127.0.0.1}{127.0.0.1:9300} committed version [1] source [zen-disco-elected-as-master ([0] nodes joined)]])
-[2018-03-07T17:18:00,174][INFO ][o.e.h.n.Netty4HttpServerTransport] [m3LWuZ2] publish_address {127.0.0.1:9200}, bound_addresses {[::1]:9200}, {127.0.0.1:9200}
-[2018-03-07T17:18:00,174][INFO ][o.e.n.Node               ] [m3LWuZ2] started
-[2018-03-07T17:18:00,194][INFO ][o.e.g.GatewayService     ] [m3LWuZ2] recovered [0] indices into cluster_state
-[2018-03-07T17:20:57,666][INFO ][o.e.c.m.MetaDataCreateIndexService] [m3LWuZ2] [logstash-2018.03.07] creating index, cause [auto(bulk api)], templates [logstash], shards [5]/[1], mappings [_default_]
-[2018-03-07T17:20:58,218][INFO ][o.e.c.m.MetaDataMappingService] [m3LWuZ2] [logstash-2018.03.07/WBFN2jXwR16CDprJIlIq-w] create_mapping [doc]
-//}
-
-#@#標準出力はいれるか要相談
-
 === Logstashの起動
 
 Kibanaで閲覧するGitのコミットログをElasticsearchに投入するため、Logstashを利用します。
@@ -272,27 +234,6 @@ output {
 
 これも参考として、出力結果を載せておきます。
 
-//cmd{
-~/Elastic-Stack/logstash-6.2.2 $ bin/logstash -f config/conf.d/gitlog-logstash.conf
-Sending Logstash's logs to /Users/mallow/Elastic-Stack/logstash-6.2.2/logs which is now configured via log4j2.properties
-[2018-03-09T23:04:07,107][INFO ][logstash.modules.scaffold] Initializing module {:module_name=>"netflow", :directory=>"/Users/mallow/Elastic-Stack/logstash-6.2.2/modules/netflow/configuration"}
-[2018-03-09T23:04:07,145][INFO ][logstash.modules.scaffold] Initializing module {:module_name=>"fb_apache", :directory=>"/Users/mallow/Elastic-Stack/logstash-6.2.2/modules/fb_apache/configuration"}
-[2018-03-09T23:04:07,538][WARN ][logstash.config.source.multilocal] Ignoring the 'pipelines.yml' file because modules or command line options are specified
-[2018-03-09T23:04:08,400][INFO ][logstash.runner          ] Starting Logstash {"logstash.version"=>"6.2.2"}
-[2018-03-09T23:04:08,970][INFO ][logstash.agent           ] Successfully started Logstash API endpoint {:port=>9600}
-[2018-03-09T23:04:14,181][INFO ][logstash.pipeline        ] Starting pipeline {:pipeline_id=>"main", "pipeline.workers"=>4, "pipeline.batch.size"=>125, "pipeline.batch.delay"=>50}
-[2018-03-09T23:04:15,035][INFO ][logstash.outputs.elasticsearch] Elasticsearch pool URLs updated {:changes=>{:removed=>[], :added=>[http://127.0.0.1:9200/]}}
-[2018-03-09T23:04:15,047][INFO ][logstash.outputs.elasticsearch] Running health check to see if an Elasticsearch connection is working {:healthcheck_url=>http://127.0.0.1:9200/, :path=>"/"}
-[2018-03-09T23:04:15,576][WARN ][logstash.outputs.elasticsearch] Restored connection to ES instance {:url=>"http://127.0.0.1:9200/"}
-[2018-03-09T23:04:15,738][INFO ][logstash.outputs.elasticsearch] ES Output version determined {:es_version=>nil}
-[2018-03-09T23:04:15,745][WARN ][logstash.outputs.elasticsearch] Detected a 6.x and above cluster: the `type` event field won't be used to determine the document _type {:es_version=>6}
-[2018-03-09T23:04:15,781][INFO ][logstash.outputs.elasticsearch] Using mapping template from {:path=>nil}
-[2018-03-09T23:04:15,815][INFO ][logstash.outputs.elasticsearch] Attempting to install template {:manage_template=>{"template"=>"logstash-*", "version"=>60001, "settings"=>{"index.refresh_interval"=>"5s"}, "mappings"=>{"_default_"=>{"dynamic_templates"=>[{"message_field"=>{"path_match"=>"message", "match_mapping_type"=>"string", "mapping"=>{"type"=>"text", "norms"=>false}}}, {"string_fields"=>{"match"=>"*", "match_mapping_type"=>"string", "mapping"=>{"type"=>"text", "norms"=>false, "fields"=>{"keyword"=>{"type"=>"keyword", "ignore_above"=>256}}}}}], "properties"=>{"@timestamp"=>{"type"=>"date"}, "@version"=>{"type"=>"keyword"}, "geoip"=>{"dynamic"=>true, "properties"=>{"ip"=>{"type"=>"ip"}, "location"=>{"type"=>"geo_point"}, "latitude"=>{"type"=>"half_float"}, "longitude"=>{"type"=>"half_float"}}}}}}}}
-[2018-03-09T23:04:15,894][INFO ][logstash.outputs.elasticsearch] New Elasticsearch output {:class=>"LogStash::Outputs::ElasticSearch", :hosts=>["//127.0.0.1"]}
-[2018-03-09T23:04:16,397][INFO ][logstash.pipeline        ] Pipeline started succesfully {:pipeline_id=>"main", :thread=>"#<Thread:0x2620d55d run>"}
-[2018-03-09T23:04:16,585][INFO ][logstash.agent           ] Pipelines running {:count=>1, :pipelines=>["main"]}
-//}
-
 
 === Kibanaの起動
 
@@ -302,18 +243,6 @@ Sending Logstash's logs to /Users/mallow/Elastic-Stack/logstash-6.2.2/logs which
 
 もふちゃんは@<code>{kibana.yml}を修正していないため、@<code>{localhost:5601}でKibanaは起動します。
 
-//cmd{
-~ $ cd Elastic-Stack/
-~/Elastic-Stack $ cd kibana-6.2.2-darwin-x86_64/
-~/Elastic-Stack/kibana-6.2.2-darwin-x86_64 $ bin/kibana
-log   [08:19:01.911] [info][status][plugin:kibana@6.2.2] Status changed from uninitialized to green - Ready
-log   [08:19:02.045] [info][status][plugin:elasticsearch@6.2.2] Status changed from uninitialized to yellow - Waiting for Elasticsearch
-log   [08:19:02.623] [info][status][plugin:timelion@6.2.2] Status changed from uninitialized to green - Ready
-log   [08:19:02.632] [info][status][plugin:console@6.2.2] Status changed from uninitialized to green - Ready
-log   [08:19:02.652] [info][status][plugin:metrics@6.2.2] Status changed from uninitialized to green - Ready
-log   [08:19:02.725] [info][listening] Server running at http://localhost:5601
-log   [08:19:02.823] [info][status][plugin:elasticsearch@6.2.2] Status changed from yellow to green - Ready
-//}
 
 この状態でブラウザから@<herf>{http://localhost:5601/}にアクセスすると、@<img>{kibana01-img01}のような画面が見えているはずです。
 
