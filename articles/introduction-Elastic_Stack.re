@@ -35,16 +35,16 @@ Elasticsearchは、Javaで作られている分散処理型の検索エンジン
 
 //footnote[introES-fn01][技術書典シリーズって名前で察した方も多いかと思いますが、これは技術書典2でもふもふちゃんがElastic Stack5の同人誌を書いたらインプレスR&Dさんが商業本にしてくれました。KindleでElasticて打つと検索トップに出てくるからびびるんだけど。]
 
-昔は自分たちでElasticsearchを構築・運用するか、AWSの機能として@@<code>{Amazon Elasticserch Service}（@<href>{https://aws.amazon.com/jp/elasticsearch-service/}）を利用するしかありませんでした。
-しかし、Elastic Stack5からはElastic社が提供するクラウドサービス@@<code>{Elastic Cloud}（@@<href>{https://www.elastic.co/jp/cloud}）を利用することでElasticsearchの管理・バージョンアップ・
+昔は自分たちでElasticsearchを構築・運用するか、AWSの機能として@<code>{Amazon Elasticserch Service}（@<href>{https://aws.amazon.com/jp/elasticsearch-service/}）を利用するしかありませんでした。
+しかし、Elastic Stack5からはElastic社が提供するクラウドサービス@<code>{Elastic Cloud}（@<href>{https://www.elastic.co/jp/cloud}）を利用することでElasticsearchの管理・バージョンアップ・
 データのバックアップなども柔軟に行うことができるようになりました。基盤の持ち方の選択肢が増えるのはありがたいですよね。
 
-Elasticserchは独自のクエリを使用してデータの問い合わせをおこなうことが特徴です。が、今後のアップデートでSQLを利用してデータの問い合わせをできるようになることが発表されています@@<href>{https://www.elastic.co/jp/elasticon/conf/2017/sf/elasticsearch-sql}。
+Elasticserchは独自のクエリを使用してデータの問い合わせをおこなうことが特徴です。が、今後のアップデートでSQLを利用してデータの問い合わせをできるようになることが発表されています@<href>{https://www.elastic.co/jp/elasticon/conf/2017/sf/elasticsearch-sql}。
 SQLの方が普及率も高いので、さらにElasticsearchを便利に利用することができそうです。
 
 === Logstash
 
-Logstashは各環境に散らばっているログを集め、指定した対象に連携できるツールです。ログの連携だけではなく、ログの加工機能も持ち合わせています@@<fn>{introES-fn02}。
+Logstashは各環境に散らばっているログを集め、指定した対象に連携できるツールです。ログの連携だけではなく、ログの加工機能も持ち合わせています@<fn>{introES-fn02}。
 
 //footnote[introES-fn02][Elastic Stackで作るBI環境 誰でもできるデータ分析入門 (技術書典シリーズ(NextPublishing)) }（@<href>{https://www.amazon.co.jp/Elastic-Stackで作るBI環境-誰でもできるデータ分析入門-技術書典シリーズ-NextPublishing/dp/484439780X}）]
 
@@ -53,7 +53,7 @@ Logstashは各環境に散らばっているログを集め、指定した対象
 類似プロダクトとしてはTresure Data社製のOSS@<code>{fluentd}（URL:@<href>{https://www.fluentd.org}）が存在します。
 エラーのわかりやすさ、環境構築の簡単さを取るのであればfluentdを、Elastic Stackとしてプロダクトをセットで運用するのであればLogstashを利用すると良いでしょう。
 
-Logstashはバージョン6からLogstashのプロセスを@@<code>{Multiple pipeline}として分割できるようになりました。これを利用すると、AのデータとBのデータをLogstashで取得したいときに
+Logstashはバージョン6からLogstashのプロセスを@<code>{Multiple pipeline}として分割できるようになりました。これを利用すると、AのデータとBのデータをLogstashで取得したいときに
 Logstashプロセスを2つ作ることができます。片方のプロセスがお亡くなりになってももう片方のデータ連携は継続して行うことができるので、対障害性が上がりますね。
 詳しくはXXを参照してください。
 
@@ -66,11 +66,13 @@ Beatsは用途に合わせてデータを簡単に送ることができる軽量
 
 #@#HPのURLリンク貼る
 
-Elastic Stack6からは@@<code>{Modules}という機能が追加されました。Modulesを利用すると、Elasticsearchへのデータ連携とKibanaのグラフ作成を自動で行ってくれます。
+Elastic Stack6からは@<code>{Modules}という機能が追加されました。Modulesを利用すると、Elasticsearchへのデータ連携とKibanaのグラフ作成を自動で行ってくれます。
 Apacheのaccess.logなど、利用できるデータは限られています。公式ドキュメント、またはKibanaのGUIで確認してください。
 
 === Kibana
 
+KibanaはElasticsearch内に保存されているデータを参照し、グラフを利用して可視化できるツールです。Elastic Stack6からは拡張機能を利用することで
+Logstashのプロセスの流れをGUIで見える化（@<code>{Logstash pipeline}）することや、
 
 == 今後のElastic Stack6のみどころだよ
 
@@ -83,7 +85,7 @@ Elastic Stackへのクエリを投げるのは今までElasticsearch独自のク
 と、いう背景があったのかは謎ですが、今後のアップデートでSQLクエリを利用してElasticsearhにクエリを発行できるようになります。
 Insertなど、特定のクエリのみ、かつ標準SQLのサポートになりますが、それでも大分楽になりますね。
 
-あ、そうそう、X-Packはソースコードが公開となりました。が、@@<b>{有償版の範囲は引き続きライセンス買わないと使うことはできません}。
+あ、そうそう、X-Packはソースコードが公開となりました。が、@<b>{有償版の範囲は引き続きライセンス買わないと使うことはできません}。
 インストール時点でわかりますが、ライセンス認証が必要ですからね。ずるしてもわかっちゃうからね。ずるはいけません。
 
 おたくは推しにお布施するじゃないですか？Elastic Stackがいいなーって思うひとはお布施するんだよ！
