@@ -72,11 +72,9 @@ Apacheのaccess.logなど、利用できるデータは限られています。�
 === Kibana
 
 KibanaはElasticsearch内に保存されているデータを参照し、グラフを利用して可視化できるツールです。Elastic Stack6からは拡張機能を利用することで
-Logstashのプロセスの流れをGUIで見える化（@<code>{Logstash pipeline}）することや、
-
-== 今後のElastic Stack6のみどころだよ
-
-有償版のプロダクトやSaaS、クラウドに関する情報はここから除外します。だって使えないやんけ！同人誌マンには使いどころがないんだよ！（突然の逆ギレ）
+Logstashのプロセスの流れをGUIで見える化（@<code>{Logstash pipeline}）することや、Elasticsearchのデータを元に閾値を超えたら通知などのアクションをすることができるようになる
+@<code>{Machine Learning}を利用できます。ちなみにLogstash pipelineとMachine Learningは有償機能ですので本同人誌では取り扱いません。同人マンが取り扱うには
+5000兆円必要なんだよ！（突然の逆ギレ）
 
 
 Elastic Stackへのクエリを投げるのは今までElasticsearch独自のクエリを書く必要がありました。
