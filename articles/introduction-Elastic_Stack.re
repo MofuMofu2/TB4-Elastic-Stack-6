@@ -60,7 +60,7 @@ Logstashプロセスを2つ作ることができます。片方のプロセス�
 === Beats
 
 Beatsは用途に合わせてデータを簡単に送ることができる軽量データシッパーです@<fn>{introES-fn03}。Go言語で作成されており、動作に必要なリソースが他プロダクトと比較して少ないことが特徴です。
-用途に合わせてXXBeatsというように、名前が異なります。ドキュメントを参照するときは注意したようが良いです。
+用途に合わせてXXBeatsというように、名前が異なります。ドキュメントも種別ごとに異なりますので、注意が必要です。
 
 //footnote[introES-fn03][https://www.elastic.co/guide/en/beats/libbeat/current/beats-reference.html]
 
