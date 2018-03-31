@@ -44,7 +44,28 @@ SQLの方が普及率も高いので、さらにElasticsearchを便利に利用�
 
 === Logstash
 
+Logstashは各環境に散らばっているログを集め、指定した対象に連携できるツールです。ログの連携だけではなく、ログの加工機能も持ち合わせています@@<fn>{introES-fn02}。
+
+//footnote[introES-fn02][Elastic Stackで作るBI環境 誰でもできるデータ分析入門 (技術書典シリーズ(NextPublishing)) }（@<href>{https://www.amazon.co.jp/Elastic-Stackで作るBI環境-誰でもできるデータ分析入門-技術書典シリーズ-NextPublishing/dp/484439780X}）]
+
+ログの取得というとファイルからの取得を思い浮かべますが、プラグインを利用することでAmazon s3やTwitterから直接データを取得することも可能です。
+
+類似プロダクトとしてはTresure Data社製のOSS@<code>{fluentd}（URL:@<href>{https://www.fluentd.org}）が存在します。
+エラーのわかりやすさ、環境構築の簡単さを取るのであればfluentdを、Elastic Stackとしてプロダクトをセットで運用するのであればLogstashを利用すると良いでしょう。
+
+Logstashはバージョン6からLogstashのプロセスを@@<code>{Multiple pipeline}として分割できるようになりました。これを利用すると、AのデータとBのデータをLogstashで取得したいときに
+Logstashプロセスを2つ作ることができます。片方のプロセスがお亡くなりになってももう片方のデータ連携は継続して行うことができるので、対障害性が上がりますね。
+詳しくはXXを参照してください。
+
+#@# todo 参照するぞ
+
 === Beats
+
+Beatsは用途に合わせてデータを簡単に送ることができる軽量データシッパーです。Go言語
+
+#@#HPのURLリンク貼る
+
+
 
 === Kibana
 
