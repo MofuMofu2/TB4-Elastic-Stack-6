@@ -193,44 +193,6 @@ drwxr-xr-x@ 16 mofumofu  staff   512  3  7 10:51 logstash-6.2.2
 これも、出力結果を載せておきます。ここは本題ではありませんので、解説や特別な設定は行いません。
 #@#文章できたらリンクを貼る
 
-//cmd{
-~/Elastic-Stack/elasticsearch-6.2.2 $ bin/elasticsearch
-[2018-03-07T17:17:49,092][INFO ][o.e.n.Node               ] [] initializing ...
-[2018-03-07T17:17:49,220][INFO ][o.e.e.NodeEnvironment    ] [m3LWuZ2] using [1] data paths, mounts [[/ (/dev/disk1s1)]], net usable_space [81.9gb], net total_space [232.9gb], types [apfs]
-[2018-03-07T17:17:49,221][INFO ][o.e.e.NodeEnvironment    ] [m3LWuZ2] heap size [990.7mb], compressed ordinary object pointers [true]
-[2018-03-07T17:17:49,223][INFO ][o.e.n.Node               ] node name [m3LWuZ2] derived from node ID [m3LWuZ2UTR6nTATQyRi_vg]; set [node.name] to override
-[2018-03-07T17:17:49,223][INFO ][o.e.n.Node               ] version[6.2.2], pid[14049], build[10b1edd/2018-02-16T19:01:30.685723Z], OS[Mac OS X/10.13.3/x86_64], JVM[Oracle Corporation/Java HotSpot(TM) 64-Bit Server VM/1.8.0_45/25.45-b02]
-[2018-03-07T17:17:49,224][INFO ][o.e.n.Node               ] JVM arguments [-Xms1g, -Xmx1g, -XX:+UseConcMarkSweepGC, -XX:CMSInitiatingOccupancyFraction=75, -XX:+UseCMSInitiatingOccupancyOnly, -XX:+AlwaysPreTouch, -Xss1m, -Djava.awt.headless=true, -Dfile.encoding=UTF-8, -Djna.nosys=true, -XX:-OmitStackTraceInFastThrow, -Dio.netty.noUnsafe=true, -Dio.netty.noKeySetOptimization=true, -Dio.netty.recycler.maxCapacityPerThread=0, -Dlog4j.shutdownHookEnabled=false, -Dlog4j2.disable.jmx=true, -Djava.io.tmpdir=/var/folders/5z/1qmk32x17pn9zv80fk26bvsw0000gn/T/elasticsearch.bvcXHDjg, -XX:+HeapDumpOnOutOfMemoryError, -XX:+PrintGCDetails, -XX:+PrintGCDateStamps, -XX:+PrintTenuringDistribution, -XX:+PrintGCApplicationStoppedTime, -Xloggc:logs/gc.log, -XX:+UseGCLogFileRotation, -XX:NumberOfGCLogFiles=32, -XX:GCLogFileSize=64m, -Des.path.home=/Users/mofumofu/Elastic-Stack/elasticsearch-6.2.2, -Des.path.conf=/Users/mofumofu/Elastic-Stack/elasticsearch-6.2.2/config]
-[2018-03-07T17:17:50,813][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [aggs-matrix-stats]
-[2018-03-07T17:17:50,813][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [analysis-common]
-[2018-03-07T17:17:50,813][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [ingest-common]
-[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [lang-expression]
-[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [lang-mustache]
-[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [lang-painless]
-[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [mapper-extras]
-[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [parent-join]
-[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [percolator]
-[2018-03-07T17:17:50,814][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [rank-eval]
-[2018-03-07T17:17:50,815][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [reindex]
-[2018-03-07T17:17:50,815][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [repository-url]
-[2018-03-07T17:17:50,815][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [transport-netty4]
-[2018-03-07T17:17:50,815][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] loaded module [tribe]
-[2018-03-07T17:17:50,816][INFO ][o.e.p.PluginsService     ] [m3LWuZ2] no plugins loaded
-[2018-03-07T17:17:55,806][INFO ][o.e.d.DiscoveryModule    ] [m3LWuZ2] using discovery type [zen]
-[2018-03-07T17:17:56,654][INFO ][o.e.n.Node               ] initialized
-[2018-03-07T17:17:56,654][INFO ][o.e.n.Node               ] [m3LWuZ2] starting ...
-[2018-03-07T17:17:56,986][INFO ][o.e.t.TransportService   ] [m3LWuZ2] publish_address {127.0.0.1:9300}, bound_addresses {[::1]:9300}, {127.0.0.1:9300}
-[2018-03-07T17:18:00,133][INFO ][o.e.c.s.MasterService    ] [m3LWuZ2] zen-disco-elected-as-master ([0] nodes joined), reason: new_master {m3LWuZ2}{m3LWuZ2UTR6nTATQyRi_vg}{cbEG0uFuRpWyWagkgCvI9A}{127.0.0.1}{127.0.0.1:9300}
-[2018-03-07T17:18:00,139][INFO ][o.e.c.s.ClusterApplierService] [m3LWuZ2] new_master {m3LWuZ2}{m3LWuZ2UTR6nTATQyRi_vg}{cbEG0uFuRpWyWagkgCvI9A}{127.0.0.1}{127.0.0.1:9300}, reason: apply cluster state (from master [master {m3LWuZ2}{m3LWuZ2UTR6nTATQyRi_vg}{cbEG0uFuRpWyWagkgCvI9A}{127.0.0.1}{127.0.0.1:9300} committed version [1] source [zen-disco-elected-as-master ([0] nodes joined)]])
-[2018-03-07T17:18:00,174][INFO ][o.e.h.n.Netty4HttpServerTransport] [m3LWuZ2] publish_address {127.0.0.1:9200}, bound_addresses {[::1]:9200}, {127.0.0.1:9200}
-[2018-03-07T17:18:00,174][INFO ][o.e.n.Node               ] [m3LWuZ2] started
-[2018-03-07T17:18:00,194][INFO ][o.e.g.GatewayService     ] [m3LWuZ2] recovered [0] indices into cluster_state
-[2018-03-07T17:20:57,666][INFO ][o.e.c.m.MetaDataCreateIndexService] [m3LWuZ2] [logstash-2018.03.07] creating index, cause [auto(bulk api)], templates [logstash], shards [5]/[1], mappings [_default_]
-[2018-03-07T17:20:58,218][INFO ][o.e.c.m.MetaDataMappingService] [m3LWuZ2] [logstash-2018.03.07/WBFN2jXwR16CDprJIlIq-w] create_mapping [doc]
-//}
-
-#@#標準出力はいれるか要相談
-
 === Logstashの起動
 
 Kibanaで閲覧するGitのコミットログをElasticsearchに投入するため、Logstashを利用します。
@@ -272,27 +234,6 @@ output {
 
 これも参考として、出力結果を載せておきます。
 
-//cmd{
-~/Elastic-Stack/logstash-6.2.2 $ bin/logstash -f config/conf.d/gitlog-logstash.conf
-Sending Logstash's logs to /Users/mallow/Elastic-Stack/logstash-6.2.2/logs which is now configured via log4j2.properties
-[2018-03-09T23:04:07,107][INFO ][logstash.modules.scaffold] Initializing module {:module_name=>"netflow", :directory=>"/Users/mallow/Elastic-Stack/logstash-6.2.2/modules/netflow/configuration"}
-[2018-03-09T23:04:07,145][INFO ][logstash.modules.scaffold] Initializing module {:module_name=>"fb_apache", :directory=>"/Users/mallow/Elastic-Stack/logstash-6.2.2/modules/fb_apache/configuration"}
-[2018-03-09T23:04:07,538][WARN ][logstash.config.source.multilocal] Ignoring the 'pipelines.yml' file because modules or command line options are specified
-[2018-03-09T23:04:08,400][INFO ][logstash.runner          ] Starting Logstash {"logstash.version"=>"6.2.2"}
-[2018-03-09T23:04:08,970][INFO ][logstash.agent           ] Successfully started Logstash API endpoint {:port=>9600}
-[2018-03-09T23:04:14,181][INFO ][logstash.pipeline        ] Starting pipeline {:pipeline_id=>"main", "pipeline.workers"=>4, "pipeline.batch.size"=>125, "pipeline.batch.delay"=>50}
-[2018-03-09T23:04:15,035][INFO ][logstash.outputs.elasticsearch] Elasticsearch pool URLs updated {:changes=>{:removed=>[], :added=>[http://127.0.0.1:9200/]}}
-[2018-03-09T23:04:15,047][INFO ][logstash.outputs.elasticsearch] Running health check to see if an Elasticsearch connection is working {:healthcheck_url=>http://127.0.0.1:9200/, :path=>"/"}
-[2018-03-09T23:04:15,576][WARN ][logstash.outputs.elasticsearch] Restored connection to ES instance {:url=>"http://127.0.0.1:9200/"}
-[2018-03-09T23:04:15,738][INFO ][logstash.outputs.elasticsearch] ES Output version determined {:es_version=>nil}
-[2018-03-09T23:04:15,745][WARN ][logstash.outputs.elasticsearch] Detected a 6.x and above cluster: the `type` event field won't be used to determine the document _type {:es_version=>6}
-[2018-03-09T23:04:15,781][INFO ][logstash.outputs.elasticsearch] Using mapping template from {:path=>nil}
-[2018-03-09T23:04:15,815][INFO ][logstash.outputs.elasticsearch] Attempting to install template {:manage_template=>{"template"=>"logstash-*", "version"=>60001, "settings"=>{"index.refresh_interval"=>"5s"}, "mappings"=>{"_default_"=>{"dynamic_templates"=>[{"message_field"=>{"path_match"=>"message", "match_mapping_type"=>"string", "mapping"=>{"type"=>"text", "norms"=>false}}}, {"string_fields"=>{"match"=>"*", "match_mapping_type"=>"string", "mapping"=>{"type"=>"text", "norms"=>false, "fields"=>{"keyword"=>{"type"=>"keyword", "ignore_above"=>256}}}}}], "properties"=>{"@timestamp"=>{"type"=>"date"}, "@version"=>{"type"=>"keyword"}, "geoip"=>{"dynamic"=>true, "properties"=>{"ip"=>{"type"=>"ip"}, "location"=>{"type"=>"geo_point"}, "latitude"=>{"type"=>"half_float"}, "longitude"=>{"type"=>"half_float"}}}}}}}}
-[2018-03-09T23:04:15,894][INFO ][logstash.outputs.elasticsearch] New Elasticsearch output {:class=>"LogStash::Outputs::ElasticSearch", :hosts=>["//127.0.0.1"]}
-[2018-03-09T23:04:16,397][INFO ][logstash.pipeline        ] Pipeline started succesfully {:pipeline_id=>"main", :thread=>"#<Thread:0x2620d55d run>"}
-[2018-03-09T23:04:16,585][INFO ][logstash.agent           ] Pipelines running {:count=>1, :pipelines=>["main"]}
-//}
-
 
 === Kibanaの起動
 
@@ -302,18 +243,6 @@ Sending Logstash's logs to /Users/mallow/Elastic-Stack/logstash-6.2.2/logs which
 
 もふちゃんは@<code>{kibana.yml}を修正していないため、@<code>{localhost:5601}でKibanaは起動します。
 
-//cmd{
-~ $ cd Elastic-Stack/
-~/Elastic-Stack $ cd kibana-6.2.2-darwin-x86_64/
-~/Elastic-Stack/kibana-6.2.2-darwin-x86_64 $ bin/kibana
-log   [08:19:01.911] [info][status][plugin:kibana@6.2.2] Status changed from uninitialized to green - Ready
-log   [08:19:02.045] [info][status][plugin:elasticsearch@6.2.2] Status changed from uninitialized to yellow - Waiting for Elasticsearch
-log   [08:19:02.623] [info][status][plugin:timelion@6.2.2] Status changed from uninitialized to green - Ready
-log   [08:19:02.632] [info][status][plugin:console@6.2.2] Status changed from uninitialized to green - Ready
-log   [08:19:02.652] [info][status][plugin:metrics@6.2.2] Status changed from uninitialized to green - Ready
-log   [08:19:02.725] [info][listening] Server running at http://localhost:5601
-log   [08:19:02.823] [info][status][plugin:elasticsearch@6.2.2] Status changed from yellow to green - Ready
-//}
 
 この状態でブラウザから@<herf>{http://localhost:5601/}にアクセスすると、@<img>{kibana01-img01}のような画面が見えているはずです。
 
@@ -321,125 +250,189 @@ log   [08:19:02.823] [info][status][plugin:elasticsearch@6.2.2] Status changed f
 //}
 
 これで準備はできました。
-Gitログの可視化を今すぐやりたい人は「Gitの可視化をやってみる」まで飛ばしてください。
 
-== Kibana6の歩き方（という名の見所紹介）
+== Kibanaを使ってGitのコミット状況を閲覧する
 
-Kibanaのバージョン5を使っていた人は、「またUIが変わったんですかい！」と思うかもしれません。もふちゃんもそうおもうにゃわん、です。
+では、早速Gitのコミットログ（以降git logとします）をグラフにしていきましょう。
+まずはKibana@<href>{http://localhost:5601}にアクセスします。@<code>{kibana.yml}でURLを変更していた場合、
+自分で設定したURLへアクセスしてください。
 
-//image[kibana01-img02][Kibana（ver5.4）の画面]{
+アクセスすると、@<img>{kibana01-img01}が見えていますね。まずは画面左端にある歯車アイコンを押して@<code>{Management}画面を開きましょう。
+
+=== 利用するindexの設定を行う
+
+Elasticsearchは@<code>{index}にデータを保存しています。Kibanaでグラフを作るときに、どの@<code>{index}を参照すればよいか
+はじめに設定する必要があります。
+
+//image[kibana01-img02][Kibanaが参照するindexを設定する]{
 //}
 
-=== みんなに配慮、優しい色合い
+親切なことに、画面下側にindexの名前が出てきます。コピー＆ペーストで@<code>{Index pattern}にindex名を入れてしまいましょう。
+index名の指定をするときは、@<code>{*（アスタリスク）}を利用することができます。たとえば@<code>{logstash-*}と設定すれば
+@<code>{logstash-}で始まるindexを全て参照することができます。
 
-まず、大きく異なるのは全体の色味です。Kibanaのバージョン5（以降、Kibana5とします）はピンクや青など、明るい色をメインカラーとして使用していました。かわいいですね。
-ところが、Kibana6からは青を基調とした昆布のような色合いになっています。Kibana5と比較すると地味ですね。
+デフォルトでは、LogstashからデータをElasticsearchに連携するときに@<code>{logstash-日付}としてindexを作成します。
+なので、Logstash側でindexを指定していない場合、@<code>{logstash-*}をKibanaから参照するようにしておけば問題ありません。
 
-なぜそんな地味カラーになってしまったのでしょう？
-これにはちゃんとわけがあります。
+次に、どのfieldを時刻として参照するか設定します。
 
-@<code>{色盲}という言葉をみなさんご存知でしょうか？ヒトの目は網膜の中に錐体細胞という細胞を持っています。
-この細胞、赤・青・緑を感じることができる物質をそれぞれ持っています。赤・青・緑の濃さを見分けて、色をいろいろ見分けることができるんですね。
-
-色盲ではない人は3色の色を感じることができるのですが、何らかの原因で赤・青・緑の錐体細胞のどれかがうまく働かなくなってしまう人もいます。
-それが、色盲という状態です。
-この色盲、何と男性では20名に1人、女性の500人に1人の割合で見受けられる、という研究もあります（黄色人種の場合）。
-そして、赤系の色盲になる人が1番多いのです@<fn>{kibana01-fn01}。
-
-//footnote[kibana01-fn01][参考：https://www.nig.ac.jp/color/gen/]
-
-もう、もふちゃんが何を言いたいかわかりましたか？Elastic社はこの色盲の方に配慮してUIの色を変更したのです。
-Elastic Stackを色々な人に使ってもらいたいという心意気ってやつですね。こんなもてなしの心をもってもふちゃんも生きていきたいものです。
-
-=== 楽々ぽんのDashboardセットアップ
-
-で、次に特徴的なのは@<code>{APM}や@<code>{Logging}の文字ですね。これは@<code>{Modules}というElastic Stackの新機能です。
-micci184の章でも触れていますが、専用の@<code>{Beats Modules}を起動すると、Elasticsearchに自動で接続・KibanaのDashboardまで作成してもらえます。
-あら便利！ヘル○オ並みの便利さです。
-
-#@#章決まったら章題入れる
-#@#Dashboardの説明は前にいれて、そこを書いておく
-
-「あら、じゃあもうVisualizeするひつようないわーん」と思った方もいるかもしれません。ただこのModules、利用できるデータの種類に制限があります。
-Elastic Stack6.2の時点で利用できるModulesは次の通りです。（KibanaのUIの中で確認できるぞい！）
-
-* Apacheのログ
-* Apacheのメトリクス
-* APM
-* Dockerのメトリクス
-* Kubernetesのメトリクス
-* MySQLのログ
-* MySQLのメトリクス
-* Netflow
-* Nginxのログ
-* Nginxのメトリクス
-* Redisのログ
-* Redisのメトリクス
-* システムログ
-* システムのメトリクス
-
-@<code>{Netflow}はCisco社が開発したネットワークトラフィックの詳細情報を収集するための技術です。
-@<code>{Redis}はNoSQLデータベースの1種です。
-
-となると、このラインナップを見る限りWeb系をメインターゲットとして置いてるように見えますね。
-やはりWebサービスは性能命ですから、性能やサービス監視は簡単に構築したいものです、って需要をうまくくんでますなあって気持ちになります。
-
-=== グラフの種類も増えました
-
-Visualizeを利用すると、自分でグラフを作成できるというのは前の章でお伝えした通りです。
-このVisualize、デフォルトで利用できるグラフが増えました。
-
-//image[kibana01-img03][Kibana6.2のVisualize]{
+//image[kibana01-img03][どのfieldを時刻として参照するか設定する]{
 //}
 
-ちなみにKibana5.4から増えたグラフは次の通りです。なんで5.4からかだって？もふちゃんが知ってるの、それが最後なの！しょうがないでしょ同人誌書くときしか使わないんだから！（いかり）
+@<code>{@timestamp}を選択すると、LogstashがデータをElasticsearchに連携したときの時刻を基準としてデータを閲覧することになります。
+今回はいつGitにコミットが作成されたかを閲覧したいので、@<code>{author_date}を時刻として参照するようにします。
 
-* Goal
-* Coordinate Map
-* Region Map
-* Controls
-* Vega
+== Discoverでgit logの様子を観察する
 
-あらー随分とデフォルトで利用できるグラフ種別が増えましたね。すごいですね。
+//image[kibana01-img04][Discoverの画面に遷移した状態]{
+//}
 
-==== Goal
-==== Coordinate Map/Region Map
-==== Controls
-==== Vega
+画面左端にあるコンパスのアイコンを押すと、@<code>{Discover}の画面に遷移します。@<code>{Discover}ではElasticsearchに保存されているデータを
+直接参照することが可能です。画面上部のグラフは、いつ・どのくらいのデータがElasticsearchに保存されたかを示しています。ここで先ほどindexの設定時に指定した時刻を利用します。
 
-=== 何気に嬉しいお便利機能
+画面右上の時計マークでは、表示するデータの期間を指定しています。例えば@<img>{kibana01-img04}では、時刻が@<code>{Last 15 minutes}と設定されています。
+この場合、@<b>{今の時刻から}15分前までにコミットがあったデータ（＝@<code>{author_date}の時刻が現在から15分前のもの）を閲覧する状態となっています。
 
-これから紹介する機能、はもふもふちゃんが「あら便利！むかしよりも進化してるわ！」と思ったけど、そんなに推し推しされていない機能です。
+条件に当てはまるデータが存在しない場合、@<img>{kibana01-img04}のようにデータが存在しないことを示す画面が表示されます。顔文字がなんかちょっと腹たつような感じですね。
+この場合、時計マークをクリックして時刻の範囲を変更しましょう。時刻を広めにとると何かしらのデータが表示されるはずです。それでもダメであれば、Elasticserchにデータが
+保存されていない可能性があります。データの連携がきちんとできているか、再度見直しましょう。
 
-==== Dev Toolsの入力補完
+//image[kibana01-img05][時刻を調整してgit logがDiscover画面に表示された]{
+//}
 
-「GoならわかるElasticsearch」の章ではコンソール上で直接Elasticsearchにクエリを発行していました。
-しかし、KibanaのGUIには@@<code>{Dev Tools}という画面があります。これがすんばらしいのです。
+データの詳細を閲覧するためには、データの横にある@<code>{▶︎}をクリックします。
+jsonのfieldごとにデータが別れて表示されるので、どのfieldに何のデータが保存されたかを確認することが可能です。
 
-なにがすんばらしいのか？それは、クエリを入力する途中で入力補完が出てくるというところです。
+//image[kibana01-img06][▶︎を押してデータの詳細を閲覧する]{
+//}
 
-例えば、今Elasticsearchに存在するindexを出したいなーと思ったとします。
+基本的なデータの参照方法がわかったところで、いよいよグラフを作成していきたいと思います。
 
-コンソール上でクエリを発行するのであれば、次のように手で記載しますよね。
+== Visualizeで同人誌の進捗を観察する
 
-#@# keigodasuに合わせる
+では、早速新しいグラフを作成します。画面左端の棒グラフアイコンをクリックして<code>{Visualize}を開きましょう。
+開くと@<img>{kibana01-img07}のように、グラフを選択する画面が開きます。
+すでにグラフが存在すれば、ここから詳細を閲覧することができますが、今回は何もグラフが存在しないので新しくグラフを作るしかありません。
+@<code>{Create a visualization}をクリックしてグラフを作成しましょう。
 
-でも、Kibanaの@@<code>{Dev Tools}で同じように記載しようとすると…？
+//image[kibana01-img07][グラフが存在しないので、作るしかない]{
+//}
 
-#@# キャプチャを貼る
+@<code>{Create a visualization}をクリックすると、@<img>{kibana01-img08}のようにグラフの種別を選択する画面が出てきます。
+まずは基本の線グラフを作成してみましょう。
 
-あら！AtomやVSCodeのように予測が出てきました。
+@<code>{Line}を選択すると、どのindexデータを利用するかを指定する画面になります。indexの設定画面で指定した名前をクリックして
+次に進みましょう。
 
-三角を押すと、そのままElasticsearchにクエリを発行できます。jsonにはシンタックスハイライトが適用されているので、可読性も高いです。
+=== Line Chartを作成する
 
-作業用コンソールをいくつも立ち上げておくのは事故の元、と言いますが、Elasticsearchに限って言えば、@@<code>{Dev Tools}を利用することで作業用ウィンドウを1つ節約できます。
-みなさんも使ってみてはいかがでしょうか。
+//image[kibana01-img10][Visualizeの初期画面]{
+//}
 
-#@# クエリは英語表記に統一するか？
+これでは何も表示されていませんね。次の順序でグラフを作成したいと思います。
 
-#@# Re:VIEWって章参照できるはずだからやり方みてみよう
+ 1. X軸（横軸）の設定を行う
+ 2. Y軸（縦軸）の設定を行う
+ 3. コミッターごとにグラフの線を分ける
+ 4. 見た目をいい感じに整える
 
-==== Chart系が一括で切り替えできる
-==== Discoverの検索窓にQueryのsyntax例が入っている
+==== X軸（横軸）の設定を行う
 
-いいか、細やかな気遣いが大事なんだぞ。わかるかな？
+線グラフなので、時系列でどのようにコミット数が遷移しているかわかると気持ちがいいですよね。というわけで
+X軸の基準を時間に変更したいと思います。
+
+@<code>{Buckets}の@<code>{X-Axis}をクリックして、詳細画面を開きましょう。
+@<code>{Aggregation}でどんな基準をX軸にするのか決定します。Aggregationは集合という意味ですから、
+どんなデータの集まりをグラフにするのかを決定するという意味なのかな、という気がしますね。
+
+今回はコミットの時間をX軸にしたいので、@<code>{Date Histogram}を選択します。すると、
+自動で自分が設定した時間軸が@<code>{Field}に入ってきます。もちろん、ここで時間軸として利用するfieldを
+変更することも可能です。
+
+//image[kibana01-img11][X軸をDate Histogramに]{
+//}
+
+設定を変更して画面左上の@<code>{▶︎}ボタンをクリックすると、グラフが@<img>{kibana01-img11}のように変化しました。
+このように、設定を変更したら@<code>{▶︎}を押さないと変更が反映されません。画面全体をリロードすると、もう一度設定をやり直す
+ことになります。悲しいですね。
+
+@<code>{Interval}はデータをプロットする間隔を指定します。最初は@<code>{Auto}にしておいて、後から自分の好みで
+設定しなおすと良いでしょう。
+
+==== Y軸（縦軸）の設定を行う
+
+今度はY軸の設定を行います。とはいえ、今回は「いつどのくらいコミットがあったかをみたい」ことが目的なので、
+コミット数が時系列にプロットされていれば良いですよね。あまりいじくる必要はなさそうです。
+
+とはいえ、データのの平均を見たいときは困りますね。@<code>{Metrics}の@<code>{Aggregation}をクリックすると
+今度はどんな方法でデータの数を数えるか変更することができます。デフォルトは@<code>{Count}なのでデータの数を縦にプロットしますが、
+@<code>{Average}に変更すると、データの平均をプロットすることが可能です。SQLのように、MAX・MIN・Sumといった演算をすることも可能です。
+ただし、これら数値を扱うような設定は、indexに保存されているデータに数値型のものがないと利用できません。今回は文字列型のデータばかりですから、
+大人しく@<code>{Count}を利用することにしましょう。
+
+//image[kibana01-img12][Y軸の設定を行うMetrics]{
+//}
+
+==== コミッターごとにグラフの線を分ける
+
+現時点でもだいぶ日によるコミット量に差がある、ということがわかり面白いのですが、コミッターごとにグラフを分割できたほうが
+もっと面白いですよね。micci184がサボってる！とか、もふもふちゃんは駆け込み型ですね、とかkeigodasumは締め切り直前に駆け込む型ですね
+とかが分かった方が「こらー！」ってしやすくなります。
+
+というわけで、線グラフをコミッターごとに分割しましょう。
+
+@<code>{Buckets}の下側にある@<code>{Add sub-buckets}をクリックします。@<code>{Select buckets type}の画面が出てきて
+次の2種類が選択できるようになります。
+
+ * Split Series
+ * Split Chart
+
+fieldの値ごとに線グラフを分けて表示したい場合は@<code>{Split Series}を、1つの線グラフをfieldの値ごとに分割したいときは@<code>{Split Chart}を利用します。
+今回はコミッターごとに線グラフを分けたいので@<code>{Split Series}を編集していきます。どちらも編集の流れは同じなので、@<code>{Split Chart}を利用したい人も
+これ以降の編集の流れを参照してみてください。
+
+@<code>{Sub Aggregation}ではグラフを分割する基準を決めることができます。今回はgit logの@<code>{author_name}で分割したいので、
+@<code>{Terms}を指定してfieldを用いてグラフを分割できるように設定します。
+
+@<code>{Field}で実際のfield名を指定します。@<img>{kibana01-img13}では@<code>{author_name.keyword}と記載されていますが、
+field名の後にはデータの型が記載されています。プログラミング言語と違い、文字列型は@<code>{keyword}と記載されます。アイコンはtと書いてあるので
+textなんだなとわかるんですけどね。
+
+@<code>{Order By}ではグラフとして表示する@<code>{author_name}は上位5名までと設定しています。@<code>{Descending}は上位XX、
+@<code>{Ascending}は下位XX名となります。この辺いつも混乱して、自分の商業誌を毎回眺めるもふちゃんであります。
+
+Order Byというと、SQLのORDER BY句を連想しますが、KibanaのOrder Byはソートに加え、指定した数しかグラフを表示してくれません。
+例えば今回の場合、もし10人コミッターがいたとしても@<img>{kibana01-img13}の設定ではコミット数上位5名しか表示されません。
+このように、Kibanaのグラフを作成するときは自分が可視化したいデータの特性をちゃんと把握しておくことが重要になります。
+
+//image[kibana01-img13][コミッターごとに線グラフを表示]{
+//}
+
+=== できたグラフの様子を観察
+
+ちょっと時間軸も長めに設定してみました（2ヶ月ぶんくらいにしてます）。もふもふちゃんが散々「2月中に初稿をかけい！」と
+脅したせいかわかりませんが、2月末だけ明らかにコミット量が増えてますね。そのあとは個人の好き好きに修正をかけたりしてる感じです。
+ちゃっかりElastic社のJun Ohtaniさんの名前がありますが、typoの修正をPull Requestしていただいたので名前が出てきている感じです。
+
+ってか！みんなちゃんとやれよ感あってはずかしい！
+
+これを@<code>{Metrics & Axces}オプションから棒グラフ（@<code>{bar}）にしてみると、@<img>{kibana01-img14}のようになります。
+やはりコミット数の推移を見たいのであれば、線グラフのようなプロット型の物を利用した方がわかりやすいですね。
+
+//image[kibana01-img14][コミッターごとのコミット数を棒グラフにしてみた]{
+//}
+
+グラフの保存は画面右上の@<code>{Save}から行うことができます。好きな名前をいれて保存しておきましょう。
+保存しない場合、画面を閉じてしまったら設定は全部消えます。もう一度最初から作り直しです。
+
+== この章のまとめ
+
+どうでしょう？明らかにみんな締め切り駆け込み型なのがわかりました…じゃなくて、大量のデータを分析するのに
+Kibanaは結構便利だよねということが分かっていただけたでしょうか？
+
+なるべく元データをLogstashやfluentdで取得しやすい形に加工しておくことと、データの特性をちゃんと見て
+グラフを作成していくのがポイントなのでは？ともふもふちゃんは思います。
+
+データのパースにはそれなりのリソースを消費しますから、なるべくならデータはjsonとかの階層がある形式にしておきたいものですね。
+
+にしても、みんな駆け込みコミット型なのがほんと恥ずかしいですね。しょうがない、締め切り近くにならないといい原稿が思いつかないんだよ！（突然の逆ギレ）
