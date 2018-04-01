@@ -381,28 +381,28 @@ X軸の基準を時間に変更したいと思います。
 
 というわけで、線グラフをコミッターごとに分割しましょう。
 
-@@<code>{Buckets}の下側にある@@<code>{Add sub-buckets}をクリックします。@@<code>{Select buckets type}の画面が出てきて
+@<code>{Buckets}の下側にある@<code>{Add sub-buckets}をクリックします。@<code>{Select buckets type}の画面が出てきて
 次の2種類が選択できるようになります。
 
  * Split Series
  * Split Chart
 
-fieldの値ごとに線グラフを分けて表示したい場合は@@<code>{Split Series}を、1つの線グラフをfieldの値ごとに分割したいときは@@<code>{Split Chart}を利用します。
-今回はコミッターごとに線グラフを分けたいので@@<code>{Split Series}を編集していきます。どちらも編集の流れは同じなので、@@<code>{Split Chart}を利用したい人も
+fieldの値ごとに線グラフを分けて表示したい場合は@<code>{Split Series}を、1つの線グラフをfieldの値ごとに分割したいときは@<code>{Split Chart}を利用します。
+今回はコミッターごとに線グラフを分けたいので@<code>{Split Series}を編集していきます。どちらも編集の流れは同じなので、@<code>{Split Chart}を利用したい人も
 これ以降の編集の流れを参照してみてください。
 
-@@<code>{Sub Aggregation}ではグラフを分割する基準を決めることができます。今回はgit logの@@<code>{author_name}で分割したいので、
-@@<code>{Terms}を指定してfieldを用いてグラフを分割できるように設定します。
+@<code>{Sub Aggregation}ではグラフを分割する基準を決めることができます。今回はgit logの@<code>{author_name}で分割したいので、
+@<code>{Terms}を指定してfieldを用いてグラフを分割できるように設定します。
 
-@@<code>{Field}で実際のfield名を指定します。@@<img>{kibana01-img13}では@@<code>{author_name.keyword}と記載されていますが、
-field名の後にはデータの型が記載されています。プログラミング言語と違い、文字列型は@@<code>{keyword}と記載されます。アイコンはtと書いてあるので
+@<code>{Field}で実際のfield名を指定します。@<img>{kibana01-img13}では@<code>{author_name.keyword}と記載されていますが、
+field名の後にはデータの型が記載されています。プログラミング言語と違い、文字列型は@<code>{keyword}と記載されます。アイコンはtと書いてあるので
 textなんだなとわかるんですけどね。
 
-@@<code>{Order By}ではグラフとして表示する@@<code>{author_name}は上位5名までと設定しています。@@<code>{Descending}は上位XX、
-@@<code>{Ascending}は下位XX名となります。この辺いつも混乱して、自分の商業誌を毎回眺めるもふちゃんであります。
+@<code>{Order By}ではグラフとして表示する@<code>{author_name}は上位5名までと設定しています。@<code>{Descending}は上位XX、
+@<code>{Ascending}は下位XX名となります。この辺いつも混乱して、自分の商業誌を毎回眺めるもふちゃんであります。
 
 Order Byというと、SQLのORDER BY句を連想しますが、KibanaのOrder Byはソートに加え、指定した数しかグラフを表示してくれません。
-例えば今回の場合、もし10人コミッターがいたとしても@@<img>{kibana01-img13}の設定ではコミット数上位5名しか表示されません。
+例えば今回の場合、もし10人コミッターがいたとしても@<img>{kibana01-img13}の設定ではコミット数上位5名しか表示されません。
 このように、Kibanaのグラフを作成するときは自分が可視化したいデータの特性をちゃんと把握しておくことが重要になります。
 
 //image[kibana01-img13][コミッターごとに線グラフを表示]{
@@ -416,13 +416,13 @@ Order Byというと、SQLのORDER BY句を連想しますが、KibanaのOrder B
 
 ってか！みんなちゃんとやれよ感あってはずかしい！
 
-これを@@<code>{Metrics & Axces}オプションから棒グラフ（@@<code>{bar}）にしてみると、@@<img>{kibana01-img14}のようになります。
+これを@<code>{Metrics & Axces}オプションから棒グラフ（@<code>{bar}）にしてみると、@<img>{kibana01-img14}のようになります。
 やはりコミット数の推移を見たいのであれば、線グラフのようなプロット型の物を利用した方がわかりやすいですね。
 
 //image[kibana01-img14][コミッターごとのコミット数を棒グラフにしてみた]{
 //}
 
-グラフの保存は画面右上の@@<code>{Save}から行うことができます。好きな名前をいれて保存しておきましょう。
+グラフの保存は画面右上の@<code>{Save}から行うことができます。好きな名前をいれて保存しておきましょう。
 保存しない場合、画面を閉じてしまったら設定は全部消えます。もう一度最初から作り直しです。
 
 == この章のまとめ
