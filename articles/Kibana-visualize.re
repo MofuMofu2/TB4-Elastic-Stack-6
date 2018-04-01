@@ -250,3 +250,26 @@ output {
 //}
 
 これで準備はできました。
+
+== Kibanaを使ってGitのコミット状況を閲覧する
+
+では、早速Gitのコミットログ（以降git logとします）をグラフにしていきましょう。
+まずはKibana@@<href>{http://localhost:5601}にアクセスします。@@<code>{kibana.yml}でURLを変更していた場合、
+自分で設定したURLへアクセスしてください。
+
+アクセスすると、@@<img>{kibana01-img01}が見えていますね。まずは画面左端にある歯車アイコンを押して@<code>{Management}画面を開きましょう。
+
+=== 利用するindexの設定を行う
+
+Elasticsearchは@@<code>{index}にデータを保存しています。Kibanaでグラフを作るときに、どの@@<code>{index}を参照すればよいか
+はじめに設定する必要があります。
+
+//image[kibana01-img02][Kibanaが参照するindexを設定する]{
+//}
+
+親切なことに、画面下側にindexの名前が出てきます。コピー＆ペーストで@@<code>{Index pattern}にindex名を入れてしまいましょう。
+index名の指定をするときは、@@<code>{*（アスタリスク）}を利用することができます。たとえば@@<code>{logstash-*}と設定すれば
+@@<code>{logstash-}で始まるindexを全て参照することができます。
+
+デフォルトでは、LogstashからデータをElasticsearchに連携するときに@@<code>{logstash-日付}としてindexを作成します。
+なので、Logstash側でindexを指定していない場合、@@<code>{logstash-*}をKibanaから参照するようにしておけば問題ありません。
