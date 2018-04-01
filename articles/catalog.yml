@@ -17,6 +17,8 @@ CHAPS:
   - beats.re
   # GitとKibanaで同人誌の進捗を可視化するぞ！
   - Kibana-visualize.re
+  # Kibana6の見所
+  - Kibana-alpha.re
 
 APPENDIX:
 
