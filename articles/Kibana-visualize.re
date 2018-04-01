@@ -273,3 +273,11 @@ index名の指定をするときは、@@<code>{*（アスタリスク）}を利�
 
 デフォルトでは、LogstashからデータをElasticsearchに連携するときに@@<code>{logstash-日付}としてindexを作成します。
 なので、Logstash側でindexを指定していない場合、@@<code>{logstash-*}をKibanaから参照するようにしておけば問題ありません。
+
+次に、どのfieldを時刻として参照するか設定します。
+
+//image[kibana01-img03][どのfieldを時刻として参照するか設定する]{
+//}
+
+@@<code>{@timestamp}を選択すると、LogstashがデータをElasticsearchに連携したときの時刻を基準としてデータを閲覧することになります。
+今回はいつGitにコミットが作成されたかを閲覧したいので、@@<code>{author_date}を時刻として参照するようにします。
