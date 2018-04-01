@@ -254,53 +254,53 @@ output {
 == Kibanaを使ってGitのコミット状況を閲覧する
 
 では、早速Gitのコミットログ（以降git logとします）をグラフにしていきましょう。
-まずはKibana@@<href>{http://localhost:5601}にアクセスします。@@<code>{kibana.yml}でURLを変更していた場合、
+まずはKibana@<href>{http://localhost:5601}にアクセスします。@<code>{kibana.yml}でURLを変更していた場合、
 自分で設定したURLへアクセスしてください。
 
-アクセスすると、@@<img>{kibana01-img01}が見えていますね。まずは画面左端にある歯車アイコンを押して@<code>{Management}画面を開きましょう。
+アクセスすると、@<img>{kibana01-img01}が見えていますね。まずは画面左端にある歯車アイコンを押して@<code>{Management}画面を開きましょう。
 
 === 利用するindexの設定を行う
 
-Elasticsearchは@@<code>{index}にデータを保存しています。Kibanaでグラフを作るときに、どの@@<code>{index}を参照すればよいか
+Elasticsearchは@<code>{index}にデータを保存しています。Kibanaでグラフを作るときに、どの@<code>{index}を参照すればよいか
 はじめに設定する必要があります。
 
 //image[kibana01-img02][Kibanaが参照するindexを設定する]{
 //}
 
-親切なことに、画面下側にindexの名前が出てきます。コピー＆ペーストで@@<code>{Index pattern}にindex名を入れてしまいましょう。
-index名の指定をするときは、@@<code>{*（アスタリスク）}を利用することができます。たとえば@@<code>{logstash-*}と設定すれば
-@@<code>{logstash-}で始まるindexを全て参照することができます。
+親切なことに、画面下側にindexの名前が出てきます。コピー＆ペーストで@<code>{Index pattern}にindex名を入れてしまいましょう。
+index名の指定をするときは、@<code>{*（アスタリスク）}を利用することができます。たとえば@<code>{logstash-*}と設定すれば
+@<code>{logstash-}で始まるindexを全て参照することができます。
 
-デフォルトでは、LogstashからデータをElasticsearchに連携するときに@@<code>{logstash-日付}としてindexを作成します。
-なので、Logstash側でindexを指定していない場合、@@<code>{logstash-*}をKibanaから参照するようにしておけば問題ありません。
+デフォルトでは、LogstashからデータをElasticsearchに連携するときに@<code>{logstash-日付}としてindexを作成します。
+なので、Logstash側でindexを指定していない場合、@<code>{logstash-*}をKibanaから参照するようにしておけば問題ありません。
 
 次に、どのfieldを時刻として参照するか設定します。
 
 //image[kibana01-img03][どのfieldを時刻として参照するか設定する]{
 //}
 
-@@<code>{@timestamp}を選択すると、LogstashがデータをElasticsearchに連携したときの時刻を基準としてデータを閲覧することになります。
-今回はいつGitにコミットが作成されたかを閲覧したいので、@@<code>{author_date}を時刻として参照するようにします。
+@<code>{@timestamp}を選択すると、LogstashがデータをElasticsearchに連携したときの時刻を基準としてデータを閲覧することになります。
+今回はいつGitにコミットが作成されたかを閲覧したいので、@<code>{author_date}を時刻として参照するようにします。
 
 == Discoverでgit logの様子を観察する
 
 //image[kibana01-img04][Discoverの画面に遷移した状態]{
 //}
 
-画面左端にあるコンパスのアイコンを押すと、@@<code>{Discover}の画面に遷移します。@@<code>{Discover}ではElasticsearchに保存されているデータを
+画面左端にあるコンパスのアイコンを押すと、@<code>{Discover}の画面に遷移します。@<code>{Discover}ではElasticsearchに保存されているデータを
 直接参照することが可能です。画面上部のグラフは、いつ・どのくらいのデータがElasticsearchに保存されたかを示しています。ここで先ほどindexの設定時に指定した時刻を利用します。
 
-画面右上の時計マークでは、表示するデータの期間を指定しています。例えば@@<img>{kibana01-img04}では、時刻が@@<code>{Last 15 minutes}と設定されています。
-この場合、@@<b>{今の時刻から}15分前までにコミットがあったデータ（＝@@<code>{author_date}の時刻が現在から15分前のもの）を閲覧する状態となっています。
+画面右上の時計マークでは、表示するデータの期間を指定しています。例えば@<img>{kibana01-img04}では、時刻が@<code>{Last 15 minutes}と設定されています。
+この場合、@<b>{今の時刻から}15分前までにコミットがあったデータ（＝@<code>{author_date}の時刻が現在から15分前のもの）を閲覧する状態となっています。
 
-条件に当てはまるデータが存在しない場合、@@<img>{kibana01-img04}のようにデータが存在しないことを示す画面が表示されます。顔文字がなんかちょっと腹たつような感じですね。
+条件に当てはまるデータが存在しない場合、@<img>{kibana01-img04}のようにデータが存在しないことを示す画面が表示されます。顔文字がなんかちょっと腹たつような感じですね。
 この場合、時計マークをクリックして時刻の範囲を変更しましょう。時刻を広めにとると何かしらのデータが表示されるはずです。それでもダメであれば、Elasticserchにデータが
 保存されていない可能性があります。データの連携がきちんとできているか、再度見直しましょう。
 
 //image[kibana01-img05][時刻を調整してgit logがDiscover画面に表示された]{
 //}
 
-データの詳細を閲覧するためには、データの横にある@@<code>{▶︎}をクリックします。
+データの詳細を閲覧するためには、データの横にある@<code>{▶︎}をクリックします。
 jsonのfieldごとにデータが別れて表示されるので、どのfieldに何のデータが保存されたかを確認することが可能です。
 
 //image[kibana01-img06][▶︎を押してデータの詳細を閲覧する]{
