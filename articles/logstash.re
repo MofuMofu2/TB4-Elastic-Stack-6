@@ -18,18 +18,15 @@ ELBはログを出力しているので、そのログ何らかの形で取得�
 
 == 実行環境を準備する
 
-
 Logstashの使い方を知る前に、実行環境を整える必要があります。
 サーバは、AWSのEC2を利用しおり、OSは、AmazonLinuxで構築していきます。
-インスタンスタイプは、最低限必要なリソースを積んだものを選択しています。
-そのため、OS差異によって、発行するコマンドが変わってくるので、その辺は公式HPをみて頂ければと思います。
+インスタンスタイプですが、稼働に最低限必要なリソースのものを選択しています。
+そのため、OSによって発行するコマンドが変わってくるので、その辺は公式HPをみて頂ければと思います。
 
  * Amazon Linux AMI 2017.09.1 (HVM), SSD Volume Type - ami-97785bed
  * t2.medium(vCPU: 2,Mem: 4)
 
-
-
-今回導入するミドルウェアのバージョンは以下です。
+今回導入するミドルウェアのバージョンは次の通りです。
 
  * Elasticsearch 6.2.2
  * Logstash 6.2.2
@@ -38,10 +35,8 @@ Logstashの使い方を知る前に、実行環境を整える必要がありま
  * Auditbeat 6.2.2
  * Packetbeat 6.2.2
 
-
-
-@<href>{https://www.elastic.co/jp/products,Download Elastic Stack}
-
+各プロダクトはこちらのリンク（@<href>{https://www.elastic.co/jp/products,Download Elastic Stack}）から
+ダウンロードすることが可能です。
 
 === こんな環境を想定しているよ
 
