@@ -58,14 +58,12 @@ AWSの公式ドキュメントなどを参考に設定してください。
 
 == ミドルウェアのインストール
 
+次の順番でインストールを実施します。
 
-以下の流れでインストールしていきます。
-
- 1. Java 8インストール
- 1. Elasticsearchインストール
- 1. Logstashインストール
- 1. Kibanaインストール
-
+ 1. Java 8
+ 2. Elasticsearch
+ 3. Logstash
+ 4. Kibana
 
 === Java 8のインストール
 
