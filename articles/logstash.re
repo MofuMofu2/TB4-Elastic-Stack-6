@@ -67,31 +67,19 @@ AWSの公式ドキュメントなどを参考に設定してください。
 
 === Java 8のインストール
 
+Elasticsearch、Logstashの動作にはJava（バージョン8）が必要です。
+まずは、Javaがインストールされているか・もしインストールされている場合、Javaのバージョンを確認します。
 
-Elasticsearch、Logstashを実行するにあたって、Java 8が必要なため、インストールします。
-Javaの切り替えにalternativesコマンドを使用して変更します。
-
-
-
-まずは、Javaがインストールされているかとバージョンを確認します。
-
-
-//emlist[][bash]{
-$ java -version
-xx
+//emlist[logstash-01][Javaのバージョンを確認する]{
+java -version
 //}
 
+AmazonLinuxの場合、Javaが最初からインストールされています。
+ただしバージョンは7なので、Java 8を新しくインストールする必要があります。
 
-AmazonLinuxの場合は、Javaが最初からインストールされています。
-ただし、バージョンが、Java 7であることがわかります。
-そのため、Java 8をインストールしていきます。
-
-
-//emlist[][bash]{
-### Install Java 8
-$ sudo yum -y install java-1.8.0-openjdk-devel
+//emlist[logstash-02][Java 8のインストール]{
+sudo yum -y install java-1.8.0-openjdk-devel
 //}
-
 
 Java 8のインストールが完了したので、再度バージョンを確認します。
 
