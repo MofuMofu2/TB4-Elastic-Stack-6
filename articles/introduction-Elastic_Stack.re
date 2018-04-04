@@ -1,6 +1,9 @@
 = Elastic Stackとは
 
-Elastic StackとはElastic社が開発しているプロダクト群です。
+Elastic Stackは、Elasticsearch社が提供するプロダクトです。
+以前までは、ELKという言葉で、Elasticsearch、Logstash、Kibanaの頭文字をとった呼び名で親しまれていました。
+しかし、Beatsという新たなプロダクトが増えたことにより、ELKでは違和感があるのと、ELKにうまい具合にB（Beatsの頭文字）を追加することも難しいという事態が発生しました。
+そこで、ELKをやめて、Elastic Stackという名前に統合し、以下の4つがプロダクトとして構成されています。
 
 * Elasticserch
 * Logstash
@@ -30,6 +33,7 @@ Elasticsearchは、Javaで作られている分散処理型の検索エンジン
 //}
 
 と説明されています@<fn>{introES-fn01}。
+用途としては、リアルタイムデータ分析、ログ解析、全文検索など様々なところで利用されています。
 
 //footnote[introES-fn01][技術書典シリーズって名前で察した方も多いかと思いますが、これは技術書典2でもふもふちゃんがElastic Stack5の同人誌を書いたらインプレスR&Dさんが商業本にしてくれました。KindleでElasticて打つと検索トップに出てくるからびびるんだけど。]
 
