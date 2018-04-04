@@ -81,25 +81,17 @@ AmazonLinuxの場合、Javaが最初からインストールされています�
 sudo yum -y install java-1.8.0-openjdk-devel
 //}
 
-Java 8のインストールが完了したので、再度バージョンを確認します。
+=== Javaのバージョンを変更
+
+JavaをインストールしただけではOSが利用するJavaのバージョンが切り替わりません。
+@<code>{alternatives}コマンドを利用して利用するJavaのバージョンを切り替えましょう。
 
 
-//emlist[][bash]{
-$ java -version
-xx
+//emlist[logstash-03][Javaのバージョンを変更]{
+sudo alternatives --config java
 //}
 
-
-あれ？あれれ？
-バージョンが変わってないですね。。
-
-
-
-実は、Javaをインストールしただけでは切り替わらないため、alternativesコマンドを発行する必要があります。
-alternativesコマンドを発行すると対話形式でJavaの選択ができので、Java 8を選択します。
-
-
-//emlist[][bash]{
+//cmd{
 $ sudo alternatives --config java
 
 There are 2 programs which provide 'java'.
@@ -112,12 +104,9 @@ There are 2 programs which provide 'java'.
 Enter to keep the current selection[+], or type selection number: 2
 //}
 
+Javaのバージョンを変更した後は、もう一度@<code>{java -version}でバージョンが8になっているか確認しましょう。
 
-それでは、再度バージョンを確認してみましょう。
-今度は、Java 8になっていることがわかりますね。
-
-
-//emlist[][bash]{
+//cmd{
 $ java -version
 openjdk version "1.8.0_161"
 OpenJDK Runtime Environment (build 1.8.0_161-b14)
