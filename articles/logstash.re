@@ -135,9 +135,11 @@ OpenJDK 64-Bit Server VM (build 25.161-b14, mixed mode)
 ファイル名は自由につけてよい、ということです。
 
 
-//list[][bash]{
-### Add elastic.repo
-$ sudo vim /etc/yum.repos.d/elasticstack.repo
+//list[logstash-04][elasticstack.repoの追加]{
+sudo vim /etc/yum.repos.d/elasticstack.repo
+//}
+
+//cmd{
 [elasticstack-6.x]
 name=Elastic repository for 6.x packages
 baseurl=https://artifacts.elastic.co/packages/6.x/yum
@@ -148,20 +150,22 @@ autorefresh=1
 type=rpm-md
 //}
 
-
 Output先としてElasticsearchを利用するため、Elasticsearchをインストールします。
 
 
-//list[][bash]{
-### Install Elasticsearch
-$ sudo yum install elasticsearch
+//list[logstash-05][Elasticsearhのインストール]{
+sudo yum install elasticsearch
 //}
 
 
-インストールが完了したので、バージョンを確認します。
+Elasticserchのバージョンを念のため確認します。
 
 
-//list[][bash]{
+//list[logstash-06][Elasticsearhのバージョン確認]{
+/usr/share/elasticsearch/bin/elasticsearch --version
+//}
+
+//cmd{
 $ /usr/share/elasticsearch/bin/elasticsearch --version
 Version: 6.2.2, Build: 10b1edd/2018-02-16T19:01:30.685723Z, JVM: 1.8.0_161
 //}
@@ -170,12 +174,16 @@ Version: 6.2.2, Build: 10b1edd/2018-02-16T19:01:30.685723Z, JVM: 1.8.0_161
 Elasticsearchのサービス自動起動の設定をします。
 
 
-//list[][bash]{
-### Auto start setting
+//list[logstash-07][サービス自動起動の設定]{
+sudo chkconfig --add elasticsearch
+//}
+
+//cmd{
 $ sudo chkconfig --add elasticsearch
 $ chkconfig --list | grep elasticsearch
 elasticsearch   0:off   1:off   2:on    3:on    4:on    5:on    6:off
 //}
+
 
 === Logstashのインストール
 
