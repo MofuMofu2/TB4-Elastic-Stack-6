@@ -70,14 +70,14 @@ AWSの公式ドキュメントなどを参考に設定してください。
 Elasticsearch、Logstashの動作にはJava（バージョン8）が必要です。
 まずは、Javaがインストールされているか・もしインストールされている場合、Javaのバージョンを確認します。
 
-//emlist[logstash-01][Javaのバージョンを確認する]{
+//list[logstash-01][Javaのバージョンを確認する]{
 java -version
 //}
 
 AmazonLinuxの場合、Javaが最初からインストールされています。
 ただしバージョンは7なので、Java 8を新しくインストールする必要があります。
 
-//emlist[logstash-02][Java 8のインストール]{
+//list[logstash-02][Java 8のインストール]{
 sudo yum -y install java-1.8.0-openjdk-devel
 //}
 
@@ -87,7 +87,7 @@ JavaをインストールしただけではOSが利用するJavaのバージョ�
 @<code>{alternatives}コマンドを利用して利用するJavaのバージョンを切り替えましょう。
 
 
-//emlist[logstash-03][Javaのバージョンを変更]{
+//list[logstash-03][Javaのバージョンを変更]{
 sudo alternatives --config java
 //}
 
@@ -125,7 +125,7 @@ OpenJDK 64-Bit Server VM (build 25.161-b14, mixed mode)
 
 始めに、Elasticsearchなどのパッケージをダウンロードするため、GPGキーをインポートします。
 
-//emlist[logstash-03][GPGキーのインポート]{
+//list[logstash-03][GPGキーのインポート]{
  rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 //}
 
@@ -135,7 +135,7 @@ OpenJDK 64-Bit Server VM (build 25.161-b14, mixed mode)
 ファイル名は自由につけてよい、ということです。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Add elastic.repo
 $ sudo vim /etc/yum.repos.d/elasticstack.repo
 [elasticstack-6.x]
@@ -152,7 +152,7 @@ type=rpm-md
 Output先としてElasticsearchを利用するため、Elasticsearchをインストールします。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Install Elasticsearch
 $ sudo yum install elasticsearch
 //}
@@ -161,7 +161,7 @@ $ sudo yum install elasticsearch
 インストールが完了したので、バージョンを確認します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 $ /usr/share/elasticsearch/bin/elasticsearch --version
 Version: 6.2.2, Build: 10b1edd/2018-02-16T19:01:30.685723Z, JVM: 1.8.0_161
 //}
@@ -170,7 +170,7 @@ Version: 6.2.2, Build: 10b1edd/2018-02-16T19:01:30.685723Z, JVM: 1.8.0_161
 Elasticsearchのサービス自動起動の設定をします。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Auto start setting
 $ sudo chkconfig --add elasticsearch
 $ chkconfig --list | grep elasticsearch
@@ -183,7 +183,7 @@ elasticsearch   0:off   1:off   2:on    3:on    4:on    5:on    6:off
 ログを取り込むのに必要なLogstashをインストールします。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Install Logstash
 $ sudo yum install logstash
 //}
@@ -192,7 +192,7 @@ $ sudo yum install logstash
 インストールが完了したので、バージョンを確認します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 $ /usr/share/logstash/bin/logstash --version
 logstash 6.2.2
 //}
@@ -206,7 +206,7 @@ logstash 6.2.2
 @<href>{https://www.elastic.co/guide/en/logstash/current/plugins-inputs-s3.html,S3 Input Plugin}
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Install S3 Input Plugin
 $ /usr/share/logstash/bin/logstash-plugin install logstash-input-s3
 Validating logstash-input-s3
@@ -218,7 +218,7 @@ Installation successful
 LogstashもElasticsearchと同様にサービス自動起動の設定をします。
 
 
-//emlist[][bash]{
+//list[][bash]{
 hogehoge
 //}
 
@@ -228,7 +228,7 @@ hogehoge
 ビジュアライズするためにKibanaをインストールします。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Install Kibana
 $ yum install kibana
 //}
@@ -237,7 +237,7 @@ $ yum install kibana
 Kibanaも自動起動設定をします。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Auto start setting
 $ sudo chkconfig --add kibana
 $ chkconfig --list | grep kibana
@@ -266,7 +266,7 @@ kibana      0:off   1:off   2:on    3:on    4:on    5:on    6:off
 設定変更する前に、Elasticsaerchの設定ファイルが構成されているディレクトリを見ていきたいと思います。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Elasticsearch directory structure
 /etc/elasticsearch/
  ┣ elasticsearch.yml
@@ -304,7 +304,7 @@ Elasticsaerchのヒープサイズを変更したい！ってなった時は、j
 以下のように設定します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Heap size change
 $ vim /etc/elasticsearch/jvm.options
 -Xms2g
@@ -328,7 +328,7 @@ Elasticsaerchでクラスタ構成をする場合などに設定するファイ�
 "0.0.0.0"と設定することで、どこからでもアクセス可能となります。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Settings to enable access from anywhere
 $ network.host: 0.0.0.0
 //}
@@ -353,7 +353,7 @@ No.	Item	Content
 Elasticsearchを起動し、動作確認をします。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Service activation
 $ service elasticsearch start
 Starting elasticsearch:                                    [  OK  ]
@@ -365,7 +365,7 @@ Elasticsearchは、ローカル環境に構築しているので、"localhost"�
 デフォルトのポートは、"9200"のため、ポート指定します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Check the operation of elasticsearch
 $ curl localhost:9200
 {
@@ -396,7 +396,7 @@ Elasticsaerchからレスポンスが返ってきましたね。
 Elasticsearchの時と同様にLogstashもディレクトリ構成をみていきたいと思います。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Elasticsearch directory structure
 /etc/logstash/
  ┣ conf.d
@@ -439,7 +439,7 @@ logstash.ymlでは、パイプラインのバッチサイズやディレイ設�
 ymlファイルのため、以下のように階層やフラットな構成で記載することが可能です。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### hierarchical form
 pipeline:
   batch:
@@ -479,7 +479,7 @@ Logstashの起動方法は、"コマンド起動"と"サービス起動"の二�
 そのため、"Input"と"Output"のみの構成としています。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Cleate pipeline
 $ vim /etc/logstash/conf.d/test.conf
 input {
@@ -496,7 +496,7 @@ output {
 入力した文字（ここではtest）が"message"に表示にされていることがわかります。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Run Pipeline
 $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/test.conf
 .
@@ -538,7 +538,7 @@ ALBのログは、AWS公式ページに記載されているサンプルログ�
 以下がサンプルログです。
 
 
-//emlist{
+//list{
 https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188
 192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57
 "GET https://www.example.com:443/ HTTP/1.1" "curl/7.46.0" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2
@@ -551,7 +551,7 @@ arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d
 ファイル名は任意でいいのですが、今回は、"alb.log"にします。
 
 
-//emlist[][bash]{
+//list[][bash]{
 $ vim /etc/logstash/alb.log
 https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57 "GET https://www.example.com:443/ HTTP/1.1" "curl/7.46.0" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067 "Root=1-58337281-1d84f3d73c47ec4e58577259" www.example.com arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012
 //}
@@ -566,7 +566,7 @@ https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  192.168.
 それでは、"alb.conf"という設定ファイルを作成します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 $ vim /etc/logstash/conf.d/alb.conf
 input {
   file{
@@ -595,7 +595,7 @@ No.	Item	Content
 ではでは、作った設定ファイルで実行します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Run Pipeline
 $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 {
@@ -625,7 +625,7 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 以下にALBのログフォーマットを記載します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 type timestamp elb client:port target:port request_processing_time target_processing_time response_processing_time elb_status_code target_status_code received_bytes sent_bytes "request" "user_agent" ssl_cipher ssl_protocol target_group_arn trace_id domain_name chosen_cert_arn
 //}
 
@@ -670,7 +670,7 @@ Grokフィルタするためのパターンファイルを作成します。
 パターンファイルを作成せずにパイプラインファイルのFilter内にGrokフィルタを記載することも可能ですが、可読性や管理がしやすくするためパターンファイルを外出ししています。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Create directory
 $ mkdir /etc/logstash/patterns
 $ ll | grep patterns
@@ -689,7 +689,7 @@ patternsディレクトリが作成できたので、配下にALBのパターン
 この"ALB@<b>{ACCESS}LOG"は、任意の名前を指定できます。
 
 
-//emlist[][bash]{
+//list[][bash]{
 $ sudo vim /etc/logstash/patterns/alb_patterns
 # Application Load Balancing
 ALB_ACCESS_LOG %{NOTSPACE:class} %{TIMESTAMP_ISO8601:date} %{NOTSPACE:elb}  (?:%{IP:client_ip}:%{INT:client_port:int}) (?:%{IP:backend_ip}:%{INT:backend_port:int}|-) (:?%{NUMBER:request_processing_time:float}|-1) (?:%{NUMBER:target_processing_time:float}|-1) (?:%{NUMBER:response_processing_time:float}|-1) (?:%{INT:elb_status_code}|-) (?:%{INT:target_status_code:int}|-) %{INT:received_bytes:int} %{INT:sent_bytes:int} \"%{ELB_REQUEST_LINE}\" \"(?:%{DATA:user_agent}|-)\" (?:%{NOTSPACE:ssl_cipher}|-) (?:%{NOTSPACE:ssl_protocol}|-)  %{NOTSPACE:target_group_arn} \"%{NOTSPACE:trace_id}\"
@@ -699,7 +699,7 @@ ALB_ACCESS_LOG %{NOTSPACE:class} %{TIMESTAMP_ISO8601:date} %{NOTSPACE:elb}  (?:%
 パターンファイルが準備できましたので、パイプライファイルの"alb.conf"に"Filter"を追加します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### update alb.conf
 $ vim /etc/logstash/conf.d/alb.conf
 input {
@@ -734,7 +734,7 @@ output {
 先ほど実行した時と違って、いい感じにkey-valueのかたちになっていることがわかります。
 
 
-//emlist[][bash]{
+//list[][bash]{
 $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 {
                         "verb" => "GET",
@@ -807,7 +807,7 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 また、"match"で"message"に取り込まれている値を対象にGrok-Patterns(ここでいうALB}ACCESS_LOG)を適用しています。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### grok-filter
   grok {
     patterns_dir => ["/etc/logstash/patterns/alb_patterns"]
@@ -823,7 +823,7 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 また、タイムゾーンを日本にしたいため、"Asia/Tokyo"を指定しています。
 
 
-//emlist[][bash]{
+//list[][bash]{
   date {
     match => [ "date", "ISO8601" ]
     timezone => "Asia/Tokyo"
@@ -846,7 +846,7 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 設定方法は、以下です。
 
 
-//emlist[][bash]{
+//list[][bash]{
   geoip {
     source => "client_ip"
   }
@@ -863,7 +863,7 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 messageを削除する場合は、Filterにmutateを追加します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 filter {
   grok {
     patterns_dir => ["/etc/logstash/patterns/alb_patterns"]
@@ -890,7 +890,7 @@ filter {
 補足ですが、コマンドラインで実行している際に以下のようなエラーが発生した場合は、Logstashのプロセスがすでに立ち上がっている時に発生します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Error executing logstash
 $ /usr/share/logstash/bin/logstash -f conf.d/alb.conf
 WARNING: Could not find logstash.yml which is typically located in $LS_HOME/config or /etc/logstash. You can specify the path using --path.settings. Continuing using the defaults
@@ -906,7 +906,7 @@ Could not find log4j2 configuration at path /usr/share/logstash/config/log4j2.pr
 この場合の対処方法は、プロセスを強制的にkillします。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Kill process
 $ ps -aux | grep logstash
 Warning: bad syntax, perhaps a bogus '-'? See /usr/share/doc/procps-3.2.8/FAQ
@@ -930,7 +930,7 @@ $ kill -9 32061
 
 ===== "Input"の編集
 
-//emlist[][bash]{
+//list[][bash]{
 ### update alb.conf
 $ vim /etc/logstash/conf.d/alb.conf
 input {
@@ -972,7 +972,7 @@ No.	Item	Content
 最後に"Output"を標準出力からElasticsearchに変更します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 output {
   elasticsearch {
     hosts => [ "localhost:9200" ]
@@ -996,7 +996,7 @@ No.	Item	Content
 以下に最終的なパイプラインの設定ファイルを記載します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Final configuration file
 input {
   s3 {
@@ -1034,7 +1034,7 @@ output {
 それでは実行させるのですが、今までコマンドライン実行だったので、最後は、サービスで動かしたいと思います。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Start logstash service
 $ initctl start logstash
 //}
@@ -1044,7 +1044,7 @@ $ initctl start logstash
 インデックスが日付単位で取り込まれていることがわかります。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Index confirmation
 $ curl -XGET localhost:9200/_cat/indices/logstash*
 yellow open logstash-logs-2016xxxx SJ07jipISK-kDlpV5tiHiA 5 1 42 0 650.6kb 650.6kb
@@ -1056,7 +1056,7 @@ yellow open logstash-logs-2016xxxx SJ07jipISK-kDlpV5tiHiA 5 1 42 0 650.6kb 650.6
 また、"?pretty"を使用することで"json"が整形されます。
 
 
-//emlist[][bash]{
+//list[][bash]{
 $ curl -XGET 'localhost:9200/logstash-2016.08.10/doc/DTAU02EB00Bh04bZnyp1/?pretty'
 {
   "_index" : "logstash-2016.08.10",
@@ -1130,7 +1130,7 @@ Elasticsearchに取り込まれたことが確認できました。
 Kibanaのディレクトリ構成は以下です。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### kibana directory structure
 /etc/kibana/
  ┗ kibana.yml
@@ -1145,7 +1145,7 @@ Kibanaは、フロント部分のためアクセス元を絞ったり、参照�
 そのため、どこからでもアクセスできるように設定するため、"0.0.0.0"のデフォルトルート設定とします（絞りたい場合は、厳密にIPアドレスを指定することで制限をかけることが可能です）
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Change server.host
 $ vim /etc/kibana/kibana.yml
 server.host: 0.0.0.0
@@ -1157,7 +1157,7 @@ server.host: 0.0.0.0
 もしリモートにElasticsearchがある場合は、以下のコメントアウトを外し、IPアドレスを指定してください。
 
 
-//emlist[][bash]{
+//list[][bash]{
 #elasticsearch.url: "http://localhost:9200"
 //}
 
@@ -1167,7 +1167,7 @@ server.host: 0.0.0.0
 Kibanaを起動し、動作確認をします。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Service activation
 $ service kibana start
 Starting kibana:                                    [  OK  ]
