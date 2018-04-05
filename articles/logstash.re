@@ -295,29 +295,22 @@ Elasticsearchを構成する際に@@<code>{jvm.options}と@@<code>{elasticsearch
 Elasticsaerchのヒープサイズを変更したい場合、jvm.optionsを編集します。
 例えば、ヒープサイズの最大と最小を設定する場合は、@@<code>{Xms(minimum heap size)}と@@<code>{Xmx(maximum heap size)}を変更します。
 じゃあ、いくつに設定すればいいの？と思う方もいるかと思いますが、要件によって変わってくる項目です。
-しかし、Elasticsaerch社の公式HPで掲載されているので、その内容を以下に記載するので参考に設定して頂ければ良いかと思います。
+公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html,Settings the heap size:}）にも考慮点が記載されているので、そちらも参考に値を決めてください。
 
  * 最小ヒープサイズ(Xms)と最大ヒープサイズ(Xmx)の値を等しくする
  * ヒープサイズを上げすぎるとGCの休止をまねく可能性がある
  * Xmxは、物理メモリの50%を割り当てて、ファイルシステム側にも十分に残すようにする
  * 割り当てるメモリは、32GB以下にする
 
+今回のサーバは、メモリを4GB搭載しているので2GBをElasticsearchに割り当てます。
 
 
-今回のサーバは、メモリを4GB搭載しているので2GBをわりあてるかたちでいいかと思います。
-以下のように設定します。
-
-
-//list[][bash]{
-### Heap size change
-$ vim /etc/elasticsearch/jvm.options
+//list[logstash-14][Elasticsearhのヒープサイズを設定]{
+vim /etc/elasticsearch/jvm.options
+# 下記設定に変更
 -Xms2g
 -Xmx2g
 //}
-
-
-@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html,Settings the heap size:}
-
 
 ==== elasticserch.ymlという設定ファイルについて
 
