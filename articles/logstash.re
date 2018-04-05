@@ -116,30 +116,23 @@ OpenJDK 64-Bit Server VM (build 25.161-b14, mixed mode)
 === Elasticsaerchのインストール
 
 
-ここからは、Elastic Stackのミドルウェアのインストールを実施していきます。
-ちなみに、公式HPをみるとわかりますが、英語ドキュメントです。
+ここからは、Elastic Stackのインストールを実施していきます。
+ちなみに、英語ドキュメント（@<href>{https://www.elastic.co/guide/en/logstash/current/installing-logstash.html,Install Logstash}
+）です。
 やはり英語だと抵抗感を抱く人がいると思うので、できる限りわかりやすく日本語で書きます。
 正直、英語ぐらいわかるわー！って人は、飛ばしちゃってください。
 
 
+始めに、Elasticsearchなどのパッケージをダウンロードするため、GPGキーをインポートします。
 
-@<href>{https://www.elastic.co/guide/en/logstash/current/installing-logstash.html,Install Logstash}
-
-
-
-てことで、Elasticsearchなどのパッケージをダウンロードするため、GPGキーをインポートします。
-
-
-//emlist[][bash]{
-### Import GPG-Key
-$ rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+//emlist[logstash-03][GPGキーのインポート]{
+ rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 //}
-
 
 キーの登録が完了したので、YUMリポジトリを追加します。
 "/etc/yum.repo/"配下に"elasticstack.repo"というファイルを作成します。
-公式では、logstash.repoとなっておりますが、今回はElasticsearchなどもインストールするため、Elastic Stackという名前にしました。
-要はファイル名は、任意で問題ないということです。
+公式ドキュメントでは、logstash.repoとなっていますが、今回はElasticsearchなども一緒にインストールするため、Elastic Stackという名前にしました。
+ファイル名は自由につけてよい、ということです。
 
 
 //emlist[][bash]{
