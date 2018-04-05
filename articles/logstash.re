@@ -222,7 +222,14 @@ Installation successful
 LogstashもElasticsearchと同様、サービス自動起動の設定をしておくと良いでしょう。
 
 //list[logstash-13][Logstashの自動起動設定]{
-sudo chkconfig --add kibana
+sudo chkconfig --add logstash
+//}
+
+//cmd{
+$ sudo chkconfig --add logstash
+$ chkconfig --list | grep logstash
+logstash      0:off   1:off   2:on    3:on    4:on    5:on    6:off
+
 //}
 
 
@@ -257,41 +264,36 @@ kibana      0:off   1:off   2:on    3:on    4:on    5:on    6:off
 以下の流れでミドルウェアの設定をしていきます。
 
  1. Elastcisearchの設定
- 1. Logstshの設定
- 1. Kibanaの設定
- 1.
+ 2. Logstshの設定
+ 3. Kibanaの設定
+
 
 
 === Elasticsearchの環境準備
 
 
-設定変更する前に、Elasticsaerchの設定ファイルが構成されているディレクトリを見ていきたいと思います。
+設定を変更する前に、Elasticsaerchの設定ファイルが構成されているディレクトリの内容を確認しましょう。
 
-
-//list[][bash]{
-### Elasticsearch directory structure
+//cmd{
 /etc/elasticsearch/
  ┣ elasticsearch.yml
  ┣ jvm.options
  ┗ log4j2.properties
 //}
 
-
-"/etc/elasticserch/"配下に3つのファイルが配置されてます。
-Elasticsearchを構成する際にjvm.optionsとelasticsearch.ymlを主に設定します。
-log4j2.propertiesは、ログの出力形式など変更が必要な際に設定してください。
-
+@@<code>{/etc/elasticsearch}配下に3つのファイルが配置されてます。
+Elasticsearchを構成する際に@@<code>{jvm.options}と@@<code>{elasticsearch.yml}を主に設定します。
+@@<code>{log4j2.properties}は、ログの出力形式など変更が必要な際に設定してください。
 
 
-今回、設定変更するのは、jvm.optionsとelasticserch.ymlです。
+今回は@@<code>{jvm.options}と@@<code>{elasticsearch.yml}を編集します。
 この二つの設定ファイルの変更と設定についての考慮点などを記載したいと思います。
 
 
-==== jvm.optionsという設定ファイルについて
+==== jvm.optionsについて
 
-
-Elasticsaerchのヒープサイズを変更したい！ってなった時は、jvm.optionsで設定変更ができます。
-例えば、ヒープサイズの最大と最小を設定する場合は、"Xms(minimum heap size)"と"Xmx(maximum heap size) "を変更します。
+Elasticsaerchのヒープサイズを変更したい場合、jvm.optionsを編集します。
+例えば、ヒープサイズの最大と最小を設定する場合は、@@<code>{Xms(minimum heap size)}と@@<code>{Xmx(maximum heap size)}を変更します。
 じゃあ、いくつに設定すればいいの？と思う方もいるかと思いますが、要件によって変わってくる項目です。
 しかし、Elasticsaerch社の公式HPで掲載されているので、その内容を以下に記載するので参考に設定して頂ければ良いかと思います。
 
