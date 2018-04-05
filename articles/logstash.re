@@ -221,6 +221,10 @@ Installation successful
 
 LogstashもElasticsearchと同様、サービス自動起動の設定をしておくと良いでしょう。
 
+//list[logstash-13][Logstashの自動起動設定]{
+sudo chkconfig --add kibana
+//}
+
 
 === Kibanaのインストール
 
