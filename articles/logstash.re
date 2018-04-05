@@ -187,35 +187,31 @@ elasticsearch   0:off   1:off   2:on    3:on    4:on    5:on    6:off
 
 === Logstashのインストール
 
+ALBのログを取得するため、Logstashをインストールします。
 
-ログを取り込むのに必要なLogstashをインストールします。
 
-
-//list[][bash]{
-### Install Logstash
-$ sudo yum install logstash
+//list[logstash-08][Logstashのインストール]{
+sudo yum install logstash
 //}
 
 
-インストールが完了したので、バージョンを確認します。
+インストールが完了したので、Logstashのバージョンを確認します。
 
 
-//list[][bash]{
-$ /usr/share/logstash/bin/logstash --version
-logstash 6.2.2
+//list[logstash-09][Logstashのバージョン確認]{
+/usr/share/logstash/bin/logstash --version
 //}
 
 
-今回は、ログのInput先がAWSのS3のため、プラグインをインストールする必要があります。
-それでは、"S3 Input Plugin"をインストールします。
+今回はログの取得元をAWSのS3としています。S3からログを取得するには追加でプラグインをインストールする必要があります。
+それでは、@@<code>{S3 Input Plugin}（@<href>{https://www.elastic.co/guide/en/logstash/current/plugins-inputs-s3.html}
+）をインストールします。
 
+//list[logstash-10][S3 Input Pluginのインストール]{
+/usr/share/logstash/bin/logstash-plugin install logstash-input-s3
+//}
 
-
-@<href>{https://www.elastic.co/guide/en/logstash/current/plugins-inputs-s3.html,S3 Input Plugin}
-
-
-//list[][bash]{
-### Install S3 Input Plugin
+//cmd{
 $ /usr/share/logstash/bin/logstash-plugin install logstash-input-s3
 Validating logstash-input-s3
 Installing logstash-input-s3
@@ -223,12 +219,8 @@ Installation successful
 //}
 
 
-LogstashもElasticsearchと同様にサービス自動起動の設定をします。
+LogstashもElasticsearchと同様、サービス自動起動の設定をしておくと良いでしょう。
 
-
-//list[][bash]{
-hogehoge
-//}
 
 === Kibanaのインストール
 
