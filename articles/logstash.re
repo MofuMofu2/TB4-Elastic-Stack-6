@@ -751,12 +751,10 @@ filter {
 
 ==== 実行時のエラーが発生した場合
 
+補足ですが、コマンドラインで実行している際に次のようなエラーが発生した場合は、Logstashのプロセスがすでに立ち上がっている可能性があります。
 
-補足ですが、コマンドラインで実行している際に以下のようなエラーが発生した場合は、Logstashのプロセスがすでに立ち上がっている時に発生します。
 
-
-//list[][bash]{
-### Error executing logstash
+//cmd{
 $ /usr/share/logstash/bin/logstash -f conf.d/alb.conf
 WARNING: Could not find logstash.yml which is typically located in $LS_HOME/config or /etc/logstash. You can specify the path using --path.settings. Continuing using the defaults
 Could not find log4j2 configuration at path /usr/share/logstash/config/log4j2.properties. Using default config which logs errors to the console
@@ -768,11 +766,10 @@ Could not find log4j2 configuration at path /usr/share/logstash/config/log4j2.pr
 //}
 
 
-この場合の対処方法は、プロセスを強制的にkillします。
+プロセスを強制的にkillすることで、エラーを解消することが可能です。
 
 
-//list[][bash]{
-### Kill process
+//cmd{
 $ ps -aux | grep logstash
 Warning: bad syntax, perhaps a bogus '-'? See /usr/share/doc/procps-3.2.8/FAQ
 root     32061  1.7 12.8 4811812 521780 pts/0  Tl   14:12   1:06 /usr/lib/jvm/java/bin/java -Xms2g -Xmx2g -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly -XX:+DisableExplicitGC -Djava.awt.headless=true -Dfile.encoding=UTF-8 -XX:+HeapDumpOnOutOfMemoryError -cp /usr/share/logstash/logstash-core/lib/jars/animal-sniffer-annotations-1.14.jar:/usr/share/logstash/logstash-core/lib/jars/commons-compiler-3.0.8.jar:/usr/share/logstash/logstash-core/lib/jars/error_prone_annotations-2.0.18.jar:/usr/share/logstash/logstash-core/lib/jars/google-java-format-1.5.jar:/usr/share/logstash/logstash-core/lib/jars/guava-22.0.jar:/usr/share/logstash/logstash-core/lib/jars/j2objc-annotations-1.1.jar:/usr/share/logstash/logstash-core/lib/jars/jackson-annotations-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/jackson-core-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/jackson-databind-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/jackson-dataformat-cbor-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/janino-3.0.8.jar:/usr/share/logstash/logstash-core/lib/jars/javac-shaded-9-dev-r4023-3.jar:/usr/share/logstash/logstash-core/lib/jars/jruby-complete-9.1.13.0.jar:/usr/share/logstash/logstash-core/lib/jars/jsr305-1.3.9.jar:/usr/share/logstash/logstash-core/lib/jars/log4j-api-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/log4j-core-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/log4j-slf4j-impl-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/logstash-core.jar:/usr/share/logstash/logstash-core/lib/jars/slf4j-api-1.7.25.jar org.logstash.Logstash -f conf.d/alb.conf
@@ -781,8 +778,7 @@ $ kill -9 32061
 //}
 
 
-これでFilterについてなんとなくわかったと思います。
-次は、いよいよ最終形態の"Input"をS3にして、"Output"をElasticsearchにする構成をやっていきたいと思います。
+次は、いよいよInputをS3にして、OutputをElasticsearchにする設定を記述します。
 
 
 ==== "Input"と"Output"を変更する
