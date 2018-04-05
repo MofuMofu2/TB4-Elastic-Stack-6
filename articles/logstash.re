@@ -528,25 +528,20 @@ Filterを利用してmessageからデータを分割していきます。
 ==== LogstashのFilterを使ってみる
 
 
-"Filter"では、取得したログを正規表現でパースするGrokフィルタや、地理情報を得るためのGeoIPフィルタを施すことができます。
-今回のALBもGrokフィルタなどを使うことで構造化することが可能です。
+Filterには取得したログを正規表現でパースするためのGrokフィルタや、地理情報を得るためのGeoIPフィルタなど、情報の種別に合わせて処理をすることが可能です。
+今回のALBもGrokフィルタなどを使うことで構造化したほうが良いでしょう。
 
+とはいえ、どのように構造化すればいいのか迷ってしまいます。まずはALBのログフォーマットを把握し、作戦を立てると良いです。
 
-
-とはいえ、どのように構造化すればいいのかということもあるので、まずはALBのログフォーマットを把握する必要があります。
-以下にALBのログフォーマットを記載します。
-
-
-//list[][bash]{
+//list[logstash-27][ALBのログフォーマット]{
 type timestamp elb client:port target:port request_processing_time target_processing_time response_processing_time elb_status_code target_status_code received_bytes sent_bytes "request" "user_agent" ssl_cipher ssl_protocol target_group_arn trace_id domain_name chosen_cert_arn
 //}
 
-
-各フィールドを表にまとめると以下になります。
+各フィールドを@@<table>{logstash-28}にまとめました。
 このようにログを取り込む前にログフォーマットを確認し、フィールド名を定義します。
-また、"Type"で各フィールドの型を定義します。
+また、@@<code>{Type}で各フィールドの型を定義しています。
 
-//table[tbl4][]{
+//table[logstash-28][ALBのログフォーマットとデータ型]{
 Log	Field	Type
 -----------------
 type	class	string
@@ -556,49 +551,42 @@ client_ip	client_ip	int
 client_port	target_port	int
 target_ip	target_ip	int
 target_port	target_port	int
-request@<b>{processing}time	request@<b>{processing}time	float
-target@<b>{processing}time	target@<b>{processing}time	float
-response@<b>{processing}time	response@<b>{processing}time	float
-elb@<b>{status}code	elb@<b>{status}code	string
-target@<b>{status}code	target@<b>{status}code	string
+request	processing time request processing time	float
+target processing time	target processing time	float
+response processing time	response processing time	float
+elb status code	elb status code	string
+target status code	target status code	string
 received_bytes	received_bytes	int
 sent_bytes	sent_bytes	int
-request	ELB@<b>{REQUEST}LINE	string
+request	ELB REQUEST LINE	string
 user_agent	user_agent	string
 ssl_cipher	ssl_cipher	string
 ssl_protocol	ssl_protocol	string
-target@<b>{group}arn	target@<b>{group}arn	string
+target group arn	target group arn	string
 trace_id	trace_id	string
 //}
 
 
-定義したフィールド単位で分割されるようにGrokフィルタを利用し、分割します。
-ちなみにですが、Grokフィルタは、様々なログに合わせて正規表現でkey-value形式に加工することが可能です。
-Grokフィルタするためのパターンファイルを作成します。
+定義したフィールド単位で分割したいので @@<code>{Grok}フィルタを利用します。
+Grokフィルタは正規表現でデータやログをkey-value形式に加工することが可能です。
 
+パターンファイルを格納するディレクトリを作成します。
+パターンファイルを作成せずにパイプラインファイルのFilter内にGrokフィルタを記載することも可能ですが、可読性や管理を楽にするためパターンファイルを外出ししています。
 
-
-が、その前にパターンファイルを格納するディレクトリを作成します。
-パターンファイルを作成せずにパイプラインファイルのFilter内にGrokフィルタを記載することも可能ですが、可読性や管理がしやすくするためパターンファイルを外出ししています。
-
-
-//list[][bash]{
-### Create directory
+//cmd{
 $ mkdir /etc/logstash/patterns
 $ ll | grep patterns
 drwxr-xr-x 2 root root 4096 xxx xx xx:xx patterns
 //}
 
-
-patternsディレクトリが作成できたので、配下にALBのパターンファイルを作成します。
-中身については、闇深いのでここでは説明しません。。無邪気に貼っつけてください。
+ディレクトリが作成できたので、ALBのパターンファイルを作成します。
+中身については、闇深いのでここでは説明しません。りまりま団の著書@@<b>{データを加工する技術}でGrokフィルタの書き方について解説しているのでboothでPDFを買うと良いですよ。（ステマ）
 また、Typeは、インデックステンプレートで作成するのが一般的かと思いますが、今回は、パターンファイルの中で指定します（いろんなやり方があるんだよという意味で）
 
 
-
-あ、後述で"grok-filter"の説明でもありますが、このパターンファイルを呼び出す時は、ファイル名の指定だけでなく、Grok-Patternsの指定も必要になります。
-ここでいう"Grok-Patterns"は、"ALB@<b>{ACCESS}LOG"に当ります。
-この"ALB@<b>{ACCESS}LOG"は、任意の名前を指定できます。
+あ、このパターンファイルを呼び出す時は、ファイル名の指定だけでなく@@<code>{Grok-Patterns}の指定も必要です。
+ここでいう@@<code>{Grok-Patterns}は、@@<code>{ALB ACCESS LOG}に該当します。
+この@<code>{ALB ACCESS LOG}は、任意の名前を指定できます。
 
 
 //list[][bash]{
