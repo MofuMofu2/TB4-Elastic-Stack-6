@@ -338,45 +338,25 @@ No.	Item	Content
 
 ==== Elasticsaerchサービス起動
 
-
 Elasticsearchを起動し、動作確認をします。
 
 
-//list[][bash]{
-### Service activation
-$ service elasticsearch start
-Starting elasticsearch:                                    [  OK  ]
+//list[logstash-17][Elasticsearhの起動]{
+service elasticsearch start
 //}
 
 
-動作確認としてELasticsearchに対して、curlします。
-Elasticsearchは、ローカル環境に構築しているので、"localhost"にcurlします。
-デフォルトのポートは、"9200"のため、ポート指定します。
+動作確認としてELasticsearchに対して、@@<code>{curl}コマンドを発行します。
+Elasticsearchは、ローカル環境に構築しているので@@<code>{localhost}を接続先とします。
+ポートは設定を変更していない限り@@<code>{9200}です。今回はデフォルト設定のままです。
 
-
-//list[][bash]{
-### Check the operation of elasticsearch
-$ curl localhost:9200
-{
-  "name" : "F5iPU0m",
-  "cluster_name" : "elasticsearch",
-  "cluster_uuid" : "Tc_Wn8RJRZ2wjAFsJkShAw",
-  "version" : {
-    "number" : "6.2.2",
-    "build_hash" : "10b1edd",
-    "build_date" : "2018-02-16T19:01:30.685723Z",
-    "build_snapshot" : false,
-    "lucene_version" : "7.2.1",
-    "minimum_wire_compatibility_version" : "5.6.0",
-    "minimum_index_compatibility_version" : "5.0.0"
-  },
-  "tagline" : "You Know, for Search"
-}
+//list[logstash-18][Elasticsearhへ接続]{
+curl localhost:9200
 //}
 
 
 Elasticsaerchからレスポンスが返ってきましたね。
-これでElasticsearchの設定完了です。
+これでElasticsearchの設定は完了です。
 
 
 === Logstashの環境準備
