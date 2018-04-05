@@ -589,19 +589,15 @@ drwxr-xr-x 2 root root 4096 xxx xx xx:xx patterns
 この@<code>{ALB ACCESS LOG}は、任意の名前を指定できます。
 
 
-//list[][bash]{
-$ sudo vim /etc/logstash/patterns/alb_patterns
-# Application Load Balancing
+//list[logstash-29][/etc/logstash/patterns/alb_patternsを次の通り編集]{
 ALB_ACCESS_LOG %{NOTSPACE:class} %{TIMESTAMP_ISO8601:date} %{NOTSPACE:elb}  (?:%{IP:client_ip}:%{INT:client_port:int}) (?:%{IP:backend_ip}:%{INT:backend_port:int}|-) (:?%{NUMBER:request_processing_time:float}|-1) (?:%{NUMBER:target_processing_time:float}|-1) (?:%{NUMBER:response_processing_time:float}|-1) (?:%{INT:elb_status_code}|-) (?:%{INT:target_status_code:int}|-) %{INT:received_bytes:int} %{INT:sent_bytes:int} \"%{ELB_REQUEST_LINE}\" \"(?:%{DATA:user_agent}|-)\" (?:%{NOTSPACE:ssl_cipher}|-) (?:%{NOTSPACE:ssl_protocol}|-)  %{NOTSPACE:target_group_arn} \"%{NOTSPACE:trace_id}\"
 //}
 
 
-パターンファイルが準備できましたので、パイプライファイルの"alb.conf"に"Filter"を追加します。
+パターンファイルを準備したので、パイプラインファイルの@@<code>{alb.conf}にFilterを追加します。
 
 
-//list[][bash]{
-### update alb.conf
-$ vim /etc/logstash/conf.d/alb.conf
+//list[logstash-30][alb.confの編集]{
 input {
   file{
     path=>"/etc/logstash/alb.log"
@@ -629,12 +625,11 @@ output {
 //}
 
 
-更新できたら実行します。
-設定内容については、後述で説明しますので、無邪気に実行してみてください。
-先ほど実行した時と違って、いい感じにkey-valueのかたちになっていることがわかります。
+編集が完了したら、@@<code>{/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf}でLogstashを実行します。
+最初に実行した時と違って、いい感じにkey-valueの形になっていることがわかります。
 
 
-//list[][bash]{
+// cmd{
 $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 {
                         "verb" => "GET",
@@ -693,77 +688,45 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 
 
 それでは、Filterで記載している内容について説明します。
-今回使用しているフィルタは、以下の3つです。
+今回使用しているフィルタは、以下の4つです。
 
- 1. grok-filter
- 1. date-filter
- 1. geoip-filter
- 1. grok-filter
+ 1. grok
+ 1. date
+ 1. geoip
 
+===== grok-filter
 
+正規表現でデータをパースする際に使用します。
+@@<code>{patterns dir}で外だししているパターンファイルを呼び出すことができます。
+また、@@<code>{match}でmessageに取り込まれている値を対象にGrok-Patterns(ここでいうALB ACCESS_LOG)を適用しています。
 
-"grok-filter"についてですが、先ほども説明した通り正規表現でパースする際に使用します。
-"patterns@<b>{dir"で外だししているパターンファイルを呼び出すことができます。@<br>{\}
-また、"match"で"message"に取り込まれている値を対象にGrok-Patterns(ここでいうALB}ACCESS_LOG)を適用しています。
+===== date-filter
 
-
-//list[][bash]{
-### grok-filter
-  grok {
-    patterns_dir => ["/etc/logstash/patterns/alb_patterns"]
-    match => { "message" => "%{ALB_ACCESS_LOG}" }
-  }
-//}
- 1. date-filter
-
-
-
-"date-filter"で"実際のログが出力された時間を"@timestamp"に置き換えています。
-置き換えないとLogstashが取り込んだ時刻が"@timestamp"に記録されてしまうからです。そのため、@timestamp"を"grok-filter"で抽出した"date"で置き換えます。
+実際のログが出力された時間を@@<code>{@timestamp}に置き換えています。
+置き換えないとLogstashがデータを取得した時刻が@<code>{@timestamp}に記録されてしまうからです。
+今回は@<code>{date}を@@<code>{@timestamp}に置き換えています。
 また、タイムゾーンを日本にしたいため、"Asia/Tokyo"を指定しています。
 
+===== geoip-filter
 
-//list[][bash]{
-  date {
-    match => [ "date", "ISO8601" ]
-    timezone => "Asia/Tokyo"
-    target => "@timestamp"
-  }
-//}
- 1. geoip-filter
-
-
-
-"geoip-filter"を使用することでIPアドレスから地理情報を取得することが可能です。
+IPアドレスから地理情報を取得することが可能です。
 例えば、どこかのグローバルIPアドレスからWhoisでどこの国からのアクセスかな？って調べる時があると思います。
-その動作を一つひとつのログに対してやっていたら死んでしまいます。。なので、"geoip-filter"を使用すれば、自動で地理情報を付与してくれるのです。
-ちなみにですが、地理情報は、Logstashが内部で保持しているデータベースを照合して地理情報を付与してくれています@<fn>{1}
+その動作を一つひとつのログに対してやっていたら死んでしまいます…。なので、geoip-filterを使用すれば、自動で地理情報を付与してくれるのです。
+ちなみにですが、地理情報は、Logstashが内部で保持しているデータベースを照合して地理情報を付与してくれています
 
 
-
-"geoip-filter"を適用するフィールドを指定します。
+geoip-filterを適用するフィールドを指定します。
 今回は、クライアントのIPアドレを元にどこからアクセスされているかを知りたいため、フィールド名の"client_ip"を指定します。
-設定方法は、以下です。
 
+===== mutate-filter
 
-//list[][bash]{
-  geoip {
-    source => "client_ip"
-  }
-//}
+不要なフィールドの削除を行うなど、データやログの編集が可能です。
+例えば、messageの値は、全てkey-valueで分割されてストアされています。そのため、無駄なリソースを使いたくない場合は、削除するというような運用を行います。
+個人的には、ストアされたデータでパースが上手くいかず@@<code>{_grokparsefailure}が発生した時の場合も踏まえると、残した方がのではないかと考えています。
 
+mutate-filterの設定を追加したalb.confは次のようになります。
 
-他にも"Filter"でやれることはたくさんあります。
-"mutate-filter"を使用すれば、不要なフィールドの削除を行ったりもできます。
-例えば、messageの値は、全てkey-valueで分割されてストアされています。そのため、無駄なリソースを使いたくない場合は、削除といったことも可能です。
-個人的には、ストアされたデータで"_grokparsefailure"が発生した時の場合も踏まえると、残した方がいいと思ってます。@<fn>{2}
-
-
-
-messageを削除する場合は、Filterにmutateを追加します。
-
-
-//list[][bash]{
+//list[logstash-31][alb.confにmutate-filterを追加]{
 filter {
   grok {
     patterns_dir => ["/etc/logstash/patterns/alb_patterns"]
@@ -783,6 +746,8 @@ filter {
   }
 }
 //}
+
+これでパイプラインファイルの設定ができました。
 
 ==== 実行時のエラーが発生した場合
 
