@@ -312,36 +312,28 @@ vim /etc/elasticsearch/jvm.options
 -Xmx2g
 //}
 
-==== elasticserch.ymlという設定ファイルについて
-
+==== elasticserch.ymlについて
 
 Elasticsaerchでクラスタ構成をする場合などに設定するファイルです。
-今回は、クラスタ構成はしないので、以下のアクセス元制限の設定のみを行います。
+今回クラスタ構成はしないので、アクセス元制限の設定のみを行います。
 
+@@<code>{network.host}を@@<code>{0.0.0.0}に編集します。
+これで、どこからでもElasticsearchにアクセスできるようになります。
 
-
-実際に変更します。
-この設定は、どこからでもアクセス可能とするため、"network.host"のみを編集します。
-"0.0.0.0"と設定することで、どこからでもアクセス可能となります。
-
-
-//list[][bash]{
-### Settings to enable access from anywhere
-$ network.host: 0.0.0.0
+//list[logstash-15][アクセス元IPの設定]{
+network.host: 0.0.0.0
 //}
 
+主な設定項目を@@<table>{logstash-16}にまとめていますので、必要に応じて設定を変更してください。
 
-以下にelasticsearch.ymlの設定項目について表に記載しています。
-ご興味がある方は、参考にして頂ければと思います。
-
-//table[tbl1][]{
+//table[logstash-16][elasticsearch.ymlの設定項目]{
 No.	Item	Content
 -----------------
 1	cluster.name: my-application	クラスタ名の指定
 2	node.name	ノード名の指定
 3	network.host	アクセス元のネットワークアドレスを指定することで制限をかけることが可能
 4	discovery.zen.ping.unicast.hosts	クラスタを組む際にノードを指定
-5	discovery.zen.minimum@<b>{master}nodes	必要最低限のノード数を指定
+5	discovery.zen.minimum.master.nodes	必要最低限のノード数を指定
 //}
 
 ==== Elasticsaerchサービス起動
