@@ -453,23 +453,11 @@ Logstashを起動後、任意の文字を標準入力します。
 ==== ALBのログをLogstashで取り込む
 
 
-ここからは実際のログを利用してパイプラインを扱っていきたいと思います。
-対象のログとして、AWSのALBログを利用します。
+ここからはALBのログを利用してパイプラインを扱っていきたいと思います。
+ALBのログは、AWS公式ページ（@<href>{https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html,Access Logs for Your Application Load Balancer:}
+）に記載されているサンプルログを利用します。
 
-
-
-ALBのログは、AWS公式ページに記載されているサンプルログを利用します。
-
-
-
-@<href>{https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html,Access Logs for Your Application Load Balancer:}
-
-
-
-以下がサンプルログです。
-
-
-//list{
+//emlist[logstash-23][ALBのサンプルログ]{
 https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188
 192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57
 "GET https://www.example.com:443/ HTTP/1.1" "curl/7.46.0" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2
@@ -478,27 +466,18 @@ arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d
 //}
 
 
-このサンプルログを"/etc/logstash/"配下に配置します。
-ファイル名は任意でいいのですが、今回は、"alb.log"にします。
-
-
-//list[][bash]{
-$ vim /etc/logstash/alb.log
-https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57 "GET https://www.example.com:443/ HTTP/1.1" "curl/7.46.0" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067 "Root=1-58337281-1d84f3d73c47ec4e58577259" www.example.com arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012
-//}
-
+このサンプルログを@@<code>{/etc/logstash/}配下に@@<code>{alb.log}として保存します。ファイル名は任意で良いです。
 
 ログファイルの準備が整ったので、パイプラインファイルを新しく作成します。
-先程作成したtest.confは、"Input"を標準入力としてましたが、ファイルを取り込むので"File input plugin"を使用します。
-"File input plugin"は、標準でインストールされているので、インストールは不要です。
+先程作成したtest.confは、Inputを標準入力としていました。
+
+今回はファイルを取り込むので@@<code>{File input plugin}を使用します。
+このプラグインは標準でインストールされているので、インストールは不要です。
+
+新しく@@<code>{alb.conf}という名前でパイプラインファイルを作成します。
 
 
-
-それでは、"alb.conf"という設定ファイルを作成します。
-
-
-//list[][bash]{
-$ vim /etc/logstash/conf.d/alb.conf
+//list[logstash-24][alb.conf]{
 input {
   file{
     path=>"/etc/logstash/alb.log"
@@ -512,36 +491,38 @@ output {
 //}
 
 
-追記した部分をについて表で説明します。
+追記した部分について表で説明します。
 
-//table[tbl3][]{
+//table[logstash-25][編集部分]{
 No.	Item	Content
 -----------------
 1	path	取り込むファイルを指定します(ディレクトリ指定の"*"指定も可能)
-2	start_position	Logstash起動した時にどこから読み込むかの指定(デフォルトは、end)
+2	start_position	Logstashを起動した時にどこから読み込むかの指定(デフォルトはend)
 3	sincedb_path	ログファイルを前回どこまで取り込んだかを記載するファイル
 //}
 
+@@<code>{alb.conf}を引数にLogstashを起動します。
 
-ではでは、作った設定ファイルで実行します。
+//list[logstash-26][Logstashの起動]{
+/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
+//}
 
-
-//list[][bash]{
-### Run Pipeline
+//cmd{
 $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 {
     "@timestamp" => 2018-02-26T08:15:31.322Z,
           "path" => "/etc/logstash/alb.logs",
        "message" => "https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57 "GET https://www.example.com:443/ HTTP/1.1" "curl/7.46.0" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067 "Root=1-58337281-1d84f3d73c47ec4e58577259" www.example.com arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012,
       "@version" => "1",
-          "host" => "ip-172-31-50-36"
+          "host" => "ip-xxx-xx-Xx-xx"
 }
 //}
 
 
-標準入力で実行した時と同様に"message"に取り込んだログが出力されていることがわかります。
-ただ、これでは構造化した形でElasticsearchにストアされないため、検索性が損なわれます。（"message"というキーに全てのログの全てのデータが入ってしまっているので、意味をなしていないということです）
-そこで、解決方法として"Filter"を利用します。
+標準入力で実行した時と同様にmessageに取り込んだログが出力されていることがわかります。
+ただ、これでは構造化した形でElasticsearchにデータ転送できないので、検索性が損なわれます。
+messageというキーに全てのログの全てのデータが入ってしまうとKibanaで検索する際に不都合が発生するのです。
+Filterを利用してmessageからデータを分割していきます。
 
 
 ==== LogstashのFilterを使ってみる
