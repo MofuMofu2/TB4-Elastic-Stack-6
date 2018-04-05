@@ -362,11 +362,10 @@ Elasticsaerchからレスポンスが返ってきましたね。
 === Logstashの環境準備
 
 
-Elasticsearchの時と同様にLogstashもディレクトリ構成をみていきたいと思います。
+Elasticsearchの時と同様に、Logstashもディレクトリ構成を確認します。
 
 
-//list[][bash]{
-### Elasticsearch directory structure
+//cmd{
 /etc/logstash/
  ┣ conf.d
  ┣ jvm.options
@@ -377,9 +376,9 @@ Elasticsearchの時と同様にLogstashもディレクトリ構成をみてい�
 //}
 
 
-各ファイルやディレクトリにについて説明します。
+各ファイルやディレクトリについて説明します。
 
-//table[tbl2][]{
+//table[logstash-19][]{
 No.	Item	Content
 -----------------
 1	conf.d	Input/Filter/Outputのパイプラインを記載したファイルの格納場所
@@ -391,37 +390,27 @@ No.	Item	Content
 //}
 
 
-ここから個々のファイルについてと説明と設定を行なっていきます。
-細かい設定などがありますが、ちょっと頑張ってもらえればと思います。
-
-
 ==== logstash.ymlの編集
 
+今回はlogstash.ymlの編集は行いませんが、@@<code>{logstash.yml}の役割について解説します。
 
-今回は、logstash.ymlの編集は行いません。
-なので、飛ばしても大丈夫ですし、ご興味のある方は、読み進めてもらえればと思います。
+このファイルでは、パイプラインのバッチサイズやディレイ設定を行います。
+Logstashの動作についてのハンドリングをすることが可能です。
+ymlファイルのため、階層やフラットな構成で記述できます。
 
-
-
-logstash.ymlでは、パイプラインのバッチサイズやディレイ設定が可能です。
-要は、Logstashの動作についてのハンドリングを施すことが可能な設定ファイルです。
-ymlファイルのため、以下のように階層やフラットな構成で記載することが可能です。
-
-
-//list[][bash]{
-### hierarchical form
+//list[logstash-20][logstash.yml]{
+# hierarchical form
 pipeline:
   batch:
     size: 125
     delay: 50
-### flat key
+# flat key
 pipeline.batch.size: 125
 pipeline.batch.delay: 50
 //}
 
 
-そもそも、パイプラインってなんぞ？って人がいると思うので説明しますね。
-そもそもですが、Logstashは、"Input"、"Filter"、"Output"の3つで構成されています。
+Logstashは@@<code>{Input}、@@<code>{Filter}、@@<code>{Output}の3つで構成されています。
 どんな役割かを以下に記載します。
 
  * Input: データソースを指定し、アクセスし、ログを取得します
