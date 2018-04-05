@@ -411,35 +411,24 @@ pipeline.batch.delay: 50
 
 
 Logstashは@@<code>{Input}、@@<code>{Filter}、@@<code>{Output}の3つで構成されています。
-どんな役割かを以下に記載します。
 
  * Input: データソースを指定し、アクセスし、ログを取得します
  * Filter: 取得したログを構造化するため、Grokでキーバリューに分割したり、地理情報などを付与したり様々なフィルタを施します
  * Output: データの取り込み先を指定します（今回はElasticsearchを指定しています）
 
-
-
-Logstashに構成されている"Input"、"Filter"、"Output"の一連をパイプラインと言っております。
-また、この定義するためのファイルが、パイプラインファイルです。
-
+この一連の流れのことを@@<b>{パイプライン（pipeline）}といいます。
 
 ==== Logstashのパイプラインを実行する
 
+実際にLogstashを動かすためにパイプラインファイルを設定します。
+Logstashの起動方法は、コマンド起動とサービス起動2種類が存在します。
+最終的にはサービス起動で起動したほうが利便性も高いですが、最初はコマンド起動を利用してLogstashの操作に慣れると良いでしょう。
 
-実際にLogstashを動かすためにパイプラインファイルを設定して、動かしていきたいと思います。
-Logstashの起動方法は、"コマンド起動"と"サービス起動"の二つの方法があります。
-最終的には、"サービス起動"で動かしますが、初めは慣れるためにも"コマンド起動"で行なっていきます。
+早速、パイプラインファイルを作成します。
+このパイプラインは、単純に標準入力からLogstashを通して標準出力を行うものです。
+そのため、InputとOutputのみの構成としています。
 
-
-
-早速ですが、パイプラインファイルを作成します。
-このパイプラインは、単純に標準入力から標準出力するものです。
-そのため、"Input"と"Output"のみの構成としています。
-
-
-//list[][bash]{
-### Cleate pipeline
-$ vim /etc/logstash/conf.d/test.conf
+//list[logstash-21][test.confの作成]{
 input {
   stdin { }
 }
@@ -448,33 +437,17 @@ output {
 }
 //}
 
+パイプラインファイルは@@<code>{test.conf}として保存し、@@<code>{/etc/logstash/conf.d/}に配置します。
 
-"test.conf"ができましたね。
-以下のコマンドを実行し、"Pipelines running"と表示されたら任意の文字を標準入力します。
-入力した文字（ここではtest）が"message"に表示にされていることがわかります。
-
-
-//list[][bash]{
-### Run Pipeline
-$ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/test.conf
-.
-.
-.
-[INFO ] 2018-xx-xx xx:xx:xx.xxx [Ruby-0-Thread-1: /usr/share/logstash/vendor/bundle/jruby/2.3.0/gems/stud-0.0.23/lib/stud/task.rb:22] agent - Pipelines running {:count=>1, :pipelines=>["main"]}
-### Enter arbitrary characters
-test
-{
-      "@version" => "1",
-       "message" => "test",
-    "@timestamp" => 2018-xx-xx xx:xx:xx.xxx,
-          "host" => "ip-xxx-xxx-xxx-xxx"
-}
+//list[logstash-22][Logstashの起動]{
+/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/test.conf
 //}
 
+Logstashを起動後、任意の文字を標準入力します。
+入力した文字（ここではtest）がmessageに表示されればLogstashは起動しています。
 
-気づいた方もいるかと思いますが、パイプラインファイルに"Filter"を記載していません。
-"Filter"を記載せず、"Input"と"Output"のみで構成することが可能なのです。
-ただし、"Filter"がないため、入力データが何も加工されず、出力されます。
+パイプラインファイルにFilterの記載は必須ではありません。InputとOutputのみで構成することが可能なのです。
+ただしこの場合、入力データの加工はできません。
 
 
 ==== ALBのログをLogstashで取り込む
