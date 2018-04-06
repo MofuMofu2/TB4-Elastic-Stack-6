@@ -1051,44 +1051,39 @@ service kibana start
 ==== Kibanaで取り込んだログをビジュアライズ
 
 Kibanaにアクセスするため、ブラウザを起動し、以下のIPアドレスを入力します。
-"Globa_IP"については、AWSから払い出されたグローバルIPアドレスを入力してください。
+@@<code>{Globa_IP}については、AWSから払い出されたグローバルIPアドレスを入力してください。
 
- * http:"Globa_IP":5601
+//list[logstash-42][KibanaにアクセスするためのURL]{
+http:"Globa_IP":5601
+//}
 
+詳しい操作方法はKibanaの章も参照してください。
 
+#@#リンク貼る
 
-Kibanaのトップページが開きますので、左ペインの"Management"をクリックしてください。
-また、"Collapse"をクリックすることで、サイドバーを縮小することができます。
-
-
-
-[kibana01.png]
-
-
-
-"Index Patterns"をクリックします。
+Kibanaのトップページが開きますので、左ペインの@@<code>{Management}をクリックしてください。
+また、@@<code>{Collapse}をクリックすることで、サイドバーを縮小することができます。
 
 
+//image[kibana01][Managementへ遷移]{
+//}
 
-[kibana02.png]
+@@<code>{Index Patterns}をクリックします。
 
-
-
-インデックスパターンを指定せずにElasticsearchに取り込んでいるため、"logstash-YYYY.MM.DD"のパターンで取り込まれます。
-そのため、"Define index pattern"の欄に"logstash-*"と入力します。
-
-
-
-[kibana03.png]
+//image[kibana02][Indexの設定]{
+//}
 
 
+インデックスパターンを指定せずにElasticsearchに取り込んでいるため、@@<code>{logstash-YYYY.MM.DD}のパターンで取り込まれます。
+そのため、@@<code>{Define index pattern}の欄に@@<code>{logstash-*}と入力します。
 
-"logstash-*"を入力すると" Success!  Your index pattern matches 1 index."と表示されたことを確認し、"Next step"をクリックします。
+//image[kibana03][Indexを選択]{
+//}
 
+を入力すると@@<code>{Success!  Your index pattern matches 1 index.}と表示されたことを確認し、@@<code>{Next step}をクリックします。
 
-
-[kibana04.png]
-
+//image[kibana04][Indexが選択できたことの確認]{
+//}
 
 
 "Time Filter field name"に"@timestamp"を選択し、"Create index pattern"をクリックします。
