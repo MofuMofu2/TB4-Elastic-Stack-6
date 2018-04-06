@@ -249,17 +249,14 @@ No.	Item	Content
 
 パイプラインファイルの@@<code>{alb_httpd.conf}を分割します。
 まず、ALB用のパイプラインファイルとして、@@<code>{alb.cfg}にします。
-拡張子を"conf"から"cfg"に変更します。拡張子を"conf"のままでも問題ないのですが、公式ドキュメントに則って"cfg"にします。
+拡張子を@@<code>{conf}から@@<code>{cfg}に変更します。拡張子@@<code>{conf}のままでも問題ないのですが、
+ここでは公式ドキュメントに則って@@<code>{cfg}にします。
+
+@@<list>{logstash_pipelines-07}は@@<code>{alb_httpd.cfg}の内容です。
+特に中身に変更はありません。@@<code>{httpd}の部分とif文を削除しただけですね。
 
 
-
-以下のように"alb.cfg"を作成します。
-特に中身は変わらず、"httpd"の部分とif文を削除しただけですね。
-
-
-//list[][ruby]{
-### pipeline_file
-$ vim /etc/logstash/conf/alb.cfg
+//list[logstash_pipelines-08][/etc/logstash/conf/alb.cfg]{
 input {
   s3 {
     tags => "alb"
@@ -293,12 +290,10 @@ output {
 //}
 
 
-あわせて"httpd.cfg"も作成します。
+同様に、@@<code>{httpd.cfg}も作成します。
 
 
-//list[][ruby]{
-### pipeline_file
-$ vim /etc/logstash/conf/httpd.cfg
+//list[logstash_pipelines-09][/etc/logstash/conf/httpd.cfg]{
 input {
   file {
     path => "/etc/logstash/log/httpd_access.log"
@@ -333,12 +328,12 @@ output {
 //}
 
 
-これで分割とファイル名の変更が完了しましたので、Logstashを再起動します。
+これで分割とファイル名の変更が完了しました。
+Logstashを再起動し、設定ファイルの反映をおこないます。
 
 
-//list[][ruby]{
-### Restart logstash service
-$ initctl restart logstash
+//list[logstash_pipelines-10][Logstashの再起動]{
+sudo initctl restart logstash
 //}
 
 === ログの確認
