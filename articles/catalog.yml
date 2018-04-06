@@ -7,16 +7,16 @@ CHAPS:
   - introduciton-Elastic_Stack.re
   # GoではじめるElasticsearch
   - elasticsearch_go.re
-  # ログをはじめて取り込んで可視化する方たちへ
-  - entry.re
   # Logstashを使ってみる
   - logstash.re
   # Logstashのマルチパイプラインを体験する
-  - logstash_ex.re
+  - logstash_pipeline.re
   # Beatsを体験する
   - beats.re
   # GitとKibanaで同人誌の進捗を可視化するぞ！
   - Kibana-visualize.re
+  # Kibana6の見所
+  - Kibana-alpha.re
 
 APPENDIX:
 
