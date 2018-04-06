@@ -204,7 +204,7 @@ sudo yum install logstash
 
 
 今回はログの取得元をAWSのS3としています。S3からログを取得するには追加でプラグインをインストールする必要があります。
-それでは、@@<code>{S3 Input Plugin}（@<href>{https://www.elastic.co/guide/en/logstash/current/plugins-inputs-s3.html}
+それでは、@<code>{S3 Input Plugin}（@<href>{https://www.elastic.co/guide/en/logstash/current/plugins-inputs-s3.html}
 ）をインストールします。
 
 //list[logstash-10][S3 Input Pluginのインストール]{
@@ -281,19 +281,19 @@ kibana      0:off   1:off   2:on    3:on    4:on    5:on    6:off
  ┗ log4j2.properties
 //}
 
-@@<code>{/etc/elasticsearch}配下に3つのファイルが配置されてます。
-Elasticsearchを構成する際に@@<code>{jvm.options}と@@<code>{elasticsearch.yml}を主に設定します。
-@@<code>{log4j2.properties}は、ログの出力形式など変更が必要な際に設定してください。
+@<code>{/etc/elasticsearch}配下に3つのファイルが配置されてます。
+Elasticsearchを構成する際に@<code>{jvm.options}と@<code>{elasticsearch.yml}を主に設定します。
+@<code>{log4j2.properties}は、ログの出力形式など変更が必要な際に設定してください。
 
 
-今回は@@<code>{jvm.options}と@@<code>{elasticsearch.yml}を編集します。
+今回は@<code>{jvm.options}と@<code>{elasticsearch.yml}を編集します。
 この二つの設定ファイルの変更と設定についての考慮点などを記載したいと思います。
 
 
 ==== jvm.optionsについて
 
 Elasticsaerchのヒープサイズを変更したい場合、jvm.optionsを編集します。
-例えば、ヒープサイズの最大と最小を設定する場合は、@@<code>{Xms(minimum heap size)}と@@<code>{Xmx(maximum heap size)}を変更します。
+例えば、ヒープサイズの最大と最小を設定する場合は、@<code>{Xms(minimum heap size)}と@<code>{Xmx(maximum heap size)}を変更します。
 じゃあ、いくつに設定すればいいの？と思う方もいるかと思いますが、要件によって変わってくる項目です。
 公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html,Settings the heap size:}）にも考慮点が記載されているので、そちらも参考に値を決めてください。
 
@@ -317,14 +317,14 @@ vim /etc/elasticsearch/jvm.options
 Elasticsaerchでクラスタ構成をする場合などに設定するファイルです。
 今回クラスタ構成はしないので、アクセス元制限の設定のみを行います。
 
-@@<code>{network.host}を@@<code>{0.0.0.0}に編集します。
+@<code>{network.host}を@<code>{0.0.0.0}に編集します。
 これで、どこからでもElasticsearchにアクセスできるようになります。
 
 //list[logstash-15][アクセス元IPの設定]{
 network.host: 0.0.0.0
 //}
 
-主な設定項目を@@<table>{logstash-16}にまとめていますので、必要に応じて設定を変更してください。
+主な設定項目を@<table>{logstash-16}にまとめていますので、必要に応じて設定を変更してください。
 
 //table[logstash-16][elasticsearch.ymlの設定項目]{
 No.	Item	Content
@@ -346,9 +346,9 @@ service elasticsearch start
 //}
 
 
-動作確認としてELasticsearchに対して、@@<code>{curl}コマンドを発行します。
-Elasticsearchは、ローカル環境に構築しているので@@<code>{localhost}を接続先とします。
-ポートは設定を変更していない限り@@<code>{9200}です。今回はデフォルト設定のままです。
+動作確認としてELasticsearchに対して、@<code>{curl}コマンドを発行します。
+Elasticsearchは、ローカル環境に構築しているので@<code>{localhost}を接続先とします。
+ポートは設定を変更していない限り@<code>{9200}です。今回はデフォルト設定のままです。
 
 //list[logstash-18][Elasticsearhへ接続]{
 curl localhost:9200
@@ -392,7 +392,7 @@ No.	Item	Content
 
 ==== logstash.ymlの編集
 
-今回はlogstash.ymlの編集は行いませんが、@@<code>{logstash.yml}の役割について解説します。
+今回はlogstash.ymlの編集は行いませんが、@<code>{logstash.yml}の役割について解説します。
 
 このファイルでは、パイプラインのバッチサイズやディレイ設定を行います。
 Logstashの動作についてのハンドリングをすることが可能です。
@@ -410,13 +410,13 @@ pipeline.batch.delay: 50
 //}
 
 
-Logstashは@@<code>{Input}、@@<code>{Filter}、@@<code>{Output}の3つで構成されています。
+Logstashは@<code>{Input}、@<code>{Filter}、@<code>{Output}の3つで構成されています。
 
  * Input: データソースを指定し、アクセスし、ログを取得します
  * Filter: 取得したログを構造化するため、Grokでキーバリューに分割したり、地理情報などを付与したり様々なフィルタを施します
  * Output: データの取り込み先を指定します（今回はElasticsearchを指定しています）
 
-この一連の流れのことを@@<b>{パイプライン（pipeline）}といいます。
+この一連の流れのことを@<b>{パイプライン（pipeline）}といいます。
 
 ==== Logstashのパイプラインを実行する
 
@@ -437,7 +437,7 @@ output {
 }
 //}
 
-パイプラインファイルは@@<code>{test.conf}として保存し、@@<code>{/etc/logstash/conf.d/}に配置します。
+パイプラインファイルは@<code>{test.conf}として保存し、@<code>{/etc/logstash/conf.d/}に配置します。
 
 //list[logstash-22][Logstashの起動]{
 /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/test.conf
@@ -466,15 +466,15 @@ arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d
 //}
 
 
-このサンプルログを@@<code>{/etc/logstash/}配下に@@<code>{alb.log}として保存します。ファイル名は任意で良いです。
+このサンプルログを@<code>{/etc/logstash/}配下に@<code>{alb.log}として保存します。ファイル名は任意で良いです。
 
 ログファイルの準備が整ったので、パイプラインファイルを新しく作成します。
 先程作成したtest.confは、Inputを標準入力としていました。
 
-今回はファイルを取り込むので@@<code>{File input plugin}を使用します。
+今回はファイルを取り込むので@<code>{File input plugin}を使用します。
 このプラグインは標準でインストールされているので、インストールは不要です。
 
-新しく@@<code>{alb.conf}という名前でパイプラインファイルを作成します。
+新しく@<code>{alb.conf}という名前でパイプラインファイルを作成します。
 
 
 //list[logstash-24][alb.conf]{
@@ -501,7 +501,7 @@ No.	Item	Content
 3	sincedb_path	ログファイルを前回どこまで取り込んだかを記載するファイル
 //}
 
-@@<code>{alb.conf}を引数にLogstashを起動します。
+@<code>{alb.conf}を引数にLogstashを起動します。
 
 //list[logstash-26][Logstashの起動]{
 /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
@@ -533,9 +533,9 @@ Filterには取得したログを正規表現でパースするためのGrokフ�
 
 とはいえ、どのように構造化すればいいのか迷ってしまいます。まずはALBのログフォーマットを把握し、作戦を立てると良いです。
 
-各フィールドを@@<table>{logstash-28}にまとめました。
+各フィールドを@<table>{logstash-28}にまとめました。
 このようにログを取り込む前にログフォーマットを確認し、フィールド名を定義します。
-また、@@<code>{Type}で各フィールドの型を定義しています。
+また、@<code>{Type}で各フィールドの型を定義しています。
 
 //table[logstash-28][ALBのログフォーマットとデータ型]{
 Log	Field	Type
@@ -563,7 +563,7 @@ trace_id	trace_id	string
 //}
 
 
-定義したフィールド単位で分割したいので @@<code>{Grok}フィルタを利用します。
+定義したフィールド単位で分割したいので @<code>{Grok}フィルタを利用します。
 Grokフィルタは正規表現でデータやログをkey-value形式に加工することが可能です。
 
 パターンファイルを格納するディレクトリを作成します。
@@ -576,12 +576,12 @@ drwxr-xr-x 2 root root 4096 xxx xx xx:xx patterns
 //}
 
 ディレクトリが作成できたので、ALBのパターンファイルを作成します。
-中身については、闇深いのでここでは説明しません。りまりま団の著書@@<b>{データを加工する技術}でGrokフィルタの書き方について解説しているのでboothでPDFを買うと良いですよ。（ステマ）
+中身については、闇深いのでここでは説明しません。りまりま団の著書@<b>{データを加工する技術}でGrokフィルタの書き方について解説しているのでboothでPDFを買うと良いですよ。（ステマ）
 また、Typeは、インデックステンプレートで作成するのが一般的かと思いますが、今回は、パターンファイルの中で指定します（いろんなやり方があるんだよという意味で）
 
 
-あ、このパターンファイルを呼び出す時は、ファイル名の指定だけでなく@@<code>{Grok-Patterns}の指定も必要です。
-ここでいう@@<code>{Grok-Patterns}は、@@<code>{ALB ACCESS LOG}に該当します。
+あ、このパターンファイルを呼び出す時は、ファイル名の指定だけでなく@<code>{Grok-Patterns}の指定も必要です。
+ここでいう@<code>{Grok-Patterns}は、@<code>{ALB ACCESS LOG}に該当します。
 この@<code>{ALB ACCESS LOG}は、任意の名前を指定できます。
 
 
@@ -590,7 +590,7 @@ ALB_ACCESS_LOG %{NOTSPACE:class} %{TIMESTAMP_ISO8601:date} %{NOTSPACE:elb}  (?:%
 //}
 
 
-パターンファイルを準備したので、パイプラインファイルの@@<code>{alb.conf}にFilterを追加します。
+パターンファイルを準備したので、パイプラインファイルの@<code>{alb.conf}にFilterを追加します。
 
 
 //list[logstash-30][alb.confの編集]{
@@ -621,7 +621,7 @@ output {
 //}
 
 
-編集が完了したら、@@<code>{/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf}でLogstashを実行します。
+編集が完了したら、@<code>{/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf}でLogstashを実行します。
 最初に実行した時と違って、いい感じにkey-valueの形になっていることがわかります。
 
 
@@ -699,19 +699,19 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 ===== grok-filter
 
 正規表現でデータをパースする際に使用します。
-@@<code>{patterns dir}で外だししているパターンファイルを呼び出すことができます。
-また、@@<code>{match}でmessageに取り込まれている値を対象にGrok-Patterns(ここでいうALB ACCESS_LOG)を適用しています。
+@<code>{patterns dir}で外だししているパターンファイルを呼び出すことができます。
+また、@<code>{match}でmessageに取り込まれている値を対象にGrok-Patterns(ここでいうALB ACCESS_LOG)を適用しています。
 
 ===== date-filter
 
-実際のログが出力された時間を@@<code>{@timestamp}に置き換えています。
+実際のログが出力された時間を@<code>{@timestamp}に置き換えています。
 置き換えないとLogstashがデータを取得した時刻が@<code>{@timestamp}に記録されてしまうからです。
-今回は@<code>{date}を@@<code>{@timestamp}に置き換えています。
+今回は@<code>{date}を@<code>{@timestamp}に置き換えています。
 また、タイムゾーンを日本にしたいため、"Asia/Tokyo"を指定しています。
 
 ===== geoip-filter
 
-IPアドレスから地理情報を取得することが可能です。@@<fn>{1}
+IPアドレスから地理情報を取得することが可能です。@<fn>{1}
 例えば、どこかのグローバルIPアドレスからWhoisでどこの国からのアクセスかな？って調べる時があると思います。
 その動作を一つひとつのログに対してやっていたら死んでしまいます…。なので、geoip-filterを使用すれば、自動で地理情報を付与してくれるのです。
 ちなみにですが、地理情報は、Logstashが内部で保持しているデータベースを照合して地理情報を付与してくれています
@@ -724,7 +724,7 @@ geoip-filterを適用するフィールドを指定します。
 
 不要なフィールドの削除を行うなど、データやログの編集が可能です。
 例えば、messageの値は、全てkey-valueで分割されてストアされています。そのため、無駄なリソースを使いたくない場合は、削除するというような運用を行います。
-個人的には、ストアされたデータでパースが上手くいかず@@<code>{_grokparsefailure}が発生した時の場合も踏まえると、残した方が良いのではないかと考えています。@@<fn>{2}
+個人的には、ストアされたデータでパースが上手くいかず@<code>{_grokparsefailure}が発生した時の場合も踏まえると、残した方が良いのではないかと考えています。@<fn>{2}
 
 mutate-filterの設定を追加したalb.confは次のようになります。
 
@@ -823,7 +823,7 @@ $ kill -9 32061
 
 ===== Inputの編集
 
-@@<code>{alb.conf}へS3からデータを取得する設定を行います。
+@<code>{alb.conf}へS3からデータを取得する設定を行います。
 
 //list[logstash-32][alb.confへS3をInputにする設定を追記]{
 input {
@@ -871,7 +871,7 @@ output {
 
 以下に各オプションについて説明します。
 インデックスを任意の形で指定することも可能ですが、デフォルトのままとするため、指定はしてません。
-デフォルトだと@@<code>{logstash-logs-%{+YYYYMMdd}で作成されます。
+デフォルトだと@<code>{logstash-logs-%{+YYYYMMdd}で作成されます。
 
 //table[logstash-35][elasticserch-output-pluginの解説]{
 No.	Item	Content
@@ -934,8 +934,8 @@ curl -XGET localhost:9200/_cat/indices/logstash*
 
 
 ログがElasticsearchに保存されたかも合わせて確認します。
-@@<code>{curl -XGET localhost:9200/{index\}/{type\}/{id\}}の形式で確認できます。
-また、@@<code>{?pretty}を使用することでjsonが整形されます。
+@<code>{curl -XGET localhost:9200/{index\}/{type\}/{id\}}の形式で確認できます。
+また、@<code>{?pretty}を使用することでjsonが整形されます。
 
 
 //cmd{
@@ -1023,7 +1023,7 @@ Elasticsearchに取り込まれたことが確認できました。
 Kibanaは、フロント部分のためアクセス元を絞ったり、参照するElasticsearchの指定などが可能です。
 今回の設定は、アクセス元の制限はしない設定にします。制限方
 法は、IPアドレスによる制限になります。
-そのため、どこからでもアクセスできるように設定するため、@@<code>{0.0.0.0}のデフォルトルート設定とします（絞りたい場合は、厳密にIPアドレスを指定することで制限をかけることが可能です）
+そのため、どこからでもアクセスできるように設定するため、@<code>{0.0.0.0}のデフォルトルート設定とします（絞りたい場合は、厳密にIPアドレスを指定することで制限をかけることが可能です）
 
 
 //list[logstash-39][/etc/kibana/kibana.yml]{
@@ -1051,7 +1051,7 @@ service kibana start
 ==== Kibanaで取り込んだログをビジュアライズ
 
 Kibanaにアクセスするため、ブラウザを起動し、以下のIPアドレスを入力します。
-@@<code>{Globa_IP}については、AWSから払い出されたグローバルIPアドレスを入力してください。
+@<code>{Globa_IP}については、AWSから払い出されたグローバルIPアドレスを入力してください。
 
 //list[logstash-42][KibanaにアクセスするためのURL]{
 http:"Globa_IP":5601
@@ -1061,50 +1061,50 @@ http:"Globa_IP":5601
 
 #@#リンク貼る
 
-Kibanaのトップページが開きますので、左ペインの@@<code>{Management}をクリックしてください。
-また、@@<code>{Collapse}をクリックすることで、サイドバーを縮小することができます。
+Kibanaのトップページが開きますので、左ペインの@<code>{Management}をクリックしてください。
+また、@<code>{Collapse}をクリックすることで、サイドバーを縮小することができます。
 
 
 //image[kibana01][Managementへ遷移]{
 //}
 
-@@<code>{Index Patterns}をクリックします。
+@<code>{Index Patterns}をクリックします。
 
 //image[kibana02][Indexの設定]{
 //}
 
 
-インデックスパターンを指定せずにElasticsearchに取り込んでいるため、@@<code>{logstash-YYYY.MM.DD}のパターンで取り込まれます。
-そのため、@@<code>{Define index pattern}の欄に@@<code>{logstash-*}と入力します。
+インデックスパターンを指定せずにElasticsearchに取り込んでいるため、@<code>{logstash-YYYY.MM.DD}のパターンで取り込まれます。
+そのため、@<code>{Define index pattern}の欄に@<code>{logstash-*}と入力します。
 
 //image[kibana03][Indexを選択]{
 //}
 
-を入力すると@@<code>{Success!  Your index pattern matches 1 index.}と表示されたことを確認し、@@<code>{Next step}をクリックします。
+を入力すると@<code>{Success!  Your index pattern matches 1 index.}と表示されたことを確認し、@<code>{Next step}をクリックします。
 
 //image[kibana04][Indexが選択できたことの確認]{
 //}
 
-@@<code>{Time Filter field name}に@@<code>{@timestamp}を選択し、@@<code>{Create index pattern}をクリックします。
+@<code>{Time Filter field name}に@<code>{@timestamp}を選択し、@<code>{Create index pattern}をクリックします。
 
 //image[kibana05][Indexの作成]{
 //}
 
 これでインデックスパターンの登録が完了したので、KibanaからElasticsearchのインデックスをビジュアライズする準備が整いました。
-左ペインの@@<code>{Discover}をクリックします。
+左ペインの@<code>{Discover}をクリックします。
 
 //image[kibana06][Discover]{
 //}
 
-あれ？@@<code>{No results found}と画面に表示されており、取り込んだログがビジュアライズされてないですね。
-なぜかと言うと、今回取り込んだログの時刻が@@<code>{2016-08-10T23:39:43}のため、該当する時間でサーチをかける必要があります。
-また、時刻のデフォルト設定は、@@<code>{Last 15 minutes}のため、現在時刻から15分前までの時間がサーチ対象となっています。
+あれ？@<code>{No results found}と画面に表示されており、取り込んだログがビジュアライズされてないですね。
+なぜかと言うと、今回取り込んだログの時刻が@<code>{2016-08-10T23:39:43}のため、該当する時間でサーチをかける必要があります。
+また、時刻のデフォルト設定は、@<code>{Last 15 minutes}のため、現在時刻から15分前までの時間がサーチ対象となっています。
 
 //image[kibana07][No results found画面]{
 //}
 
-それでは、@@<code>{2016-08-10T23:39:43}が該当する時間に変更をしたいため、@@<code>{Last 15 minutes}をクリックします。
-クリックすると、@@<code>{Time Range}が表示されるので、@@<code>{Absolute}をクリックし、以下を入力します。
+それでは、@<code>{2016-08-10T23:39:43}が該当する時間に変更をしたいため、@<code>{Last 15 minutes}をクリックします。
+クリックすると、@<code>{Time Range}が表示されるので、@<code>{Absolute}をクリックし、以下を入力します。
 
  * From: 2016-08-11 00:00:00.000
  * To: 2016-08-11 23:59:59.999
@@ -1112,9 +1112,9 @@ Kibanaのトップページが開きますので、左ペインの@@<code>{Manag
 //image[kibana08][時間の指定]{
 //}
 
-先ほどの@@<code>{No results found}画面ではなく、バーが表示されていることがわかるかと思います。
+先ほどの@<code>{No results found}画面ではなく、バーが表示されていることがわかるかと思います。
 これで取り込んだログをKibanaから確認することができました。
-@@<code>{Visualize}でグラフや、世界地図などにマッピングすることで好みのダッシュボードが作成できます。
+@<code>{Visualize}でグラフや、世界地図などにマッピングすることで好みのダッシュボードが作成できます。
 
 //image[kibana09][Discover画面]{
 //}
