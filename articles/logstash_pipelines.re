@@ -161,14 +161,8 @@ HTTPD_COMBINED_LOG %{HTTPD_COMMONLOG} %{QS:referrer} %{QS:agent}
 
 
 5章で"mutate-filter"を利用すれば、不要なフィールドの削除ができるという説明をしています。
-実際にフィールド削除を行なう場合は、以下のように記載します。今回は、"path"、"host"、"date"を削除対象としています。
+実際にフィールド削除を行なう場合は、以下のように記載します。今回は、@@<code>{path}、@@<code>{host}、@@<code>{date}を削除対象としています。
 
-
-//list[][ruby]{
-mutate {
-  remove_field => [ "path", "host", "date" ]
-}
-//}
 
 === Output処理内容について
 
