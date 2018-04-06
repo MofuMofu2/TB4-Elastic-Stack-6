@@ -111,33 +111,10 @@ output {
 === Inputの処理内容
 
 Inputは、データソースの取り込み部分の定義箇所ですね。
-今回は、S3とローカルファイルのため、"S3 input plugin"と"File input pulgin"を使用します。
-"File input pulgin"は、デフォルトインストールされているので、すぐに使えます。
+今回は、S3とローカルファイルのため、@@<code>{S3 input plugin}と@@<code>{File input pulgin}を使用します。
+@@<code>{File input plugin}で利用しているオプションの詳細を@@<table>{logstash_pipelines-02}にまとめました。
 
-
-//list[][ruby]{
-input {
-  s3 {
-    tags => "alb"
-    bucket => "hoge"
-    region => "ap-northeast-1"
-    prefix => "hoge/"
-    interval => "60"
-    sincedb_path => "/var/lib/logstash/sincedb_alb"
-  }
-  file {
-    path => "/etc/logstash/log/httpd_access.log"
-    tags => "httpd"
-    start_position => "beginning"
-    sincedb_path => "/var/lib/logstash/sincedb_httpd"
-  }
-}
-//}
-
-
-"File"で定義しているオプションについて説明します。
-
-//table[tbl1][]{
+//table[logstash_pipelines-02][File input pluginのオプション]{
 No.	Item	Content
 -----------------
 1	path	ファイルが格納されているパスを指定
@@ -147,8 +124,10 @@ No.	Item	Content
 //}
 
 
-"S3"にも"File"にも共通して、"tags"を定義していることがわかります。この"tags"の値を元にif文で分岐させることができます。
-ここでは、ALBのアクセスログのため、"alb"という値を"tags"に与えます。また、Apacheのアクセスログは、"httpd"という値を与えます。
+また、@@<code>{S3 input plugin}、@@<code>{File input plugin}の設定でどちらも
+@@<code>{tags}を定義しいます。@@<code>{tags}の値を元に後の処理内容をif分岐させることができます。
+ここでは、ALBのアクセスログには@@<code>{alb}という@@<code>{tags}を設定しました。
+また、Apacheのアクセスログは、@@<code>{httpd}という@@<code>{tags}を設定しています。
 
 
 === Filter処理内容について
