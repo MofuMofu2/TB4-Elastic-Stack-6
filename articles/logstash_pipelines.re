@@ -37,9 +37,7 @@ ALBのアクセスログは、@<chapref>{logstash}と同様にS3をデータソ�
 パイプラインファイルを@@<code>{alb_httpd.conf}というファイル名にします。
 また、Apacheのアクセスログは、@@<code>{/etc/logstash/log/}配下に@@<code>{httpd_access.log}を配置している前提とします。
 
-//list[][ruby]{
-### Sample pipeline_file
-$ vim /etc/logstash/conf/alb_httpd.conf
+//list[logstash_pipelines-01][alb_httpd.confの編集]{
 input {
   s3 {
     tags => "alb"
@@ -106,12 +104,11 @@ output {
 //}
 
 
-今までのパイプラインファイルより、少し複雑になってますね。
-どのような処理がされているかを"Input"、"Filter"、"Output"に分けて説明していきます。
+今までのパイプラインファイルより、少し複雑になっています。
+どのような処理がされているかをInput、Filter、Outputに分けて説明します。
 
 
-=== Input処理内容について
-
+=== Inputの処理内容
 
 Inputは、データソースの取り込み部分の定義箇所ですね。
 今回は、S3とローカルファイルのため、"S3 input plugin"と"File input pulgin"を使用します。
