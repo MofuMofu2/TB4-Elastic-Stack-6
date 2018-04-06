@@ -919,29 +919,26 @@ output {
 
 それでは実行させるのですが、最後は、サービスで動かしたいと思います。
 
-//list[][bash]{
-### Start logstash service
-$ initctl start logstash
+//list[logstash-37][AWSでLogstashをサービス起動する]{
+initctl start logstash
 //}
 
 
 インデックスが取り込まれているかを確認します。
 インデックスが日付単位で取り込まれていることがわかります。
 
-
-//list[][bash]{
+//list[logstash-38][インデックスが作成されているか確認]{
 ### Index confirmation
-$ curl -XGET localhost:9200/_cat/indices/logstash*
-yellow open logstash-logs-2016xxxx SJ07jipISK-kDlpV5tiHiA 5 1 42 0 650.6kb 650.6kb
+curl -XGET localhost:9200/_cat/indices/logstash*
 //}
 
 
-ドキュメントも確認します。
-"curl -XGET localhost:9200/{index}/{type}/{id}"の形式で確認できます。
-また、"?pretty"を使用することで"json"が整形されます。
+ログがElasticsearchに保存されたかも合わせて確認します。
+@@<code>{curl -XGET localhost:9200/{index\}/{type\}/{id\}}の形式で確認できます。
+また、@@<code>{?pretty}を使用することでjsonが整形されます。
 
 
-//list[][bash]{
+//cmd{
 $ curl -XGET 'localhost:9200/logstash-2016.08.10/doc/DTAU02EB00Bh04bZnyp1/?pretty'
 {
   "_index" : "logstash-2016.08.10",
