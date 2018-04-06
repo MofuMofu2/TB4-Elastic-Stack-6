@@ -855,12 +855,12 @@ No.	Item	Content
 （@<href>{https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html,IAM Role}）をインスタンスに割り当てています。
 オプションで指定することも可能ですが、セキュリティ面からIAM Roleで制御してます。
 
-===== "Output"の編集
+===== Outputの編集
 
-最後に"Output"を標準出力からElasticsearchに変更します。
+最後にOutputを標準出力からElasticsearchに変更します。
 
 
-//list[][bash]{
+//list[logstash-34][OutputをElasticsearchに変更]{
 output {
   elasticsearch {
     hosts => [ "localhost:9200" ]
@@ -871,9 +871,9 @@ output {
 
 以下に各オプションについて説明します。
 インデックスを任意の形で指定することも可能ですが、デフォルトのままとするため、指定はしてません。
-デフォルトだと"logstash-logs-%{+YYYYMMdd}"で作成されます。
+デフォルトだと@@<code>{logstash-logs-%{+YYYYMMdd}で作成されます。
 
-//table[tbl6][]{
+//table[logstash-35][elasticserch-output-pluginの解説]{
 No.	Item	Content
 -----------------
 1	hosts	elasticsearchの宛先を指定
