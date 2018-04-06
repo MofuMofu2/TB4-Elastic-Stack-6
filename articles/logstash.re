@@ -758,13 +758,21 @@ filter {
 
 //cmd{
 $ /usr/share/logstash/bin/logstash -f conf.d/alb.conf
-WARNING: Could not find logstash.yml which is typically located in $LS_HOME/config or /etc/logstash. You can specify the path using --path.settings. Continuing using the defaults
-Could not find log4j2 configuration at path /usr/share/logstash/config/log4j2.properties. Using default config which logs errors to the console
-[INFO ] 2018-xx-xx xx:xx:xx.xxx [main] scaffold - Initializing module {:module_name=>"netflow", :directory=>"/usr/share/logstash/modules/netflow/configuration"}
-[INFO ] 2018-xx-xx xx:xx:xx.xxx [main] scaffold - Initializing module {:module_name=>"fb_apache", :directory=>"/usr/share/logstash/modules/fb_apache/configuration"}
-[WARN ] 2018-xx-xx xx:xx:xx.xxx [LogStash::Runner] multilocal - Ignoring the 'pipelines.yml' file because modules or command line options are specified
-[FATAL] 2018-xx-xx xx:xx:xx.xxx [LogStash::Runner] runner - Logstash could not be started because there is already another instance using the configured data directory.  If you wish to run multiple instances, you must change the "path.data" setting.
-[ERROR] 2018-xx-xx xx:xx:xx.xxx [LogStash::Runner] Logstash - java.lang.IllegalStateException: org.jruby.exceptions.RaiseException: (SystemExit) exit
+WARNING: Could not find logstash.yml which is typically located in $LS_HOME/config or /etc/logstash.
+You can specify the path using --path.settings. Continuing using the defaults
+Could not find log4j2 configuration at path /usr/share/logstash/config/log4j2.properties.
+Using default config which logs errors to the console
+[INFO ] 2018-xx-xx xx:xx:xx.xxx [main] scaffold - Initializing module {:module_name=>"netflow",
+:directory=>"/usr/share/logstash/modules/netflow/configuration"}
+[INFO ] 2018-xx-xx xx:xx:xx.xxx [main] scaffold - Initializing module {:module_name=>"fb_apache",
+:directory=>"/usr/share/logstash/modules/fb_apache/configuration"}
+[WARN ] 2018-xx-xx xx:xx:xx.xxx [LogStash::Runner] multilocal - Ignoring the 'pipelines.yml'
+file because modules or command line options are specified
+[FATAL] 2018-xx-xx xx:xx:xx.xxx [LogStash::Runner] runner - Logstash could not be started
+because there is already another instance using the configured data directory.
+If you wish to run multiple instances, you must change the "path.data" setting.
+[ERROR] 2018-xx-xx xx:xx:xx.xxx [LogStash::Runner] Logstash - java.lang.IllegalStateException:
+ org.jruby.exceptions.RaiseException: (SystemExit) exit
 //}
 
 
@@ -774,7 +782,29 @@ Could not find log4j2 configuration at path /usr/share/logstash/config/log4j2.pr
 //cmd{
 $ ps -aux | grep logstash
 Warning: bad syntax, perhaps a bogus '-'? See /usr/share/doc/procps-3.2.8/FAQ
-root     32061  1.7 12.8 4811812 521780 pts/0  Tl   14:12   1:06 /usr/lib/jvm/java/bin/java -Xms2g -Xmx2g -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly -XX:+DisableExplicitGC -Djava.awt.headless=true -Dfile.encoding=UTF-8 -XX:+HeapDumpOnOutOfMemoryError -cp /usr/share/logstash/logstash-core/lib/jars/animal-sniffer-annotations-1.14.jar:/usr/share/logstash/logstash-core/lib/jars/commons-compiler-3.0.8.jar:/usr/share/logstash/logstash-core/lib/jars/error_prone_annotations-2.0.18.jar:/usr/share/logstash/logstash-core/lib/jars/google-java-format-1.5.jar:/usr/share/logstash/logstash-core/lib/jars/guava-22.0.jar:/usr/share/logstash/logstash-core/lib/jars/j2objc-annotations-1.1.jar:/usr/share/logstash/logstash-core/lib/jars/jackson-annotations-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/jackson-core-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/jackson-databind-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/jackson-dataformat-cbor-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/janino-3.0.8.jar:/usr/share/logstash/logstash-core/lib/jars/javac-shaded-9-dev-r4023-3.jar:/usr/share/logstash/logstash-core/lib/jars/jruby-complete-9.1.13.0.jar:/usr/share/logstash/logstash-core/lib/jars/jsr305-1.3.9.jar:/usr/share/logstash/logstash-core/lib/jars/log4j-api-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/log4j-core-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/log4j-slf4j-impl-2.9.1.jar:/usr/share/logstash/logstash-core/lib/jars/logstash-core.jar:/usr/share/logstash/logstash-core/lib/jars/slf4j-api-1.7.25.jar org.logstash.Logstash -f conf.d/alb.conf
+root     32061  1.7 12.8 4811812 521780 pts/0  Tl   14:12
+1:06 /usr/lib/jvm/java/bin/java -Xms2g -Xmx2g -XX:+UseParNewGC -XX:+UseConcMarkSweepGC
+-XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly -XX:+DisableExplicitGC
+-Djava.awt.headless=true -Dfile.encoding=UTF-8 -XX:+HeapDumpOnOutOfMemoryError -cp
+/usr/share/logstash/logstash-core/lib/jars/animal-sniffer-annotations-1.14.jar:
+/usr/share/logstash/logstash-core/lib/jars/commons-compiler-3.0.8.jar:
+/usr/share/logstash/logstash-core/lib/jars/error_prone_annotations-2.0.18.jar:
+/usr/share/logstash/logstash-core/lib/jars/google-java-format-1.5.jar:
+/usr/share/logstash/logstash-core/lib/jars/guava-22.0.jar
+:/usr/share/logstash/logstash-core/lib/jars/j2objc-annotations-1.1.jar:
+/usr/share/logstash/logstash-core/lib/jars/jackson-annotations-2.9.1.jar:
+/usr/share/logstash/logstash-core/lib/jars/jackson-core-2.9.1.jar:
+/usr/share/logstash/logstash-core/lib/jars/jackson-databind-2.9.1.jar:
+/usr/share/logstash/logstash-core/lib/jars/jackson-dataformat-cbor-2.9.1.jar:
+/usr/share/logstash/logstash-core/lib/jars/janino-3.0.8.jar:
+/usr/share/logstash/logstash-core/lib/jars/javac-shaded-9-dev-r4023-3.jar:
+/usr/share/logstash/logstash-core/lib/jars/jruby-complete-9.1.13.0.jar:
+/usr/share/logstash/logstash-core/lib/jars/jsr305-1.3.9.jar:
+/usr/share/logstash/logstash-core/lib/jars/log4j-api-2.9.1.jar:
+/usr/share/logstash/logstash-core/lib/jars/log4j-core-2.9.1.jar:
+/usr/share/logstash/logstash-core/lib/jars/log4j-slf4j-impl-2.9.1.jar:
+/usr/share/logstash/logstash-core/lib/jars/logstash-core.jar:
+/usr/share/logstash/logstash-core/lib/jars/slf4j-api-1.7.25.jar org.logstash.Logstash -f conf.d/alb.conf
 root     32231  0.0  0.0 110468  2060 pts/0    S+   15:16   0:00 grep --color=auto logstash
 $ kill -9 32061
 //}
@@ -783,15 +813,15 @@ $ kill -9 32061
 次は、いよいよInputをS3にして、OutputをElasticsearchにする設定を記述します。
 
 
-==== "Input"と"Output"を変更する
+==== InputとOutputを変更する
 
 
-現在の設定は、"Input"をローカルファイル指定しており、"Output"が標準出力にしてあります。
-ここからは、"Input"をS3に変更し、"Output"をElasticsearchに変更します。
-まずは、"Input"から編集します。
+現在の設定は、Inputをローカルファイル指定しており、Outputが標準出力にしてあります。
+ここからは、InputをS3に変更し、OutputをElasticsearchに変更します。
+まずは、Inputから編集します。
 
 
-===== "Input"の編集
+===== Inputの編集
 
 //list[][bash]{
 ### update alb.conf
