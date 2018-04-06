@@ -12,7 +12,7 @@ ElasticsearchにインデクシングされたデータをKibanaで可視化す�
 
 データソースを二つ取得している環境を想定します。
 ALBのアクセスログとApacheのアクセスログの2つを取得するケースです。
-ALBのアクセスログは、@<chapref>{logstash}と同様にS3をデータソースとし、Apacheのアクセスログ@@<code>{httpd_access.log}は
+ALBのアクセスログは、@<chapref>{logstash}と同様にS3をデータソースとし、Apacheのアクセスログ@<code>{httpd_access.log}は
 ローカルのディレクトリに配置したものを取得します。
 以下にディレクトリ構成を記載します。
 
@@ -34,8 +34,8 @@ ALBのアクセスログは、@<chapref>{logstash}と同様にS3をデータソ�
 //}
 
 
-パイプラインファイルを@@<code>{alb_httpd.conf}というファイル名にします。
-また、Apacheのアクセスログは、@@<code>{/etc/logstash/log/}配下に@@<code>{httpd_access.log}を配置している前提とします。
+パイプラインファイルを@<code>{alb_httpd.conf}というファイル名にします。
+また、Apacheのアクセスログは、@<code>{/etc/logstash/log/}配下に@<code>{httpd_access.log}を配置している前提とします。
 
 //list[logstash_pipelines-01][alb_httpd.confの編集]{
 input {
@@ -111,8 +111,8 @@ output {
 === Inputの処理内容
 
 Inputは、データソースの取り込み部分の定義箇所ですね。
-今回は、S3とローカルファイルのため、@@<code>{S3 input plugin}と@@<code>{File input pulgin}を使用します。
-@@<code>{File input plugin}で利用しているオプションの詳細を@@<table>{logstash_pipelines-02}にまとめました。
+今回は、S3とローカルファイルのため、@<code>{S3 input plugin}と@<code>{File input pulgin}を使用します。
+@<code>{File input plugin}で利用しているオプションの詳細を@<table>{logstash_pipelines-02}にまとめました。
 
 //table[logstash_pipelines-02][File input pluginのオプション]{
 No.	Item	Content
@@ -124,18 +124,18 @@ No.	Item	Content
 //}
 
 
-また、@@<code>{S3 input plugin}、@@<code>{File input plugin}の設定でどちらも
-@@<code>{tags}を定義しいます。@@<code>{tags}の値を元に後の処理内容をif分岐させることができます。
-ここでは、ALBのアクセスログには@@<code>{alb}という@@<code>{tags}を設定しました。
-また、Apacheのアクセスログは、@@<code>{httpd}という@@<code>{tags}を設定しています。
+また、@<code>{S3 input plugin}、@<code>{File input plugin}の設定でどちらも
+@<code>{tags}を定義しいます。@<code>{tags}の値を元に後の処理内容をif分岐させることができます。
+ここでは、ALBのアクセスログには@<code>{alb}という@<code>{tags}を設定しました。
+また、Apacheのアクセスログは、@<code>{httpd}という@<code>{tags}を設定しています。
 
 
 === Filter処理内容について
 
-本章では、Inputで定義した@@<code>{tags}をベースにif分岐を用いた処理を行ないました。
+本章では、Inputで定義した@<code>{tags}をベースにif分岐を用いた処理を行ないました。
 if文の記述方法はRubyの記法で記述します。
 
-ここでもGrok処理を行なっているのですが、Apache用のパターンファイルを準備できていないので@@<code>{httpd_patterns}を作成します。
+ここでもGrok処理を行なっているのですが、Apache用のパターンファイルを準備できていないので@<code>{httpd_patterns}を作成します。
 
 
 //list[logstash_pipelines-03][Apacheのアクセスログ用パターンファイル]{
@@ -151,11 +151,11 @@ HTTPD_COMBINED_LOG %{HTTPD_COMMONLOG} %{QS:referrer} %{QS:agent}
 
 ==== Useragent filter plugin
 
-@@<code>{Useragent file plugin}を利用すると、Webサイトにアクセスしてきたデバイスの情報や、
+@<code>{Useragent file plugin}を利用すると、Webサイトにアクセスしてきたデバイスの情報や、
 アクセス時に利用していたブラウザのバージョンなどの情報を構造化できます。
-この処理の前にGrok処理を行なっているので、フィールド@@<code>{agent}にユーザエージェントのデータがパースされた状態になります。
+この処理の前にGrok処理を行なっているので、フィールド@<code>{agent}にユーザエージェントのデータがパースされた状態になります。
 このフィールドに対してフィルタをかけています。
-また、元データを保持したいので、@@<code>{target}オプションで元データを別フィールドの@@<code>{useragent}に出力しています。
+また、元データを保持したいので、@<code>{target}オプションで元データを別フィールドの@<code>{useragent}に出力しています。
 
 ==== Mutate filter plugin
 
