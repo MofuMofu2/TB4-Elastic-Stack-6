@@ -151,18 +151,11 @@ HTTPD_COMBINED_LOG %{HTTPD_COMMONLOG} %{QS:referrer} %{QS:agent}
 
 ==== Useragent filter plugin
 
-
-"useragent-filter"を使用することで、サイトにアクセスしてきたデバイス情報や、ブラウザのバージョンなどの情報を構造化してくれます。
-"grok-filter"をかけると、"agent"のフィールドにユーザエージェントのデータがあるので、このフィールドに対してフィルタをかけています。
-また、元データもとっておくため、"target"指定で別フィールドの"useragent"に出力しています。
-
-
-//list[][ruby]{
-useragent {
-source => "agent"
-target => "useragent"
-}
-//}
+@@<code>{Useragent file plugin}を利用すると、Webサイトにアクセスしてきたデバイスの情報や、
+アクセス時に利用していたブラウザのバージョンなどの情報を構造化できます。
+この処理の前にGrok処理を行なっているので、フィールド@@<code>{agent}にユーザエージェントのデータがパースされた状態になります。
+このフィールドに対してフィルタをかけています。
+また、元データを保持したいので、@@<code>{target}オプションで元データを別フィールドの@@<code>{useragent}に出力しています。
 
 ==== Mutate filter plugin
 
