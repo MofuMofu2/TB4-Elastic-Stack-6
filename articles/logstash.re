@@ -1085,45 +1085,32 @@ Kibanaのトップページが開きますので、左ペインの@@<code>{Manag
 //image[kibana04][Indexが選択できたことの確認]{
 //}
 
+@@<code>{Time Filter field name}に@@<code>{@timestamp}を選択し、@@<code>{Create index pattern}をクリックします。
 
-"Time Filter field name"に"@timestamp"を選択し、"Create index pattern"をクリックします。
-
-
-
-[kibana05.png]
-
-
+//image[kibana05][Indexの作成]{
+//}
 
 これでインデックスパターンの登録が完了したので、KibanaからElasticsearchのインデックスをビジュアライズする準備が整いました。
-左ペインの"Discover"をクリックします。
+左ペインの@@<code>{Discover}をクリックします。
 
+//image[kibana06][Discover]{
+//}
 
+あれ？@@<code>{No results found}と画面に表示されており、取り込んだログがビジュアライズされてないですね。
+なぜかと言うと、今回取り込んだログの時刻が@@<code>{2016-08-10T23:39:43}のため、該当する時間でサーチをかける必要があります。
+また、時刻のデフォルト設定は、@@<code>{Last 15 minutes}のため、現在時刻から15分前までの時間がサーチ対象となっています。
 
-[kibana06.png]
+//image[kibana07][No results found画面]{
+//}
 
-
-
-あれ？"No results found"と画面に表示されており、取り込んだログがビジュアライズされてないですね。
-なぜかと言うと、今回取り込んだログの時刻が"2016-08-10T23:39:43"のため、該当する時間でサーチをかける必要があります。
-また、時刻のデフォルト設定は、"Last 15 minutes"のため、現在時刻から15分前までの時間がサーチ対象となっています。
-
-
-
-[kibana07.png]
-
-
-
-それでは、"2016-08-10T23:39:43"が該当する時間に変更をしたいため、"Last 15 minutes"をクリックします。
-クリックすると、"Time Range"が表示されるので、"Absolute"をクリックし、以下を入力します。
+それでは、@@<code>{2016-08-10T23:39:43}が該当する時間に変更をしたいため、@@<code>{Last 15 minutes}をクリックします。
+クリックすると、@@<code>{Time Range}が表示されるので、@@<code>{Absolute}をクリックし、以下を入力します。
 
  * From: 2016-08-11 00:00:00.000
  * To: 2016-08-11 23:59:59.999
 
-
-
-[kibana08.png]
-
-
+//image[kibana08][時間の指定]{
+//}
 
 先ほどの"No results found"画面ではなく、バーが表示されていることがわかるかと思います。
 これで取り込んだログをKibanaから確認することができました。
