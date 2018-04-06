@@ -132,67 +132,22 @@ No.	Item	Content
 
 === Filter処理内容について
 
+本章では、Inputで定義した@@<code>{tags}をベースにif分岐を用いた処理を行ないました。
+if文の記述方法はRubyの記法で記述します。
 
-"Filter"では、様々なフィルタをかけられることを5章で体験したかと思います。今回は、タグをベースにif文による分岐を行なっています。
-if文の文法は、rubyに則ったかたちです。
-
-
-//list[][ruby]{
-filter {
-  if "alb" in [tags] {
-    grok {
-      patterns_dir => ["/etc/logstash/patterns/alb_patterns"]
-      match => { "message" => "%{ALB_ACCESS}" }
-      add_field => { "date" => "%{date01} %{time}" }
-    }
-    date {
-      match => [ "date", "ISO8601" ]
-      timezone => "Asia/Tokyo"
-      target => "@timestamp"
-    }
-    geoip {
-      source => "client_ip"
-    }
-  else if "httpd" in [tags] {
-    grok {
-      patterns_dir => ["/etc/logstash/patterns/httpd_patterns"]
-      match => { "message" => "%{HTTPD_COMBINED_LOG}" }
-    }
-    geoip {
-      source => "clientip"
-    }
-    date {
-      match => [ "date", "dd/MMM/YYYY:HH:mm:ss Z" ]
-      locale => "en"
-      target => "timestamp"
-    }
-    useragent {
-    source => "agent"
-    target => "useragent"
-    }
-    mutate {
-      remove_field => [ "path", "host", "date" ]
-    }
-  }
-}
-//}
+ここでもGrok処理を行なっているのですが、Apache用のパターンファイルを準備できていないので@@<code>{httpd_patterns}を作成します。
 
 
-ここで新たにApache用のパターンファイルを準備できていないので、作成します。
-
-
-//list[][ruby]{
-$ vim /etc/logstash/patterns/httpd_patterns
-# Access_log
+//list[logstash_pipelines-03][Apacheのアクセスログ用パターンファイル]{
 HTTPDUSER %{EMAILADDRESS}|%{USER}
-HTTPD_COMMON_LOG %{IPORHOST:clientip} %{HTTPDUSER:ident} %{HTTPDUSER:auth} \[%{HTTPDATE:timestamp}\] "(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})" %{NUMBER:response} (?:%{NUMBER:bytes}|-)
+HTTPD_COMMON_LOG %{IPORHOST:clientip} %{HTTPDUSER:ident} （紙面の都合により改行）
+%{HTTPDUSER:auth} \[%{HTTPDATE:timestamp}\] "(?:%{WORD:verb} （紙面の都合により改行）
+%{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})" （紙面の都合により改行）
+%{NUMBER:response} (?:%{NUMBER:bytes}|-)
 HTTPD_COMBINED_LOG %{HTTPD_COMMONLOG} %{QS:referrer} %{QS:agent}
 //}
 
-
-これで、Apacheのアクセスログに対しての"grok-filter"をかけることが可能になりました。
-今回新しい"Filter"で使用しているオプションについて説明します。
-
+これでGrok処理を実施するための準備ができました。
 
 ==== Useragent filter plugin
 
