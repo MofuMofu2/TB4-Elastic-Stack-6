@@ -1006,14 +1006,13 @@ $ curl -XGET 'localhost:9200/logstash-2016.08.10/doc/DTAU02EB00Bh04bZnyp1/?prett
 Elasticsearchに取り込まれたことが確認できました。
 
 
-=== Kibanaの環境準備するよ
+=== Kibanaの環境準備
 
 
-Kibanaのディレクトリ構成は以下です。
+起動前に、Kibanaのディレクトリ構成を確認してみましょう。
 
 
-//list[][bash]{
-### kibana directory structure
+//cmd{
 /etc/kibana/
  ┗ kibana.yml
 //}
@@ -1024,12 +1023,10 @@ Kibanaのディレクトリ構成は以下です。
 Kibanaは、フロント部分のためアクセス元を絞ったり、参照するElasticsearchの指定などが可能です。
 今回の設定は、アクセス元の制限はしない設定にします。制限方
 法は、IPアドレスによる制限になります。
-そのため、どこからでもアクセスできるように設定するため、"0.0.0.0"のデフォルトルート設定とします（絞りたい場合は、厳密にIPアドレスを指定することで制限をかけることが可能です）
+そのため、どこからでもアクセスできるように設定するため、@@<code>{0.0.0.0}のデフォルトルート設定とします（絞りたい場合は、厳密にIPアドレスを指定することで制限をかけることが可能です）
 
 
-//list[][bash]{
-### Change server.host
-$ vim /etc/kibana/kibana.yml
+//list[logstash-39][/etc/kibana/kibana.yml]{
 server.host: 0.0.0.0
 //}
 
@@ -1039,7 +1036,7 @@ server.host: 0.0.0.0
 もしリモートにElasticsearchがある場合は、以下のコメントアウトを外し、IPアドレスを指定してください。
 
 
-//list[][bash]{
+//list[logstash-40][elasticesearch.ymlの設定]{
 #elasticsearch.url: "http://localhost:9200"
 //}
 
