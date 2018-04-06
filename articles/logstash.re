@@ -823,9 +823,9 @@ $ kill -9 32061
 
 ===== Inputの編集
 
-//list[][bash]{
-### update alb.conf
-$ vim /etc/logstash/conf.d/alb.conf
+@@<code>{alb.conf}へS3からデータを取得する設定を行います。
+
+//list[logstash-32][alb.confへS3をInputにする設定を追記]{
 input {
   s3 {
     region => "ap-northeast-1"
@@ -840,7 +840,7 @@ input {
 
 各オプションについて説明します。
 
-//table[tbl5][]{
+//table[logstahs-33][S3-input-pluginの解説]{
 No.	Item	Content
 -----------------
 1	region	AWSのリージョンを指定
@@ -851,16 +851,11 @@ No.	Item	Content
 //}
 
 
-今回は、AWSのアクセスキーとシークレットキーを指定せず、IAM Roleをインスタンスに割り当てています。
+今回は、AWSのアクセスキーとシークレットキーを指定せず、IAM Role
+（@<href>{https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html,IAM Role}）をインスタンスに割り当てています。
 オプションで指定することも可能ですが、セキュリティ面からIAM Roleで制御してます。
 
-
-
-@<href>{https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html,IAM Role}
-
-
 ===== "Output"の編集
-
 
 最後に"Output"を標準出力からElasticsearchに変更します。
 
