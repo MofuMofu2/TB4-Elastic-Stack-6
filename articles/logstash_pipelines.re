@@ -11,11 +11,13 @@ ElasticsearchにインデクシングされたデータをKibanaで可視化す�
 == 複数データソースを取り扱うための準備
 
 データソースを二つ取得している環境を想定します。
-ALBのアクセスログとApacheのアクセスログの二つを取り込むケースです。ALBのアクセスログは、5章と同様にS3をデータソースとし、Apacheは、ローカルファイルとします。
+ALBのアクセスログとApacheのアクセスログの2つを取得するケースです。
+ALBのアクセスログは、@<chapref>{logstash}と同様にS3をデータソースとし、Apacheのアクセスログ@@<code>{httpd_access.log}は
+ローカルのディレクトリに配置したものを取得します。
 以下にディレクトリ構成を記載します。
 
 
-//emlist[][bash]{
+//cmd{
 ### Logstash directory
 /etc/logstash/
  ┣ conf.d
