@@ -209,14 +209,13 @@ sudo initctl restart logstash
 === Multiple Pipelinesの定義をしてみる
 
 
-"Multiple Pipelines"の定義ファイルは、"pipelines.yml"です。
-"pipelines.yml"にパイプラインファイルを指定するだけです。その際に、リソースの指定もできます。
-それでは、"pipelines.yml"に、ALBとApacheのアクセスログを取り込むパイプラインファイルを設定したいと思います。
+Multiple Pipelinesの設定をするために利用する定義ファイルは@@<code>{pipelines.yml}です。
+@@<code>{pipelines.yml}にパイプラインファイルを指定するだけでリソースの指定ができるのです。
+
+それでは、@@<code>{pipelines.yml}に、ALBとApacheのアクセスログを取り込むパイプラインファイルを設定したいと思います。
 
 
-//list[][ruby]{
-### pipelines.yml
-vim /etc/logstash/pipelines.yml
+//list[logstash_pipelines-05][/etc/logstash/pipelines.yml]{
 - pipeline.id: alb
   pipeline.batch.size: 125
   path.config: "/etc/logstash/conf.d/alb.cfg"
@@ -227,10 +226,12 @@ vim /etc/logstash/pipelines.yml
   pipeline.workers: 1
 //}
 
+設定したオプションについての説明を@@<table>{logstash_pipelines-06}に記載します。
+公式ドキュメント（@<href>{https://www.elastic.co/guide/en/logstash/6.x/logstash-settings-file.html}）も
+合わせて参考にしてみてください。
 
-それでは、各オプションについて見ていきたいと思います。
 
-//table[tbl2][]{
+//table[logstash_pipelines-06][pipelines.ymlの設定]{
 No.	Item	Content
 -----------------
 1	pipeline.id	任意のパイプラインIDを付与できます
@@ -239,20 +240,15 @@ No.	Item	Content
 4	pipeline.worker	ワーカーの数を指定
 //}
 
-
-@<href>{https://www.elastic.co/guide/en/logstash/6.x/logstash-settings-file.html,オプションについて}
-
-
-
-これで"Multiple Pipelines"の定義は完了です。
-ただ、これでは動かないので"Multiple Pipelines"への対応として、パイプラインファイルの分割とファイル名（拡張子）を変更します。
+これでMultiple Pipelinesの定義は完了です。
+ただ、これではLogstashは動作しません。Multiple Pipelinesへの対応として、パイプラインファイルの分割とファイル名（拡張子）を変更します。
 
 
 === パイプラインファイルの分割
 
 
-パイプラインファイルの"alb_httpd.conf"を分割します。
-まず、ALB用のパイプラインファイルとして、"alb.cfg"にします。
+パイプラインファイルの@@<code>{alb_httpd.conf}を分割します。
+まず、ALB用のパイプラインファイルとして、@@<code>{alb.cfg}にします。
 拡張子を"conf"から"cfg"に変更します。拡張子を"conf"のままでも問題ないのですが、公式ドキュメントに則って"cfg"にします。
 
 
