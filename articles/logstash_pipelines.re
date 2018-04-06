@@ -18,7 +18,6 @@ ALBのアクセスログは、@<chapref>{logstash}と同様にS3をデータソ�
 
 
 //cmd{
-### Logstash directory
 /etc/logstash/
  ┣ conf.d
  ┃ ┗ alb_httpd.conf
@@ -35,11 +34,10 @@ ALBのアクセスログは、@<chapref>{logstash}と同様にS3をデータソ�
 //}
 
 
-パイプラインファイルを"alb@<b>{httpd.conf"というファイル名にします。また、Apacheのアクセスログは、"/etc/logstash/log/"配下に"httpd}access.log"を配置している前提とします。
-実際にパイプラインファイルの中身を見ていきたいと思います。
+パイプラインファイルを@@<code>{alb_httpd.conf}というファイル名にします。
+また、Apacheのアクセスログは、@@<code>{/etc/logstash/log/}配下に@@<code>{httpd_access.log}を配置している前提とします。
 
-
-//emlist[][ruby]{
+//list[][ruby]{
 ### Sample pipeline_file
 $ vim /etc/logstash/conf/alb_httpd.conf
 input {
@@ -120,7 +118,7 @@ Inputは、データソースの取り込み部分の定義箇所ですね。
 "File input pulgin"は、デフォルトインストールされているので、すぐに使えます。
 
 
-//emlist[][ruby]{
+//list[][ruby]{
 input {
   s3 {
     tags => "alb"
@@ -163,7 +161,7 @@ No.	Item	Content
 if文の文法は、rubyに則ったかたちです。
 
 
-//emlist[][ruby]{
+//list[][ruby]{
 filter {
   if "alb" in [tags] {
     grok {
@@ -207,7 +205,7 @@ filter {
 ここで新たにApache用のパターンファイルを準備できていないので、作成します。
 
 
-//emlist[][ruby]{
+//list[][ruby]{
 $ vim /etc/logstash/patterns/httpd_patterns
 # Access_log
 HTTPDUSER %{EMAILADDRESS}|%{USER}
@@ -228,7 +226,7 @@ HTTPD_COMBINED_LOG %{HTTPD_COMMONLOG} %{QS:referrer} %{QS:agent}
 また、元データもとっておくため、"target"指定で別フィールドの"useragent"に出力しています。
 
 
-//emlist[][ruby]{
+//list[][ruby]{
 useragent {
 source => "agent"
 target => "useragent"
@@ -242,7 +240,7 @@ target => "useragent"
 実際にフィールド削除を行なう場合は、以下のように記載します。今回は、"path"、"host"、"date"を削除対象としています。
 
 
-//emlist[][ruby]{
+//list[][ruby]{
 mutate {
   remove_field => [ "path", "host", "date" ]
 }
@@ -256,7 +254,7 @@ mutate {
 本来は、一つのログしか取り扱わない場合でもインデックスを指定する方がいいです（Logstashというインデックス名だと、どのような用途のインデックスがわかりにくいため）
 
 
-//emlist[][ruby]{
+//list[][ruby]{
 output {
   if "alb" in [tags] {
     elasticsearch {
@@ -283,7 +281,7 @@ output {
 複数のログファイルを取り込める準備が整ったので、Logstashを再起動します。
 
 
-//emlist[][ruby]{
+//list[][ruby]{
 ### Restart logstash service
 $ initctl restart logstash
 //}
@@ -312,7 +310,7 @@ $ initctl restart logstash
 それでは、"pipelines.yml"に、ALBとApacheのアクセスログを取り込むパイプラインファイルを設定したいと思います。
 
 
-//emlist[][ruby]{
+//list[][ruby]{
 ### pipelines.yml
 vim /etc/logstash/pipelines.yml
 - pipeline.id: alb
@@ -359,7 +357,7 @@ No.	Item	Content
 特に中身は変わらず、"httpd"の部分とif文を削除しただけですね。
 
 
-//emlist[][ruby]{
+//list[][ruby]{
 ### pipeline_file
 $ vim /etc/logstash/conf/alb.cfg
 input {
@@ -398,7 +396,7 @@ output {
 あわせて"httpd.cfg"も作成します。
 
 
-//emlist[][ruby]{
+//list[][ruby]{
 ### pipeline_file
 $ vim /etc/logstash/conf/httpd.cfg
 input {
@@ -438,7 +436,7 @@ output {
 これで分割とファイル名の変更が完了しましたので、Logstashを再起動します。
 
 
-//emlist[][ruby]{
+//list[][ruby]{
 ### Restart logstash service
 $ initctl restart logstash
 //}
@@ -450,7 +448,7 @@ Logstashがうまく動いてくれないなどがある場合は、ログを見
 ログは、"/var/log/logstash/"配下に出力されます。したがいまして、Logstashを起動した時に"tail"で起動がうまくいっているかの確認をすると良いです。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Check Log
 $ tail -f /var/log/logstash/logstash-plain.log
 [2018-xx-xxTxx:xx:xx,xxx][INFO ][logstash.agent           ] Pipelines running {:count=>1, :pipelines=>["alb"]}
