@@ -1042,18 +1042,13 @@ server.host: 0.0.0.0
 
 ==== Kibanaサービス起動
 
-
 Kibanaを起動し、動作確認をします。
 
-
-//list[][bash]{
-### Service activation
-$ service kibana start
-Starting kibana:                                    [  OK  ]
+//list[logstash-41][Kibanaの起動]{
+service kibana start
 //}
 
 ==== Kibanaで取り込んだログをビジュアライズ
-
 
 Kibanaにアクセスするため、ブラウザを起動し、以下のIPアドレスを入力します。
 "Globa_IP"については、AWSから払い出されたグローバルIPアドレスを入力してください。
