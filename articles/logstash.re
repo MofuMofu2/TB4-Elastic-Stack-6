@@ -533,10 +533,6 @@ Filterには取得したログを正規表現でパースするためのGrokフ�
 
 とはいえ、どのように構造化すればいいのか迷ってしまいます。まずはALBのログフォーマットを把握し、作戦を立てると良いです。
 
-//list[logstash-27][ALBのログフォーマット]{
-type timestamp elb client:port target:port request_processing_time target_processing_time response_processing_time elb_status_code target_status_code received_bytes sent_bytes "request" "user_agent" ssl_cipher ssl_protocol target_group_arn trace_id domain_name chosen_cert_arn
-//}
-
 各フィールドを@@<table>{logstash-28}にまとめました。
 このようにログを取り込む前にログフォーマットを確認し、フィールド名を定義します。
 また、@@<code>{Type}で各フィールドの型を定義しています。
@@ -664,7 +660,8 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
                 "backend_port" => 80,
                     "trace_id" => "Root=1-58337281-1d84f3d73c47ec4e58577259",
                        "class" => "https",
-            "target_group_arn" => "arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067",
+            "target_group_arn" => "arn:aws:elasticloadbalancing:us-east-2:123456789012:
+																	targetgroup/my-targets/73e2d6bc24d8a067",
                      "urihost" => "www.example.com:443",
                         "path" => [
         [0] "/etc/logstash/alb.log",
@@ -679,7 +676,12 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
                          "elb" => "app/my-loadbalancer/50dc6c495c0c9188",
                 "ssl_protocol" => "TLSv1.2",
                         "date" => "2016-08-10T23:39:43.065466Z",
-                     "message" => "https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  5.10.83.30:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57 \"GET https://www.example.com:443/ HTTP/1.1\" \"curl/7.46.0\" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067 \"Root=1-58337281-1d84f3d73c47ec4e58577259\" www.example.com arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012",
+                     "message" => "https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188
+										   5.10.83.30:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57
+											 \"GET https://www.example.com:443/ HTTP/1.1\" \"curl/7.46.0\"
+											 ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:
+											 123456789012:targetgroup/my-targets/73e2d6bc24d8a067 \"Root=1-58337281-1d84f3d73c47ec4e58577259\"
+											  www.example.com arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012",
               "received_bytes" => 0,
                   "backend_ip" => "10.0.0.1",
                     "@version" => "1"
@@ -688,7 +690,7 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 
 
 それでは、Filterで記載している内容について説明します。
-今回使用しているフィルタは、以下の4つです。
+今回使用しているフィルタは、以下の3つです。
 
  1. grok
  1. date
