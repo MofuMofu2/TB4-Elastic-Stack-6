@@ -167,30 +167,13 @@ HTTPD_COMBINED_LOG %{HTTPD_COMMONLOG} %{QS:referrer} %{QS:agent}
 === Output処理内容について
 
 
-5章では、インデックスをデフォルト（"logstash-YYYY.MM.DD"）にしていましたが、複数の場合は、個々でインデックスを指定する必要があります。
-理由は、別々の用途で利用するログのため、インデックスを分ける必要があるためです。
-本来は、一つのログしか取り扱わない場合でもインデックスを指定する方がいいです（Logstashというインデックス名だと、どのような用途のインデックスがわかりにくいため）
+5章では、インデックスをデフォルト（@@<code>{logstash-YYYY.MM.DD}）にしていましたが、複数の場合は、個々でインデックスを指定する必要があります。
+ログの用途が異なるため、インデックスを分けた方が管理がしやすいです。
+本来は1つのログしか取り扱わない場合でもインデックスを指定したほうが良いです。インデックス名で用途がすぐ把握できる方が管理しやすいためです。
 
-
-//list[][ruby]{
-output {
-  if "alb" in [tags] {
-    elasticsearch {
-      hosts => [ "localhost:9200" ]
-      index => "alb-logs-%{+YYYYMMdd}"
-    }
-  }
-  else if "httpd" in [tags] {
-    elasticsearch {
-      hosts => [ "localhost:9200" ]
-      index => "httpd-logs-%{+YYYYMMdd}"
-    }
-  }
-//}
-
-
-"output"でも、if文によるタグ分岐をすることで、出力先を指定することが可能です。
-"alb"タグが付与されているデータは、"alb-logs-%{+YYYYMMdd}"でインデクシングされます。また、"httpd"タグが付与されている場合は、"httpd-logs-%{+YYYYMMdd}"でインデクシングされます。
+Outputの中でもif文処理の記述が可能です。今回はif分岐を利用してログの出力先インデックスを分けています。
+@@<code>{tags}に@@<code>{alb}が付与されているデータは、@@<code>{alb-logs-%{+YYYYMMdd}というインデックスへデータを転送します。
+また、@@<code>{tags}に@@<code>{httpd}タグが付与されている場合は、@@<code>{httpd-logs-%{+YYYYMMdd}というインデックスへデータを転送します。
 
 
 === 準備が整ったので実行するよ
