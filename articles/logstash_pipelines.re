@@ -339,11 +339,12 @@ sudo initctl restart logstash
 === ログの確認
 
 
-Logstashがうまく動いてくれないなどがある場合は、ログを見ましょう。
-ログは、"/var/log/logstash/"配下に出力されます。したがいまして、Logstashを起動した時に"tail"で起動がうまくいっているかの確認をすると良いです。
+Logstashがうまく動かない場合、まずログを見ましょう。
+Logstashの動作ログは、@@<code>{/var/log/logstash/}配下に出力されます。
 
+Logstashを起動し、ログファイルを@@<code>{tail}コマンドなどで確認しつつ、原因を突き止めていきましょう。
 
-//list[][bash]{
+//cmd{
 ### Check Log
 $ tail -f /var/log/logstash/logstash-plain.log
 [2018-xx-xxTxx:xx:xx,xxx][INFO ][logstash.agent           ] Pipelines running {:count=>1, :pipelines=>["alb"]}
@@ -351,5 +352,5 @@ $ tail -f /var/log/logstash/logstash-plain.log
 
 
 いかがでしたか？
-ここまで動かせたらLogstashをかなり理解できたのではと思います。
-次の章では、Logstashより簡易にログを取り込んで、ビジュアライズまでやりたいというニーズに応えることができるBeatsというプロダクトを説明していきます。
+ここまで動かせたらLogstashをかなり理解できているはずです。
+次は、Logstashより簡易にログを取り込みビジュアライズまでやりたい、というニーズに応えることができるBeatsというプロダクトについて説明していきます。
