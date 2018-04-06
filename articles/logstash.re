@@ -884,8 +884,7 @@ No.	Item	Content
 以下に最終的なパイプラインの設定ファイルを記載します。
 
 
-//list[][bash]{
-### Final configuration file
+//list[logstash-36][alb.confの設定]{
 input {
   s3 {
     region => "ap-northeast-1"
@@ -918,9 +917,7 @@ output {
 
 ==== Logstashサービス起動
 
-
-それでは実行させるのですが、今までコマンドライン実行だったので、最後は、サービスで動かしたいと思います。
-
+それでは実行させるのですが、最後は、サービスで動かしたいと思います。
 
 //list[][bash]{
 ### Start logstash service
