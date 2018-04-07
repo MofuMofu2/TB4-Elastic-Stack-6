@@ -43,12 +43,8 @@ Filebeatを使用することで、Apache、Nginx、MySQLなどのログ収集�
 Filebeatをインストールします。@@<chapref>{logstash}でyumリポジトリの登録が完了していることを前提として進めます。
 
 
-//emlist[][bash]{
-### Install Filebeat
-$ yum install filebeat
-$ /usr/share/filebeat/bin/filebeat --version
-Flag --version has been deprecated, version flag has been deprecated, use version subcommand
-filebeat version 6.2.2 (amd64), libbeat 6.2.2
+//list[beats-01][Filebeatsのインストール]{
+sudo yum install filebeat
 //}
 
 === Ingest Node Pluginをインストール
@@ -57,7 +53,7 @@ filebeat version 6.2.2 (amd64), libbeat 6.2.2
 UserAgent、GeoIP解析をするため、以下のプラグインをインストールします。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Install ingest-user-agent
 $ /usr/share/elasticsearch/bin/elasticsearch-plugin install ingest-user-agent
 -> Downloading ingest-user-agent from elastic
@@ -84,7 +80,7 @@ Continue with installation? [y/N]y
 問題なくインストールが完了したらElasticsearchを再起動します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 $ service elasticsearch restart
 Stopping elasticsearch:                                    [  OK  ]
 Starting elasticsearch:                                    [  OK  ]
@@ -107,7 +103,7 @@ https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules.html
 KibanaのDashboardで取り込んだログを確認するところまで見るため、Kibanaをインストールします。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Install Kibana
 $ yum install kibana
 //}
@@ -116,7 +112,7 @@ $ yum install kibana
 Kibanaへのアクセス元の制限をしないため、"server.host"の設定を変更します。@<fn>{1}
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Change server.host
 $ vim /etc/kibana/kibana.yml
 server.host: 0.0.0.0
@@ -128,7 +124,7 @@ server.host: 0.0.0.0
 Nginxをインストールし、Nginxのトップページが開くところまで実施します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Install Nginx
 $ yum install nginx
 ### Start Nginx
@@ -141,7 +137,7 @@ curlを実行し、アクセスログが出力されているかを確認しま�
 また、ステータスコード200が返ってきていることを確認します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Check access.log
 $ tail -f /var/log/nginx/access.log
 127.0.0.1 - - [xx/xxx/2018:xx:xx:xx +0000] "GET / HTTP/1.1" 200 3770 "-" "curl/7.53.1" "-"
@@ -154,7 +150,7 @@ Filebeatの設定ファイルを編集する前に、"filebeat.yml"のファイ�
 理由は、"filebeat.reference.yml"にすべてのModuleなどが記載されているため、簡易的に利用できるためです。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Change file name
 mv /etc/filebeat/filebeat..yml /etc/filebeat/filebeat.yml_origin
 mv /etc/filebeat/filebeat.reference.yml /etc/filebeat/filebeat.yml
@@ -171,7 +167,7 @@ mv /etc/filebeat/filebeat.reference.yml /etc/filebeat/filebeat.yml
 今回は、デフォルトから変更していないため、変更しません。
 
 
-//emlist{
+//list{
 ### Activate Nginx module
 $vim /etc/filebeat/filebeat.yml
 #-------------------------------- Nginx Module -------------------------------
@@ -205,7 +201,7 @@ $vim /etc/filebeat/filebeat.yml
 "Output"をElasticsearchにするため、有効化します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Activate Elasticsearch output
 $vim /etc/filebeat/filebeat.yml
 #-------------------------- Elasticsearch output -------------------------------
@@ -224,7 +220,7 @@ output.elasticsearch:
 最後にKibanaのDashboardを起動時にセットアップする設定を有効化します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Activate Dashboards
 #============================== Dashboards =====================================
 # These settings control loading the sample dashboards to the Kibana index. Loading
@@ -238,7 +234,7 @@ setup.dashboards.enabled: true
 このまま起動するとエラーが発生するためコメントアウトします。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Comment out kafka module
 $ vim /etc/filebeat/filebeat.yml
 #-------------------------------- Kafka Module -------------------------------
@@ -252,7 +248,7 @@ $ vim /etc/filebeat/filebeat.yml
 設定が完了したらFilebeatを起動します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Start Filebeat
 service filebeat start
 Starting filebeat: 2018-xx-xxTxx:xx:xx.xxxZ INFO    instance/beat.go:468    Home path: [/usr/share/filebeat] Config path: [/etc/filebeat] Data path: [/var/lib/filebeat] Logs path: [/var/log/filebeat]
@@ -347,7 +343,7 @@ Metricbeatは、サーバのリソース(CPU/Mem/process..etc)を容易にモニ
 それでは、早速インストールしていきます。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Install Metricbeat
 $ yum install metricbeat
 //}
@@ -357,7 +353,7 @@ MetricbeatもFilebeat同様にベースの設定ファイル(metricbeat.referenc
 既存で設定してある内容は全て上書きしてください。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Create metricbeat.yml
 $ vim /etc/metricbeat/metricbeat.yml
 ##################### Metricbeat Configuration Example #######################
@@ -495,7 +491,7 @@ output.elasticsearch:
 設定が完了したのでMetricbeatを起動します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Start Metricbeat
 $ service metricbeat start
 Starting metricbeat: 2018-xx-xxTxx:xx:xx.xxxZ   INFO    instance/beat.go:468    Home path: [/usr/share/metricbeat] Config path: [/etc/metricbeat] Data path: [/var/lib/metricbeat] Logs path: [/var/log/metricbeat]
@@ -563,7 +559,7 @@ CPUやメモリ、プロセスの状態をニアリアルタイムにモニタ�
 それでは、ここからAuditbeatをインストールします。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Install Auditbeat
 $ yum install auditbeat
 //}
@@ -573,7 +569,7 @@ Auditbeatの設定ファイルは、以下を使用します。
 既存で設定してある内容は全て上書きしてください。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Create auditbeat.yml
 $ vim /etc/auditbeat/auditbeat.yml
 ###################### Auditbeat Configuration Example #########################
@@ -703,7 +699,7 @@ output.elasticsearch:
 設定が完了したので、Auditbeatを起動します。
 
 
-//emlist[][bash]{
+//list[][bash]{
 ### Start Auditbeat
 $ service auditbeat start
 Starting auditbeat: 2018-xx-xxTxx:xx:xx.xxxZ    INFO    instance/beat.go:468    Home path: [/usr/share/auditbeat] Config path: [/etc/auditbeat] Data path: [/var/lib/auditbeat] Logs path: [/var/log/auditbeat]
