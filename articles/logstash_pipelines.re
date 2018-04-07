@@ -2,7 +2,7 @@
 
 
 @<chapref>{logstash}では、LogstashでS3にあるALBのログを取得し、Elasticsearchに送付しました。
-ElasticsearchにインデクシングされたデータをKibanaで可視化するところまで実施しました。
+そして、ElasticsearchにインデクシングされたデータをKibanaで可視化するところまで実施しました。
 
 しかし、実際に何かのサービスを運用する際は、複数のデータソースを取り扱うケースが多いです。
 本章では、複数のデータソースを取り扱う場合のパイプラインファイルの設定方法について説明します。
@@ -10,7 +10,7 @@ ElasticsearchにインデクシングされたデータをKibanaで可視化す�
 
 == 複数データソースを取り扱うための準備
 
-データソースを二つ取得している環境を想定します。
+データソースを2つ取得している環境を想定します。
 ALBのアクセスログとApacheのアクセスログの2つを取得するケースです。
 ALBのアクセスログは、@<chapref>{logstash}と同様にS3をデータソースとし、Apacheのアクセスログ@<code>{httpd_access.log}は
 ローカルのディレクトリに配置したものを取得します。
@@ -125,14 +125,14 @@ No.	Item	Content
 
 
 また、@<code>{S3 input plugin}、@<code>{File input plugin}の設定でどちらも
-@<code>{tags}を定義しいます。@<code>{tags}の値を元に後の処理内容をif分岐させることができます。
+@<code>{tags}を定義しています。@<code>{tags}の値を元に後の処理内容をif分岐させることができます。
 ここでは、ALBのアクセスログには@<code>{alb}という@<code>{tags}を設定しました。
 また、Apacheのアクセスログは、@<code>{httpd}という@<code>{tags}を設定しています。
 
 
 === Filter処理内容について
 
-本章では、Inputで定義した@<code>{tags}をベースにif分岐を用いた処理を行ないました。
+@<list>{logstash_pipelines-02}では、Inputで定義した@<code>{tags}をベースにif分岐を用いた処理を行いました。
 if文の記述方法はRubyの記法で記述します。
 
 ここでもGrok処理を行なっているのですが、Apache用のパターンファイルを準備できていないので@<code>{httpd_patterns}を作成します。
@@ -153,15 +153,15 @@ HTTPD_COMBINED_LOG %{HTTPD_COMMONLOG} %{QS:referrer} %{QS:agent}
 
 @<code>{Useragent file plugin}を利用すると、Webサイトにアクセスしてきたデバイスの情報や、
 アクセス時に利用していたブラウザのバージョンなどの情報を構造化できます。
-この処理の前にGrok処理を行なっているので、フィールド@<code>{agent}にユーザエージェントのデータがパースされた状態になります。
-このフィールドに対してフィルタをかけています。
-また、元データを保持したいので、@<code>{target}オプションで元データを別フィールドの@<code>{useragent}に出力しています。
+この処理の前にGrok処理を行っているので、フィールド@<code>{agent}にユーザエージェントのデータがパースされて保存されます。
+フィールド@<code>{agent}に対してFilter処理を行います。
+また、元データを保持するために、@<code>{target}オプションで元データを別フィールドの@<code>{useragent}に出力しています。
 
 ==== Mutate filter plugin
 
 
-5章で"mutate-filter"を利用すれば、不要なフィールドの削除ができるという説明をしています。
-実際にフィールド削除を行なう場合は、以下のように記載します。今回は、@<code>{path}、@<code>{host}、@<code>{date}を削除対象としています。
+@<chapref>{logstash}で@<code>{mutate-filter}を利用すれば、不要なフィールドの削除ができるという説明をしています。
+実際にフィールド削除を行う場合は、以下のように記載します。今回は、@<code>{path}、@<code>{host}、@<code>{date}を削除対象としています。
 
 
 === Output処理内容について
