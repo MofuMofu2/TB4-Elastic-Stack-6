@@ -101,9 +101,9 @@ $ tail -f /var/log/nginx/access.log
 === Filebeat Module
 
 
-Filebeatの設定ファイルを編集する前に、@@<code>{filebeat.yml}を@@<code>{filebeat.reference.yml}に置き換えます。
-このとき@@<code>{filebeat.reference.yml}という名前から@@<code>{filebeat.yml}に名前を合わせて変更します。
-@@<code>{filebeat.reference.yml}にModulesの設定が記載されているため、これを利用した方がより簡単にBeatsのセットアップが行えるからです。
+Filebeatの設定ファイルを編集する前に、@<code>{filebeat.yml}を@<code>{filebeat.reference.yml}に置き換えます。
+このとき@<code>{filebeat.reference.yml}という名前から@<code>{filebeat.yml}に名前を合わせて変更します。
+@<code>{filebeat.reference.yml}にModulesの設定が記載されているため、これを利用した方がより簡単にBeatsのセットアップが行えるからです。
 
 //cmd{
 ### Change file name
@@ -112,7 +112,7 @@ mv /etc/filebeat/filebeat.reference.yml /etc/filebeat/filebeat.yml
 //}
 
 
-@@<code>{filebeat.yml}の編集を行い、Nginxの有効化を行います。Nginxのパス設定ですが、インストールした状態（デフォルト）のまま
+@<code>{filebeat.yml}の編集を行い、Nginxの有効化を行います。Nginxのパス設定ですが、インストールした状態（デフォルト）のまま
 利用するのであればパスの変更は不要です。今回はデフォルト設定のまま利用しています。
 
 //list[beats-07][filebeat.ymlの編集]{
@@ -174,8 +174,8 @@ setup.dashboards.enabled: true
 //}
 
 
-@@<code>{filebeat.reference.yml}をベースに@@<code>{filebeat.yml}を作成しているため、
-デフォルトでkafkaが@@<code>{enabled: true}になっています。
+@<code>{filebeat.reference.yml}をベースに@<code>{filebeat.yml}を作成しているため、
+デフォルトでkafkaが@<code>{enabled: true}になっています。
 このまま起動するとエラーが発生するためコメントアウトします。
 
 
