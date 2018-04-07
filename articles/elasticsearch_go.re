@@ -79,13 +79,7 @@ ElasticsearchのDockerイメージの起動オプションなどはDockerHubの�
 
 
 まずはElasticsearchを操作するためのクライアントライブラリを決める必要があります。
-Elastic社の公式クライアントもあるのですが、現時点では絶賛開発中なうえにあまり活発にメンテナンスもされていません。。。
-
-
-//quote{
-https://github.com/elastic/go-elasticsearch
-
-//}
+Elastic社の公式クライアント@<href>{https://github.com/elastic/go-elasticsearch}もあるのですが、現時点では絶賛開発中なうえにあまり活発にメンテナンスもされていません…。
 
 
 今回は下記のクライアントを利用します。
