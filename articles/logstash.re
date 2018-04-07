@@ -75,7 +75,7 @@ java -version
 //}
 
 AmazonLinuxの場合、Javaが最初からインストールされています。
-ただしバージョンは7なので、Java 8を新しくインストールする必要があります。
+ただしバージョンは7のため、Java 8を新しくインストールする必要があります。
 
 //list[logstash-02][Java 8のインストール]{
 sudo yum -y install java-1.8.0-openjdk-devel
@@ -113,7 +113,7 @@ OpenJDK Runtime Environment (build 1.8.0_161-b14)
 OpenJDK 64-Bit Server VM (build 25.161-b14, mixed mode)
 //}
 
-=== Elasticsaerchのインストール
+=== Elasticsearchのインストール
 
 
 ここからは、Elastic Stackのインストールを実施していきます。
@@ -153,12 +153,12 @@ type=rpm-md
 Output先としてElasticsearchを利用するため、Elasticsearchをインストールします。
 
 
-//list[logstash-05][Elasticsearhのインストール]{
+//list[logstash-05][Elasticsearchのインストール]{
 sudo yum install elasticsearch
 //}
 
 
-Elasticserchのバージョンを念のため確認します。
+Elasticsearchのバージョンを念のため確認します。
 
 
 //list[logstash-06][Elasticsearhのバージョン確認]{
@@ -312,7 +312,7 @@ vim /etc/elasticsearch/jvm.options
 -Xmx2g
 //}
 
-==== elasticserch.ymlについて
+==== Elasticsearch.ymlについて
 
 Elasticsaerchでクラスタ構成をする場合などに設定するファイルです。
 今回クラスタ構成はしないので、アクセス元制限の設定のみを行います。
@@ -854,7 +854,7 @@ output {
 インデックスを任意の形で指定することも可能ですが、デフォルトのままとするため、指定はしてません。
 デフォルトだと@<code>{logstash-logs-%{+YYYYMMdd}で作成されます。
 
-//table[logstash-35][elasticserch-output-pluginの解説]{
+//table[logstash-35][Elasticsearch-output-pluginの解説]{
 No.	Item	Content
 -----------------
 1	hosts	elasticsearchの宛先を指定
