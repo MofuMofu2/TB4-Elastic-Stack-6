@@ -300,11 +300,11 @@ func main() {
 ==== ドキュメントIDによる取得
 
 
-次に先ほど登録したドキュメントをドキュメントIDを指定して取得します。
-olivere/elasticでは取得したドキュメントはStrucrtに詰め直し、そのStructのフィールドを経由してデータを取得できます。
+次に先ほど登録したドキュメントを、@@<code>{ドキュメントID}を指定して取得します。
+@<code>{Elastic:An Elasticsearch client for the Go}では取得したドキュメントはStrucrtに保存し直し、そのStructのフィールドを経由してデータを取得できます。
 
 
-//list[][Go]{
+//list[elasticsearch-list09][ドキュメントの取得]{
 
 type Chat struct {
   User string `json:"user"`,
@@ -333,7 +333,7 @@ func main() {
 ドキュメントIDをもとに登録したドキュメントを削除してみます。
 
 
-//list[][Go]{
+//list[elasticsearch-list10][ドキュメントの削除]{
 package main
 
 import (
