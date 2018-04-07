@@ -82,20 +82,10 @@ ElasticsearchのDockerイメージの起動オプションなどはDockerHubの�
 Elastic社の公式クライアント@<href>{https://github.com/elastic/go-elasticsearch}もあるのですが、現時点では絶賛開発中なうえにあまり活発にメンテナンスもされていません…。
 
 
-今回は下記のクライアントを利用します。
+今回は@@<code>{Elastic:An Elasticsearch client for the Go}（@<href>{https://github.com/olivere/elastic}）を利用します。
+こちらのクライアントは開発も活発で、Elasticの早いバージョンアップにもいち早く対応されています。
 
-
-//quote{
-https://github.com/olivere/elastic
-
-//}
-
-
-こちらのクライアントは開発も活発で、Elasticの早いバージョンアップにもいち早く対応されてます。
-
-
-
-それではライブラリをインストールしてみましょう。
+それではクライアントをインストールしましょう。
 今回はgo getでインストールしますが、実際のプロダクト利用時はdepなどのパッケージ管理ツールの利用をおすすめします。
 
 
