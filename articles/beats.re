@@ -2,15 +2,15 @@
 = Beats
 
 
-Beatsは、シンプルなデータ取り込みツールです。@<br>{}
-あれ？Logstashは？と思う方もいると思いますが、Logstashは、豊富な機能を持ってます。@<br>{}
-前回の章で説明したGrokフィルダで複雑なログを取り込むことも可能ですし、"Input"のデータソースを多種多様に選択することが可能です。@<br>{}
-そのため、Logstashを利用するには、学習コストもそれなりに発生するので、手軽に利用することができません。  
+Beatsは、シンプルなデータ取り込みツールです。
+あれ？Logstashは？と思う方もいると思いますが、Logstashは、豊富な機能を持ってます。
+前回の章で説明したGrokフィルダで複雑なログを取り込むことも可能ですし、"Input"のデータソースを多種多様に選択することが可能です。
+そのため、Logstashを利用するには、学習コストもそれなりに発生するので、手軽に利用することができません。
 
 
 
-そこで、手軽にデータを取り込みたい時に利用するのがBeatsです。@<br>{}
-何が手軽かというとYAMLで完結するのです。@<br>{}
+そこで、手軽にデータを取り込みたい時に利用するのがBeatsです。
+何が手軽かというとYAMLで完結するのです。
 しかもほぼ設定する箇所はないです。
 
 
@@ -42,7 +42,7 @@ Beatsは、シンプルなデータ取り込みツールです。@<br>{}
 == Filebeat
 
 
-Filebeatを使用することで、Apache、Nginx、MySQLなどのログ収集、パースが容易にできます。@<br>{}
+Filebeatを使用することで、Apache、Nginx、MySQLなどのログ収集、パースが容易にできます。
 また、KibanaのDashboardも生成するため、すぐにモニタリングを始めることができます。
 
 
@@ -100,12 +100,12 @@ Starting elasticsearch:                                    [  OK  ]
 //}
 
 
-FilebeatのNginx Moduleを使用して、どれだけ楽に構築できるかを触れたいと思います。@<br>{}
+FilebeatのNginx Moduleを使用して、どれだけ楽に構築できるかを触れたいと思います。
 そのほかのModuleについては、以下の公式ページに記載してあります。
 
 
 //quote{
-Filebeat Module: 
+Filebeat Module:
 https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules.html
 
 //}
@@ -113,7 +113,7 @@ https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules.html
 === Kibanaをインストール
 
 
-KibanaのDashboardで取り込んだログを確認するところまで見るため、Kibanaをインストールします。  
+KibanaのDashboardで取り込んだログを確認するところまで見るため、Kibanaをインストールします。
 
 
 //emlist[][bash]{
@@ -146,7 +146,7 @@ Starting nginx:                                            [  OK  ]
 //}
 
 
-curlを実行し、アクセスログが出力されているかを確認します。@<br>{}
+curlを実行し、アクセスログが出力されているかを確認します。
 また、ステータスコード200が返ってきていることを確認します。
 
 
@@ -159,7 +159,7 @@ $ tail -f /var/log/nginx/access.log
 === Filebeat Module
 
 
-Filebeatの設定ファイルを編集する前に、"filebeat.yml"のファイル置き換えとファイル名変更を行います。@<br>{}
+Filebeatの設定ファイルを編集する前に、"filebeat.yml"のファイル置き換えとファイル名変更を行います。
 理由は、"filebeat.reference.yml"にすべてのModuleなどが記載されているため、簡易的に利用できるためです。
 
 
@@ -170,13 +170,13 @@ mv /etc/filebeat/filebeat.reference.yml /etc/filebeat/filebeat.yml
 //}
 
 
-"filebeat.yml"の編集を行い、Nginxの有効化、"Output"をElasticsearchに設定を行います。@<br>{}
-また、起動時にKibanaのDashboardを作成するよう設定します。   
+"filebeat.yml"の編集を行い、Nginxの有効化、"Output"をElasticsearchに設定を行います。
+また、起動時にKibanaのDashboardを作成するよう設定します。
 
 
 
-"filebeat.yml"でNginxのModuleを有効化します。@<br>{}
-ログのパスはデフォルトから変更してなければ、変更不要です。@<br>{}
+"filebeat.yml"でNginxのModuleを有効化します。
+ログのパスはデフォルトから変更してなければ、変更不要です。
 今回は、デフォルトから変更していないため、変更しません。
 
 
@@ -275,7 +275,7 @@ Config OK
 //}
 
 
-あとは、データが取り込まれているかをKibanaを開いて確認します。  
+あとは、データが取り込まれているかをKibanaを開いて確認します。
 
 
 
@@ -288,8 +288,8 @@ http://{Global_IP}:5601
 //}
 
 
-以下のトップページが開きます。@<br>{}
-左ペインにある"Management"をクリックします。  
+以下のトップページが開きます。
+左ペインにある"Management"をクリックします。
 
 
 
@@ -313,8 +313,8 @@ Filebeatのインデックスパターンが登録されていることがわか
 
 
 
-左ペインにある"Dashboard"をクリックします。@<br>{}
-様々なDashboardが登録されていることがわかります。@<br>{}
+左ペインにある"Dashboard"をクリックします。
+様々なDashboardが登録されていることがわかります。
 Logstashなどでログを取り込んだ場合は、Dashboardを一から作成する必要がありますが、Beatsの場合は、あらかじめ用意されてます。
 
 
@@ -323,7 +323,7 @@ Logstashなどでログを取り込んだ場合は、Dashboardを一から作成
 
 
 
-今回は、Nginxの"[Filebeat Nginx] Overview"というDashboardをクリックします。@<br>{}
+今回は、Nginxの"[Filebeat Nginx] Overview"というDashboardをクリックします。
 取り込んだログがDashboardに表示されていることがわかります。
 
 
@@ -332,8 +332,8 @@ Logstashなどでログを取り込んだ場合は、Dashboardを一から作成
 
 
 
-いかがでしたか？@<br>{}
-他にも取り込みたいログがあれば、"filebeat.yml"のModuleを有効化するだけで容易にモニタリングができるようになります。  
+いかがでしたか？
+他にも取り込みたいログがあれば、"filebeat.yml"のModuleを有効化するだけで容易にモニタリングができるようになります。
 
 
 
@@ -343,13 +343,13 @@ Logstashなどでログを取り込んだ場合は、Dashboardを一から作成
 == Metricbeat
 
 
-Metricbeatは、サーバのリソース(CPU/Mem/process..etc)を容易にモニタリングすることができます。@<br>{}
-その他にもDockerやElasticsaerchなども対応しており、様々なプロダクトをモニタリングが可能です。  
+Metricbeatは、サーバのリソース(CPU/Mem/process..etc)を容易にモニタリングすることができます。
+その他にもDockerやElasticsaerchなども対応しており、様々なプロダクトをモニタリングが可能です。
 
 
 
-また、先ほどのFilebeatと同様にYAMLを編集するだけなので、学習コストもほぼいらずに導入できます。@<br>{}
-今回は、サーバのメトリックをモニタリングできるところまで見たいと思います。  
+また、先ほどのFilebeatと同様にYAMLを編集するだけなので、学習コストもほぼいらずに導入できます。
+今回は、サーバのメトリックをモニタリングできるところまで見たいと思います。
 
 
 
@@ -362,7 +362,7 @@ $ yum install metricbeat
 //}
 
 
-MetricbeatもFilebeat同様にベースの設定ファイル(metricbeat.reference.yml)があるのですが、デフォルト有効化されているModuleが多いため、以下の設定ファイルを使用します。@<br>{}
+MetricbeatもFilebeat同様にベースの設定ファイル(metricbeat.reference.yml)があるのですが、デフォルト有効化されているModuleが多いため、以下の設定ファイルを使用します。
 既存で設定してある内容は全て上書きしてください。
 
 
@@ -518,7 +518,7 @@ Config OK
 //}
 
 
-Filebeatと同様にデータが取り込まれているかをKibanaを開いて確認します。@<br>{}
+Filebeatと同様にデータが取り込まれているかをKibanaを開いて確認します。
 ブラウザを開いてKibanaへアクセスします。
 
 
@@ -536,7 +536,7 @@ http://{Global_IP}:5601
 
 
 
-左ペインにある"Dashboard"をクリックします。@<br>{}
+左ペインにある"Dashboard"をクリックします。
 検索ウィンドウから"Metricbeat"を入力すると様々なDashboardがヒットします。
 
 
@@ -545,7 +545,7 @@ http://{Global_IP}:5601
 
 
 
-今回は、"[Metricbeat System] Host Overview"というDashboardをクリックします。@<br>{}
+今回は、"[Metricbeat System] Host Overview"というDashboardをクリックします。
 CPUやメモリ、プロセスの状態をニアリアルタイムにモニタリングができていることがわかります。
 
 
@@ -554,18 +554,18 @@ CPUやメモリ、プロセスの状態をニアリアルタイムにモニタ�
 
 
 
-このようにサーバやコンテナなどにMetricbeatを導入することで一元的にモニタリングすることができます。@<br>{}
+このようにサーバやコンテナなどにMetricbeatを導入することで一元的にモニタリングすることができます。
 次が最後ですが、監査ログを容易に取り込むための"Auditbeat"についてです。
 
 
 == Auditbeat
 
 
-サーバの監査としてauditdが出力する"audit.log"をモニタリングしている方は多くいるのではないでしょうか。@<br>{}
-"audit.log"を保管するだけでなく、ニアリアルタイムにモニタリングするためにLogstashなどのツールを利用している方もいると思います。@<br>{}
-ただ、これから"audit.log"をモニタリングしたいという人からしたらハードルが高く、モニタリングするまでに時間を要してしまいます。@<br>{}
-そこで、Beatsには、Auditbeatというデータシッパーがあるので容易に導入することができます。@<br>{}
-ここまでFilbeatやMetricbeatを触ってきたらわかる通り、学習コストはほぼかからないでDashboardで閲覧するところまでできてしまいます。  
+サーバの監査としてauditdが出力する"audit.log"をモニタリングしている方は多くいるのではないでしょうか。
+"audit.log"を保管するだけでなく、ニアリアルタイムにモニタリングするためにLogstashなどのツールを利用している方もいると思います。
+ただ、これから"audit.log"をモニタリングしたいという人からしたらハードルが高く、モニタリングするまでに時間を要してしまいます。
+そこで、Beatsには、Auditbeatというデータシッパーがあるので容易に導入することができます。
+ここまでFilbeatやMetricbeatを触ってきたらわかる通り、学習コストはほぼかからないでDashboardで閲覧するところまでできてしまいます。
 
 
 
@@ -578,7 +578,7 @@ $ yum install auditbeat
 //}
 
 
-Auditbeatの設定ファイルは、以下を使用します。@<br>{}
+Auditbeatの設定ファイルは、以下を使用します。
 既存で設定してある内容は全て上書きしてください。
 
 
@@ -727,7 +727,7 @@ Config OK
 //}
 
 
-データが取り込まれているかをKibanaを開いて確認します。@<br>{}
+データが取り込まれているかをKibanaを開いて確認します。
 ブラウザを開いてKibanaへアクセスします。
 
 
@@ -745,7 +745,7 @@ http://{Global_IP}:5601
 
 
 
-左ペインにある"Dashboard"をクリックします。@<br>{}
+左ペインにある"Dashboard"をクリックします。
 検索ウィンドウから"Auditbeat"を入力すると様々なDashboardがヒットします。
 
 
@@ -762,22 +762,22 @@ http://{Global_IP}:5601
 
 
 
-これまでBeatsを見てきていかがでしたか？@<br>{}
-モニタリングしたいModuleを有効化するだけで容易にモニタリングできる環境が手に入ります。@<br>{}
-この他にもWidnowsを対象にしたものや、サービスの死活監視としてのBeatsなどがあります。@<br>{}
-同じような学習コストで体験できるので、体験して頂ければと思います。  
+これまでBeatsを見てきていかがでしたか？
+モニタリングしたいModuleを有効化するだけで容易にモニタリングできる環境が手に入ります。
+この他にもWidnowsを対象にしたものや、サービスの死活監視としてのBeatsなどがあります。
+同じような学習コストで体験できるので、体験して頂ければと思います。
 
 
 = まとめ
 
 
-いかがでしたか？@<br>{}
-LogstashとBeatsの両方を体験することで、ログ収集時の選択肢が増えたのではないでしょうか。@<br>{}
-また、LogstashとBeatsの違いがわからないという方々にお会いすることがあるので、少しでも違いを理解頂ければ幸いです。  
+いかがでしたか？
+LogstashとBeatsの両方を体験することで、ログ収集時の選択肢が増えたのではないでしょうか。
+また、LogstashとBeatsの違いがわからないという方々にお会いすることがあるので、少しでも違いを理解頂ければ幸いです。
 
 
 
-最後となりますが、ここまでお付き合い頂きありがとうございます。  
+最後となりますが、ここまでお付き合い頂きありがとうございます。
 
 
 
