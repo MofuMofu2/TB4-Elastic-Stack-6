@@ -41,14 +41,14 @@ Elasticsearchは、Javaで作られている分散処理型の検索エンジン
 しかし、Elastic Stack5からはElastic社が提供するクラウドサービス@<code>{Elastic Cloud}（@<href>{https://www.elastic.co/jp/cloud}）を利用することでElasticsearchの管理・バージョンアップ・
 データのバックアップなども柔軟に行うことができるようになりました。基盤の持ち方の選択肢が増えるのはありがたいですよね。
 
-Elasticsearchは独自のクエリを使用してデータの問い合わせをおこなうことが特徴です。が、今後のアップデートでSQLを利用してデータの問い合わせをできるようになることが発表されています@<href>{https://www.elastic.co/jp/elasticon/conf/2017/sf/elasticsearch-sql}。
+Elasticsearchは独自のクエリを使用してデータの問い合わせをおこなうことが特徴です。が、今後のアップデートでSQLを利用してデータの問い合わせをできるようになることが発表されています（@<href>{https://www.elastic.co/jp/elasticon/conf/2017/sf/elasticsearch-sql}）。
 SQLの方が普及率も高いので、さらにElasticsearchを便利に利用することができそうです。
 
 === Logstash
 
 世の中にはたくさんのログやデータがあります。サーバ運用など、いろんなかたちで携わっている方が多いのではないでしょうか。
 例を挙げると、Webサービスのログから分析用途として使用するときや、障害対応でログの調査を行うときに関わりますね。
-ログに何らかの形で携わったことがある人は、一度はログやデータの解析は面倒な作業だと思ったのではないでしょうか。@@<fn>{introES-fn03}
+ログに何らかの形で携わったことがある人は、一度はログやデータの解析は面倒な作業だと思ったのではないでしょうか。@<fn>{introES-fn03}
 
 //footnote[introES-fn03][micciはあるっていってました。もふもふちゃんは面倒臭そうな作業は苦手ですが、パワーポイント作る方が苦手です。]
 
@@ -61,14 +61,12 @@ Logstashは各環境に散らばっているログを集め、指定した対象
 
 ログの取得というとファイルからの取得を思い浮かべますが、プラグインを利用することでAmazon s3やTwitterから直接データを取得することも可能です。
 
-類似プロダクトとしてはTresure Data社製のOSS@<code>{fluentd}（URL:@<href>{https://www.fluentd.org}）が存在します。
+類似プロダクトとしてはTresure Data社製のOSSである、@<code>{fluentd}（@<href>{https://www.fluentd.org}）が存在します。
 エラーのわかりやすさ、環境構築の簡単さを取るのであればfluentdを、Elastic Stackとしてプロダクトをセットで運用するのであればLogstashを利用すると良いでしょう。
 
 Logstashはバージョン6からLogstashのプロセスを@<code>{Multiple pipeline}として分割できるようになりました。これを利用すると、AのデータとBのデータをLogstashで取得したいときに
 Logstashプロセスを2つ作ることができます。片方のプロセスがお亡くなりになってももう片方のデータ連携は継続して行うことができるので、対障害性が上がりますね。
-詳しくはXXを参照してください。
-
-#@# todo 参照するぞ
+詳しくは@<chapref>{logstash}を参照してください。
 
 === Beats
 
