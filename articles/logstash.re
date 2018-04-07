@@ -12,7 +12,7 @@ ELBはログを出力しているので、そのログ何らかの形で取得�
 
 === この章で目指すこと
 
- * ALB(AWSのアプリケーションロードバランサ)のログをLogstashでElasticsearchにストアできるになる
+ * ALB(AWSのアプリケーションロードバランサ)のログをLogstashでElasticsearchにストアできるになる
  * 取り込んだログをKibanaでビジュアライズできる
 
 
@@ -666,26 +666,7 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
                         "path" => [
         [0] "/etc/logstash/alb.log",
         [1] "/"
-    ],
-                 "httpversion" => "1.1",
-             "elb_status_code" => "200",
-                        "host" => "ip-172-31-50-36",
-                  "@timestamp" => 2016-08-10T23:39:43.065Z,
-      "target_processing_time" => 0.048,
-    "response_processing_time" => 0.037,
-                         "elb" => "app/my-loadbalancer/50dc6c495c0c9188",
-                "ssl_protocol" => "TLSv1.2",
-                        "date" => "2016-08-10T23:39:43.065466Z",
-                     "message" => "https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188
-										   5.10.83.30:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57
-											 \"GET https://www.example.com:443/ HTTP/1.1\" \"curl/7.46.0\"
-											 ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:
-											 123456789012:targetgroup/my-targets/73e2d6bc24d8a067 \"Root=1-58337281-1d84f3d73c47ec4e58577259\"
-											  www.example.com arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012",
-              "received_bytes" => 0,
-                  "backend_ip" => "10.0.0.1",
-                    "@version" => "1"
-}
+    ]
 //}
 
 
@@ -1058,8 +1039,6 @@ http:"Globa_IP":5601
 //}
 
 詳しい操作方法はKibanaの章も参照してください。
-
-#@#リンク貼る
 
 Kibanaのトップページが開きますので、左ペインの@<code>{Management}をクリックしてください。
 また、@<code>{Collapse}をクリックすることで、サイドバーを縮小することができます。

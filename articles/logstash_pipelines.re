@@ -130,7 +130,7 @@ No.	Item	Content
 また、Apacheのアクセスログは、@<code>{httpd}という@<code>{tags}を設定しています。
 
 
-=== Filter処理内容について
+=== Filter処理内容について
 
 本章では、Inputで定義した@<code>{tags}をベースにif分岐を用いた処理を行ないました。
 if文の記述方法はRubyの記法で記述します。
@@ -161,19 +161,19 @@ HTTPD_COMBINED_LOG %{HTTPD_COMMONLOG} %{QS:referrer} %{QS:agent}
 
 
 5章で"mutate-filter"を利用すれば、不要なフィールドの削除ができるという説明をしています。
-実際にフィールド削除を行なう場合は、以下のように記載します。今回は、@@<code>{path}、@@<code>{host}、@@<code>{date}を削除対象としています。
+実際にフィールド削除を行なう場合は、以下のように記載します。今回は、@<code>{path}、@<code>{host}、@<code>{date}を削除対象としています。
 
 
-=== Output処理内容について
+=== Output処理内容について
 
 
-5章では、インデックスをデフォルト（@@<code>{logstash-YYYY.MM.DD}）にしていましたが、複数の場合は、個々でインデックスを指定する必要があります。
+5章では、インデックスをデフォルト（@<code>{logstash-YYYY.MM.DD}）にしていましたが、複数の場合は、個々でインデックスを指定する必要があります。
 ログの用途が異なるため、インデックスを分けた方が管理がしやすいです。
 本来は1つのログしか取り扱わない場合でもインデックスを指定したほうが良いです。インデックス名で用途がすぐ把握できる方が管理しやすいためです。
 
 Outputの中でもif文処理の記述が可能です。今回はif分岐を利用してログの出力先インデックスを分けています。
-@@<code>{tags}に@@<code>{alb}が付与されているデータは、@@<code>{alb-logs-%{+YYYYMMdd}というインデックスへデータを転送します。
-また、@@<code>{tags}に@@<code>{httpd}タグが付与されている場合は、@@<code>{httpd-logs-%{+YYYYMMdd}というインデックスへデータを転送します。
+@<code>{tags}に@<code>{alb}が付与されているデータは、@<code>{alb-logs-%{+YYYYMMdd}というインデックスへデータを転送します。
+また、@<code>{tags}に@<code>{httpd}タグが付与されている場合は、@<code>{httpd-logs-%{+YYYYMMdd}というインデックスへデータを転送します。
 
 
 === 準備が整ったので実行するよ
@@ -195,7 +195,7 @@ sudo initctl restart logstash
 しかし、5系までのLogstashではデータの処理に利用するリソースの振り分けを行うことができませんでした。
 
 でも大丈夫です！Logstashの6系からはデータごとにLogstashが利用するリソースを配分することが可能となりました！
-ここからは、今1番イケてる@@<code>{Multiple Pipelines}について説明していきます。
+ここからは、今1番イケてる@<code>{Multiple Pipelines}について説明していきます。
 
 
 == Multiple Pipelinesについて
@@ -209,10 +209,10 @@ sudo initctl restart logstash
 === Multiple Pipelinesの定義をしてみる
 
 
-Multiple Pipelinesの設定をするために利用する定義ファイルは@@<code>{pipelines.yml}です。
-@@<code>{pipelines.yml}にパイプラインファイルを指定するだけでリソースの指定ができるのです。
+Multiple Pipelinesの設定をするために利用する定義ファイルは@<code>{pipelines.yml}です。
+@<code>{pipelines.yml}にパイプラインファイルを指定するだけでリソースの指定ができるのです。
 
-それでは、@@<code>{pipelines.yml}に、ALBとApacheのアクセスログを取り込むパイプラインファイルを設定したいと思います。
+それでは、@<code>{pipelines.yml}に、ALBとApacheのアクセスログを取り込むパイプラインファイルを設定したいと思います。
 
 
 //list[logstash_pipelines-05][/etc/logstash/pipelines.yml]{
@@ -226,7 +226,7 @@ Multiple Pipelinesの設定をするために利用する定義ファイルは@@
   pipeline.workers: 1
 //}
 
-設定したオプションについての説明を@@<table>{logstash_pipelines-06}に記載します。
+設定したオプションについての説明を@<table>{logstash_pipelines-06}に記載します。
 公式ドキュメント（@<href>{https://www.elastic.co/guide/en/logstash/6.x/logstash-settings-file.html}）も
 合わせて参考にしてみてください。
 
@@ -247,13 +247,13 @@ No.	Item	Content
 === パイプラインファイルの分割
 
 
-パイプラインファイルの@@<code>{alb_httpd.conf}を分割します。
-まず、ALB用のパイプラインファイルとして、@@<code>{alb.cfg}にします。
-拡張子を@@<code>{conf}から@@<code>{cfg}に変更します。拡張子@@<code>{conf}のままでも問題ないのですが、
-ここでは公式ドキュメントに則って@@<code>{cfg}にします。
+パイプラインファイルの@<code>{alb_httpd.conf}を分割します。
+まず、ALB用のパイプラインファイルとして、@<code>{alb.cfg}にします。
+拡張子を@<code>{conf}から@<code>{cfg}に変更します。拡張子@<code>{conf}のままでも問題ないのですが、
+ここでは公式ドキュメントに則って@<code>{cfg}にします。
 
-@@<list>{logstash_pipelines-07}は@@<code>{alb_httpd.cfg}の内容です。
-特に中身に変更はありません。@@<code>{httpd}の部分とif文を削除しただけですね。
+@<list>{logstash_pipelines-07}は@<code>{alb_httpd.cfg}の内容です。
+特に中身に変更はありません。@<code>{httpd}の部分とif文を削除しただけですね。
 
 
 //list[logstash_pipelines-07][/etc/logstash/conf/alb.cfg]{
@@ -290,7 +290,7 @@ output {
 //}
 
 
-同様に、@@<code>{httpd.cfg}も作成します。
+同様に、@<code>{httpd.cfg}も作成します。
 
 
 //list[logstash_pipelines-09][/etc/logstash/conf/httpd.cfg]{
@@ -340,9 +340,9 @@ sudo initctl restart logstash
 
 
 Logstashがうまく動かない場合、まずログを見ましょう。
-Logstashの動作ログは、@@<code>{/var/log/logstash/}配下に出力されます。
+Logstashの動作ログは、@<code>{/var/log/logstash/}配下に出力されます。
 
-Logstashを起動し、ログファイルを@@<code>{tail}コマンドなどで確認しつつ、原因を突き止めていきましょう。
+Logstashを起動し、ログファイルを@<code>{tail}コマンドなどで確認しつつ、原因を突き止めていきましょう。
 
 //cmd{
 ### Check Log
