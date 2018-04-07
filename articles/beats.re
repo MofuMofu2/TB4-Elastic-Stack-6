@@ -201,51 +201,37 @@ sudo service filebeat start
 
 
 以下のトップページが開きます。
-左ペインにある"Management"をクリックします。
+左ペインにあるManagementをクリックします。
 
 
+//image[filebeat01][Managementをクリック]{
+//}
 
-[filebeat01.png]
+Index Patternsをクリックします。
 
-
-
-"Index Patterns"をクリックします。
-
-
-
-[filebeat02.png]
-
-
+//image[filebeat02][Indexを選択]{
+//}
 
 Filebeatのインデックスパターンが登録されていることがわかります。
 
+//image[filebeat03][Filebeatのインデックスパターンを確認]{
+//}
 
-
-[filebeat03.png]
-
-
-
-左ペインにある"Dashboard"をクリックします。
+左ペインにある@@<code>{Dashboard}をクリックします。
 様々なDashboardが登録されていることがわかります。
 Logstashなどでログを取り込んだ場合は、Dashboardを一から作成する必要がありますが、Beatsの場合は、あらかじめ用意されてます。
 
+//image[filebeat04][Dashboardの確認]{
+//}
 
-
-[filebeat04.png]
-
-
-
-今回は、Nginxの"[Filebeat Nginx] Overview"というDashboardをクリックします。
+今回は、Nginxの@@<code>{Filebeat Nginx Overview}というDashboardをクリックします。
 取り込んだログがDashboardに表示されていることがわかります。
 
-
-
-[filebeat05.png]
-
-
+//image[filebeat05][Filebeat Nginx Overview]{
+//}
 
 いかがでしたか？
-他にも取り込みたいログがあれば、"filebeat.yml"のModuleを有効化するだけで容易にモニタリングができるようになります。
+他にも取り込みたいログがあれば、@@<code>{filebeat.yml}のModuleを有効化するだけで容易にモニタリングができるようになります。
 
 
 
