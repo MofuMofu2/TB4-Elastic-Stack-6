@@ -19,7 +19,7 @@ Elasticsearchはとても多くの機能を有しています。そのため、�
 
 
 //emlist{
-# docker pull docker.elastic.co/elasticsearch/elasticsearch:6.2.2 
+# docker pull docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 //}
 
 
@@ -50,18 +50,18 @@ network.publish_host	localhost	ElasticsearchのAPIエンドポイントとして
 
 //emlist{
 # curl http://localhost:9200
-{                                              
-  "name" : "WlZn3XP",                          
-  "cluster_name" : "docker-cluster",           
-  "cluster_uuid" : "7Ltq7Ph_Tv-cLofAglwp_g",   
-  "version" : {                                
-    "number" : "5.6.4",                        
-    "build_hash" : "8bbedf5",                  
-    "build_date" : "2017-10-31T18:55:38.105Z", 
-    "build_snapshot" : false,                  
-    "lucene_version" : "6.6.1"                 
-  },                                           
-  "tagline" : "You Know, for Search"           
+{
+  "name" : "WlZn3XP",
+  "cluster_name" : "docker-cluster",
+  "cluster_uuid" : "7Ltq7Ph_Tv-cLofAglwp_g",
+  "version" : {
+    "number" : "5.6.4",
+    "build_hash" : "8bbedf5",
+    "build_date" : "2017-10-31T18:55:38.105Z",
+    "build_snapshot" : false,
+    "lucene_version" : "6.6.1"
+  },
+  "tagline" : "You Know, for Search"
 }
 //}
 
@@ -451,7 +451,7 @@ Analyzerは以下の要素から構成されています。これらを組み合
 
 
 
-//TODO: イメージ図をいれる
+#@#//TODO: イメージ図をいれる
 
 
 
@@ -723,7 +723,7 @@ func main() {
 //}
 
 
-//TODO:ネストがふかいもの
+#@#//TODO:ネストがふかいもの
 
 
 === ちょっと応用
@@ -809,7 +809,7 @@ Multi Fields機能を利用することで一つのフィールドに対して�
         "user": {
           "type": "text",
           "fields": {
-            "raw": { 
+            "raw": {
               "type":  "keyword"
             }
           }
