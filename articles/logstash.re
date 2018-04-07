@@ -130,7 +130,7 @@ OpenJDK 64-Bit Server VM (build 25.161-b14, mixed mode)
 //}
 
 キーの登録が完了したので、YUMリポジトリを追加します。
-"/etc/yum.repo/"配下に"elasticstack.repo"というファイルを作成します。
+@<chap>{/etc/yum.repo/}配下に@<code>{elasticstack.repo}というファイルを作成します。
 公式ドキュメントでは、logstash.repoとなっていますが、今回はElasticsearchなども一緒にインストールするため、Elastic Stackという名前にしました。
 ファイル名は自由につけてよい、ということです。
 
