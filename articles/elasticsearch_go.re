@@ -497,7 +497,7 @@ Chatマッピングの１階層下に存在する、messageフィールドのana
 ここではMapping定義を再作成します。
 
 
-//list{
+//list[elasticsearch-list12][Mapping定義の再作成]{
 # curl -XDELETE 'http://localhost:9200/chat'
 # curl -XPUT 'http://localhost:9200/chat' -H "Content-Type: application/json" -d @mapping.json
 //}
@@ -514,7 +514,7 @@ Searchメソッドはelastic.SearchServiceのQueryメソッドに検索条件を
 取得できたドキュメントをStruct経由で操作する際はreflectパッケージを使って操作します。
 
 
-//list{
+//list[elasticsearch-list13][Searchメソッドの実行]{
 package main
 
 import (
@@ -572,7 +572,7 @@ Elastic:An Elasticsearch client for the GoでTermQueryを利用する際はTerm 
 elastic.NewTermQueryは検索対象のフィールドと検索文字列を指定します。
 
 
-//list{
+//list[elasticsearch-list14][Term Queryを用いたドキュメント検索]{
 package main
 
 import (
@@ -640,7 +640,7 @@ must_not	NOT	boolQuery := elastic.NewBoolQuery() <br> boolQuery.MustNot(elastic.
 userが「佐藤」で、messageに「Elasticsearch」が含まれるが「Solor」が含まれないドキュメントを検索するクエリは以下の通りです。
 
 
-//list{
+//list[elasticsearch-list15][Analyzerの設定]{
 package main
 
 import (
@@ -705,7 +705,7 @@ func main() {
  * Scroll API
  ** Elasticsearchが提供しているページング機能です。limit&offsetと違い、検索時のスナップショットを保持し、カーソルを利用してページの取得をおこなえます。
  * Multi Fields
- ** Multi Fieldsタイプを指定することで1つのフィールドに対してデータ型やAnalyze設定がことなる複数のフィールドを保持することができます。
+ ** Multi Fieldsタイプを指定することで1つのフィールドに対してデータ型やAnalyze設定が異なる複数のフィールドを保持することができます。
  * Alias
  ** インデックスに別名をつけてアクセスすることができる機能です。任意の検索条件を指定したエイリアスも作成することが可能で、RDBのビューのような機能も利用できます。
 
@@ -713,13 +713,13 @@ func main() {
 ==== Scroll API
 
 
-Scroll APIを利用することで、スクロールタイプのページング機能を手軽に利用することができます。Elasticsearchにはlimit&offsetでの取得もできます。
-ただし、limit&offsetの場合、都度検索がおこなわれたうえで指定したoffsetからlimit数分のドキュメントを取得するため、取得結果に抜け漏れや重複が生じる可能性があります。
-一方でScroll APIを利用した場合、初回検索時のスナップショットが生成されます。そのため、Scroll APIが返すスクロールIDを利用することで、初回検索時のスナップショットに対して任意の箇所からページングをおこなうことができます。
-使い方もとても簡単で、elastic.ScrollServiceを介して操作することができます。
+Scroll APIを利用することで、スクロールタイプのページング機能を手軽に利用することができます。Elasticsearchでは@@<code>{limit&offset}を用いた値の取得もできます。
+ただし、@@<code>{limit&offset}を利用した場合、検索がおこなわれる度に指定したoffsetからlimit数分のドキュメントを取得します。そのため、取得結果に抜け漏れや重複が生じる可能性があります。
+一方でScroll APIを利用した場合、初回検索時にスナップショットが生成されます。そのため、Scroll APIが返すスクロールIDを利用することで、初回検索時のスナップショットに対して任意の箇所からページングをおこなうことができます。
+使い方はとても簡単で、@@<code>{elastic.ScrollService}を介して操作することができます。
 
 
-//list{
+//list[elasticsearch-list16][Scroll APIを利用した検索]{
 package main
 
 import (
