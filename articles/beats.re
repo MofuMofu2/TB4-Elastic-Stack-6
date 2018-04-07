@@ -217,21 +217,21 @@ Filebeatのインデックスパターンが登録されていることがわか
 //image[filebeat03][Filebeatのインデックスパターンを確認]{
 //}
 
-左ペインにある@@<code>{Dashboard}をクリックします。
+左ペインにある@<code>{Dashboard}をクリックします。
 様々なDashboardが登録されていることがわかります。
 Logstashなどでログを取り込んだ場合は、Dashboardを一から作成する必要がありますが、Beatsの場合は、あらかじめ用意されてます。
 
 //image[filebeat04][Dashboardの確認]{
 //}
 
-今回は、Nginxの@@<code>{Filebeat Nginx Overview}というDashboardをクリックします。
+今回は、Nginxの@<code>{Filebeat Nginx Overview}というDashboardをクリックします。
 取り込んだログがDashboardに表示されていることがわかります。
 
 //image[filebeat05][Filebeat Nginx Overview]{
 //}
 
 いかがでしたか？
-他にも取り込みたいログがあれば、@@<code>{filebeat.yml}のModuleを有効化するだけで容易にモニタリングができるようになります。
+他にも取り込みたいログがあれば、@<code>{filebeat.yml}のModuleを有効化するだけで容易にモニタリングができるようになります。
 
 
 
@@ -252,7 +252,7 @@ sudo yum install metricbeat
 //}
 
 
-MetricbeatもFilebeat同様にベースの設定ファイル@@<code>{metricbeat.reference.yml}があるのですが、
+MetricbeatもFilebeat同様にベースの設定ファイル@<code>{metricbeat.reference.yml}があるのですが、
 デフォルト有効化されているModuleが多いため、以下の設定ファイルを使用します。
 既存で設定してある内容は全て上書きしてください。
 
@@ -398,72 +398,48 @@ sudo service metricbeat start
 
 
 Filebeatと同様にデータが取り込まれているかをKibanaを開いて確認します。
-ブラウザを開いてKibanaへアクセスします。
+ブラウザを開いてKibana（@<href>{http://{Global_IP\}:5601}）へアクセスします。
 
+Index Patternsの画面を開くとFilebeatのインデックスパターンの他にMetricbeatのインデックスパターンがあることがわかります
 
-//quote{
-http://{Global_IP}:5601
-
+//image[metricbeat01][Metricbeatのインデックスを確認その1]{
 //}
 
+Dashboardをクリックし、Metricbeatのインデックスを確認します。
 
-"Index Patterns"の画面を開くとFilebeatのインデックスパターンの他にMetricbeatのインデックスパターンがあることがわかります
+//image[metricbeat02][Metricbeatのインデックスを確認その2]{
+//}
 
-
-
-[metricbeat01.png]
-
-
-
-左ペインにある"Dashboard"をクリックします。
-検索ウィンドウから"Metricbeat"を入力すると様々なDashboardがヒットします。
-
-
-
-[metricbeat02.png]
-
-
-
-今回は、"[Metricbeat System] Host Overview"というDashboardをクリックします。
+今回は、@<code>{Metricbeat System Host Overview}というDashboardをクリックします。
 CPUやメモリ、プロセスの状態をニアリアルタイムにモニタリングができていることがわかります。
 
+//image[metricbeat03][MetricbeatのDashboard]{
+//}
 
-
-[metricbeat03.png]
-
-
-
-このようにサーバやコンテナなどにMetricbeatを導入することで一元的にモニタリングすることができます。
-次が最後ですが、監査ログを容易に取り込むための"Auditbeat"についてです。
+このようにサーバやコンテナなどにMetricbeatを導入することで一元的にサーバの状態をモニタリングすることができます。
+次が最後ですが、監査ログを容易に取り込むためのAuditbeatについてみていきます。
 
 
 == Auditbeat
 
-
-サーバの監査としてauditdが出力する"audit.log"をモニタリングしている方は多くいるのではないでしょうか。
-"audit.log"を保管するだけでなく、ニアリアルタイムにモニタリングするためにLogstashなどのツールを利用している方もいると思います。
-ただ、これから"audit.log"をモニタリングしたいという人からしたらハードルが高く、モニタリングするまでに時間を要してしまいます。
+サーバの監査としてauditdが出力する@<code>{audit.log}をモニタリングしている方は多くいるのではないでしょうか。
+@<code>{audit.log}を保管するだけでなく、ニアリアルタイムにモニタリングするためにLogstashなどのツールを利用している方もいると思います。
+ただ、これから@<code>{audit.log}をモニタリングしたいという人からしたらハードルが高く、モニタリングするまでに時間を要してしまいます。
 そこで、Beatsには、Auditbeatというデータシッパーがあるので容易に導入することができます。
 ここまでFilbeatやMetricbeatを触ってきたらわかる通り、学習コストはほぼかからないでDashboardで閲覧するところまでできてしまいます。
-
-
 
 それでは、ここからAuditbeatをインストールします。
 
 
-//list[][bash]{
-### Install Auditbeat
-$ yum install auditbeat
+//list[beats-09][Auditbeatのインストール]{
+sudo yum install auditbeat
 //}
 
-
-Auditbeatの設定ファイルは、以下を使用します。
-既存で設定してある内容は全て上書きしてください。
+@<list>{beats-10}の@<code>{auditbeat.yml}を既存で設定してある内容は全て上書きしてください。
 
 
-//list[][bash]{
-### Create auditbeat.yml
-$ vim /etc/auditbeat/auditbeat.yml
+//list[beats-10][/etc/auditbeat/auditbeat.ymlの編集]{
+
 ###################### Auditbeat Configuration Example #########################
 
 # This is an example configuration file highlighting only the most common
@@ -591,80 +567,41 @@ output.elasticsearch:
 設定が完了したので、Auditbeatを起動します。
 
 
-//list[][bash]{
-### Start Auditbeat
-$ service auditbeat start
-Starting auditbeat: 2018-xx-xxTxx:xx:xx.xxxZ    INFO    instance/beat.go:468    Home path: [/usr/share/auditbeat] Config path: [/etc/auditbeat] Data path: [/var/lib/auditbeat] Logs path: [/var/log/auditbeat]
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    instance/beat.go:475    Beat UUID: c8ed5e31-a553-4c66-a69d-401d9bf38c18
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    instance/beat.go:213    Setup Beat: auditbeat; Version: 6.2.2
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    elasticsearch/client.go:145 Elasticsearch url: http://localhost:9200
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    pipeline/module.go:76   Beat name: ip-172-31-50-36
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    [auditd]    auditd/audit_linux.go:65    auditd module is running as euid=0 on kernel=4.9.76-3.78.amzn1.x86_64
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    [auditd]    auditd/audit_linux.go:88    socket_type=multicast will be used.
-Config OK
-                                                           [  OK  ]
+//list[beats-11][Auditbeatの起動]{
+sudo service auditbeat start
 //}
 
 
 データが取り込まれているかをKibanaを開いて確認します。
 ブラウザを開いてKibanaへアクセスします。
 
+@<code>{Index Patterns}の画面を開くとFilebeatのインデックスパターンの他にAuditbeatのインデックスパターンがあることがわかります。
 
-//quote{
-http://{Global_IP}:5601
-
+//image[auditbeat01][Auditbeatのインデックス確認]{
 //}
 
+左ペインにあるDashboardをクリックします。
+検索ウィンドウから@<code>{Auditbeat}と入力すると様々なDashboardがヒットします。
 
-"Index Patterns"の画面を開くとFilebeatのインデックスパターンの他にAuditbeatのインデックスパターンがあることがわかります
+//image[auditbeat02][AuditbeatのDashboardを確認]{
+//}
 
+@<code>{Auditbeat File Integrity Overview}や@<code>{Auditbeat Auditd Overview}からモニタリングが可能です。
 
+//image[auditbeat03][Auditbeatを用いたモニタリング]{
+//}
 
-[auditbeat01.png]
-
-
-
-左ペインにある"Dashboard"をクリックします。
-検索ウィンドウから"Auditbeat"を入力すると様々なDashboardがヒットします。
-
-
-
-[auditbeat02.png]
-
-
-
-"[Auditbeat File Integrity] Overview"や"[Auditbeat Auditd] Overview"からモニタリングが可能です。
-
-
-
-[auditbeat03.png]
-
-
-
-これまでBeatsを見てきていかがでしたか？
-モニタリングしたいModuleを有効化するだけで容易にモニタリングできる環境が手に入ります。
-この他にもWidnowsを対象にしたものや、サービスの死活監視としてのBeatsなどがあります。
-同じような学習コストで体験できるので、体験して頂ければと思います。
+Beatsの機能、いかがだったでしょうか？
+Moduleを有効化するだけで、簡単にサーバの情報を可視化できる環境が手に入ります。
+他のBeatsについては今回扱いませんが、少ない学習コストで情報の可視化が可能です。みなさんもぜひ試してみてはいかがでしょうか。
 
 
 = まとめ
 
 
 いかがでしたか？
-LogstashとBeatsの両方を体験することで、ログ収集時の選択肢が増えたのではないでしょうか。
-また、LogstashとBeatsの違いがわからないという方々にお会いすることがあるので、少しでも違いを理解頂ければ幸いです。
-
-
-
-最後となりますが、ここまでお付き合い頂きありがとうございます。
-
-
-
-これからもみなさんがログと素敵な時間を過ごせることを願ってます。
-
-
+LogstashとBeatsの両方を操作できると、ログ収集時の選択肢が増えます。
+2つのプロダクトの違いを理解できると、状況に合わせて適切なプロダクトの使い分けが可能となります。
+みなさんがログと素敵な時間を過ごせることを願っています。
 
 @micci184
-
-
-//footnote[1][AWSのSecurityGroup側で制限はかけているので、Kibana側では制限しないようにしています]
