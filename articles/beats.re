@@ -164,7 +164,7 @@ output.elasticsearch:
 最後にKibanaのDashboardを起動時にセットアップする設定を有効化します。
 
 
-//list[beats-09][KibanaのDashboardを自動で作成する]{
+//list[beats-09x][KibanaのDashboardを自動で作成する]{
 ### Activate Dashboards
 #============================== Dashboards =====================================
 # These settings control loading the sample dashboards to the Kibana index. Loading
@@ -438,7 +438,7 @@ sudo yum install auditbeat
 @<list>{beats-10}の@<code>{auditbeat.yml}を既存で設定してある内容は全て上書きしてください。
 
 
-//list[beats-10][/etc/auditbeat/auditbeat.ymlの編集]{
+//list[beats-10x][/etc/auditbeat/auditbeat.ymlの編集]{
 
 ###################### Auditbeat Configuration Example #########################
 
@@ -567,7 +567,7 @@ output.elasticsearch:
 設定が完了したので、Auditbeatを起動します。
 
 
-//list[beats-11][Auditbeatの起動]{
+//list[beats-11x][Auditbeatの起動]{
 sudo service auditbeat start
 //}
 
