@@ -171,16 +171,16 @@ keyword型とtext型は両者ともString型に相当します。その違いは
 
 
 Elasticsearch 6系のデータ型の詳細は公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html}）を参照してみてください。
-多くのデータ型が標準でサポートされていています。
+多くのデータ型が標準でサポートされています。
 
 === Hello, Elasticsearch with GO
 
 
-それでGoを使ってElasticsearchを触っていきましょう。
+それではGoを使ってElasticsearchを触っていきましょう。
 まずはさきほどDockerで起動したElasticsearchへの接続確認も兼ねて、Elasticsearchのバージョン情報などを取得してみましょう。
 
 
-//list[][Go]{
+//list[elasticsearch-list07][Go言語を用いてElasticsearchに接続する]{
 package main
 
 import (
@@ -208,10 +208,10 @@ func main() {
 //}
 
 
-elastic.NewClientでクライアントを作成します。その際にelastic.ClientOptionFuncで複数の設定を渡すことができます。
-上のサンプルではelastic.SetURL()にて接続する先のElasticsearchのエンドポイントを指定しています。
+@@<code>{elastic.NewClient}でクライアントを作成します。その際に@@<code>{elastic.ClientOptionFunc}で複数の設定を引数とすることが可能です。
+@@<list>{elasticsearch-list07}では@@<code>{elastic.SetURL()}にて接続する先のElasticsearchのエンドポイントを指定しています。
 クライアントを作成すると、そのオブジェクトを通じてElasticsearchを操作することができるようになります。
-Elasticsearchのバージョン情報といったシステム情報を取得する際はPingを利用します。
+Elasticsearchのバージョン情報といったシステム情報を取得する際は@@<code>{Ping}を利用します。
 
 
 === 単純なCRUD操作
@@ -229,7 +229,7 @@ Elasticsearchのバージョン情報といったシステム情報を取得す�
 
 
 操作にあたっては、さきほど作成したMappingに対応するStructを通じておこなっていきます。
-なので、今回サンプルとして利用するChat Mappingに対応するStructを定義します。
+よって、今回サンプルとして利用するChat Mappingに対応するStructを定義します。
 
 
 //list{
