@@ -232,7 +232,7 @@ Elasticsearchのバージョン情報といったシステム情報を取得す�
 よって、今回サンプルとして利用するChat Mappingに対応するStructを定義します。
 
 
-//list{
+//list[elasticsearch-list20][Structの定義]{
 type Chat struct {
     User    string    `json:"user"`
     Message string    `json:"message"`
