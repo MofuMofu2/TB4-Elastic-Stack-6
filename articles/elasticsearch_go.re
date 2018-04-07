@@ -568,7 +568,7 @@ func main() {
 
 
 TermQueryを利用することで、指定した文字列を完全に含むドキュメントを検索することができます。
-Elastic:An Elasticsearch client for the GoでTermQueryを利用する際はTerm Queryは@@<code>{elastic.TermQuery}を利用します。
+Elastic:An Elasticsearch client for the GoでTermQueryを利用する際はTerm Queryは@<code>{elastic.TermQuery}を利用します。
 elastic.NewTermQueryは検索対象のフィールドと検索文字列を指定します。
 
 
@@ -713,10 +713,10 @@ func main() {
 ==== Scroll API
 
 
-Scroll APIを利用することで、スクロールタイプのページング機能を手軽に利用することができます。Elasticsearchでは@@<code>{limit&offset}を用いた値の取得もできます。
-ただし、@@<code>{limit&offset}を利用した場合、検索がおこなわれる度に指定したoffsetからlimit数分のドキュメントを取得します。そのため、取得結果に抜け漏れや重複が生じる可能性があります。
+Scroll APIを利用することで、スクロールタイプのページング機能を手軽に利用することができます。Elasticsearchでは@<code>{limit&offset}を用いた値の取得もできます。
+ただし、@<code>{limit&offset}を利用した場合、検索がおこなわれる度に指定したoffsetからlimit数分のドキュメントを取得します。そのため、取得結果に抜け漏れや重複が生じる可能性があります。
 一方でScroll APIを利用した場合、初回検索時にスナップショットが生成されます。そのため、Scroll APIが返すスクロールIDを利用することで、初回検索時のスナップショットに対して任意の箇所からページングをおこなうことができます。
-使い方はとても簡単で、@@<code>{elastic.ScrollService}を介して操作することができます。
+使い方はとても簡単で、@<code>{elastic.ScrollService}を介して操作することができます。
 
 
 //list[elasticsearch-list16][Scroll APIを利用した検索]{
@@ -806,7 +806,7 @@ userフィールドのtypeにmulti_fieldを指定しています。以下のよ�
 
 
 AliasはIndexに別名をつけてアクセスすることができる機能です。任意の検索条件を指定したエイリアスも作成することが可能で、RDBのビューのような機能も利用できます。
-@@<code>{Elastic:An Elasticsearch client for the Go}ではAliasServiceを経由して操作することができます。
+@<code>{Elastic:An Elasticsearch client for the Go}ではAliasServiceを経由して操作することができます。
 
 
 //list[elasticsearch-list18][AliasServiceを利用してIndexを操作]{
@@ -849,7 +849,7 @@ func main() {
 
 
 最後にエラーハンドリングについて記載します。
-@@<code>{Elastic:An Elasticsearch client for the Go}では@@<code>{elastic.Error}経由で詳細なエラー情報を取得できます。これをもとにしてエラーハンドリングを実装することができます。
+@<code>{Elastic:An Elasticsearch client for the Go}では@<code>{elastic.Error}経由で詳細なエラー情報を取得できます。これをもとにしてエラーハンドリングを実装することができます。
 
 
 //list[elasticsearch-list19][エラーハンドリング]{
