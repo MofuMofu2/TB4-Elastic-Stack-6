@@ -529,16 +529,16 @@ Filterを利用してmessageからデータを分割していきます。
 ==== LogstashのFilterを使ってみる
 
 
-Filterには取得したログを正規表現でパースするためのGrokフィルタや、地理情報を得るためのGeoIPフィルタなど、情報の種別に合わせて処理をすることが可能です。
+取得したログを正規表現でパースするためのGrokフィルタや、地理情報を得るためのGeoIPフィルタなど、Filterにはログの種別に合わせた処理をするためのプラグインが存在します。S
 今回のALBもGrokフィルタなどを使うことで構造化したほうが良いでしょう。
 
 とはいえ、どのように構造化すればいいのか迷ってしまいます。まずはALBのログフォーマットを把握し、作戦を立てると良いです。
 
-各フィールドを@<table>{logstash-28}にまとめました。
+各フィールドを@<table>{table01}にまとめました。
 このようにログを取り込む前にログフォーマットを確認し、フィールド名を定義します。
 また、@<code>{Type}で各フィールドの型を定義しています。
 
-//table[logstash-28][ALBのログフォーマットとデータ型]{
+//table[table01][ALBのログフォーマットとデータ型]{
 Log	Field	Type
 -----------------
 type	class	string
@@ -577,7 +577,7 @@ drwxr-xr-x 2 root root 4096 xxx xx xx:xx patterns
 //}
 
 ディレクトリが作成できたので、ALBのパターンファイルを作成します。
-中身については、闇深いのでここでは説明しません。りまりま団の著書@<b>{データを加工する技術}でGrokフィルタの書き方について解説しているのでboothでPDFを買うと良いですよ。（ステマ）
+中身については、闇深いのでここでは説明しません。りまりま団の著書『@<b>{データを加工する技術}』でGrokフィルタの書き方について解説しているのでboothでPDFを買うと良いですよ。（ステマ）
 また、Typeは、インデックステンプレートで作成するのが一般的かと思いますが、今回は、パターンファイルの中で指定します（いろんなやり方があるんだよという意味で）
 
 
@@ -587,7 +587,12 @@ drwxr-xr-x 2 root root 4096 xxx xx xx:xx patterns
 
 
 //list[logstash-29][/etc/logstash/patterns/alb_patternsを次の通り編集]{
-ALB_ACCESS_LOG %{NOTSPACE:class} %{TIMESTAMP_ISO8601:date} %{NOTSPACE:elb}  (?:%{IP:client_ip}:%{INT:client_port:int}) (?:%{IP:backend_ip}:%{INT:backend_port:int}|-) (:?%{NUMBER:request_processing_time:float}|-1) (?:%{NUMBER:target_processing_time:float}|-1) (?:%{NUMBER:response_processing_time:float}|-1) (?:%{INT:elb_status_code}|-) (?:%{INT:target_status_code:int}|-) %{INT:received_bytes:int} %{INT:sent_bytes:int} \"%{ELB_REQUEST_LINE}\" \"(?:%{DATA:user_agent}|-)\" (?:%{NOTSPACE:ssl_cipher}|-) (?:%{NOTSPACE:ssl_protocol}|-)  %{NOTSPACE:target_group_arn} \"%{NOTSPACE:trace_id}\"
+ALB_ACCESS_LOG %{NOTSPACE:class} %{TIMESTAMP_ISO8601:date} %{NOTSPACE:elb}
+(?:%{IP:client_ip}:%{INT:client_port:int}) (?:%{IP:backend_ip}:%{INT:backend_port:int}|-)
+(:?%{NUMBER:request_processing_time:float}|-1) (?:%{NUMBER:target_processing_time:float}|-1)
+(?:%{NUMBER:response_processing_time:float}|-1) (?:%{INT:elb_status_code}|-) (?:%{INT:target_status_code:int}|-)
+ %{INT:received_bytes:int} %{INT:sent_bytes:int} \"%{ELB_REQUEST_LINE}\" \"(?:%{DATA:user_agent}|-)\"
+ (?:%{NOTSPACE:ssl_cipher}|-) (?:%{NOTSPACE:ssl_protocol}|-)  %{NOTSPACE:target_group_arn} \"%{NOTSPACE:trace_id}\"
 //}
 
 
