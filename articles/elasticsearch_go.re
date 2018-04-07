@@ -97,31 +97,27 @@ go get "github.com/olivere/elastic"
 
 
 さて、いよいよGoでElasticsearchを操作していきましょう。
-しかしその前に検索するデータを投入するためのIndexとTypeを作成していきましょう。
+しかしその前に検索するデータを投入するためのIndexとTypeを作成していきます。
 
 
 === IndexとType
 
 
 Elasticsearchで検索をおこなうために、まずIndexとTypeを作成する必要があります。
-RDBMSで例えと以下に相当します。
-* Indexはスキーマ/データベース
-* Typeはテーブル
+RDBMSで例えると以下に相当します。
+
+ * Indexはスキーマ/データベース
+ * Typeはテーブル
 
 
 
-と、よくこのようにRDBMSで例えられることが多いのですが、ここで注意が必要なのがTypeはElasticsearch 7系より廃止が予定されています。
-また5系までは1つのIndexに複数のTypeを作成できたのですが、6系では1つのIndexに1つのTypeのみ作れる仕様へ変わっています。
+と、このようにRDBMSで例えられることが多いのですが、ここで注意が必要なのがTypeはElasticsearch 7系より廃止が予定されています。
+また5系までは1つのIndexに複数のTypeを作成できたのですが、6系では1つのIndexに1つのTypeのみ作成できる仕様へ変わっています
+（参考：@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/master/removal-of-types.html}）。
 
-
-//quote{
-https://www.elastic.co/guide/en/elasticsearch/reference/master/removal-of-types.html
-
-//}
-
-
-本書ではElasticsearch6系を利用するため、1 Indexに1 Typeを作成します。
+本章ではElasticsearch6系を利用するため、1 Indexに1 Typeを作成します。
 また、ElasticsearchはMapping定義を作成しなくてもデータを投入することもできます。
+
 その際は投入したJSONデータにあわせたMappingが自動で作成されます。
 実際のアプリケーションでElasticsearchを利用する場合、Mapping定義によりデータスキーマを固めて利用することの方が多いかと思います。
 また、Mapping定義を作成することにより、各フィールド単位でより細かな検索設定をおこなえるため、本章では動的Mappingは利用せず、Mapping定義を作成し利用します。
@@ -130,14 +126,12 @@ https://www.elastic.co/guide/en/elasticsearch/reference/master/removal-of-types.
 === 本章で利用するMapping定義
 
 
-本書ではChatアプリケーションを想定したIndex/Typeをもとに操作をおこなっていきます。
+本章ではChatアプリケーションを想定したIndex/Typeをもとに操作をおこなっていきます。
+
+Elasticsearchを操作するにあたり利用するMapping定義を@@<list>{elasticsearch-list05}に記述しました。
 
 
-
-Elasticsearchを操作するにあたり利用するMapping定義は以下の通りです。
-
-
-//list{
+//list[elasticsearch-list05][Mapping定義]{
 {
   "mappings": {
     "chat": {
@@ -161,16 +155,12 @@ Elasticsearchを操作するにあたり利用するMapping定義は以下の通
 //}
 
 
-今回はchatというTypeへドキュメントを登録していきます。propertiesにフィールドの項目を設定していきます。
-フィールド名とそのデータ型を"type"で指定していきます。今回指定しているデータ型は以下の通りです。
+今回は@@<code>{chat}というTypeへドキュメントを登録していきます。また、@@<code>{properties}にフィールドの項目を設定します。
+フィールド名とそのデータ型を@@<code>{type}で指定していきます。今回指定しているデータ型について説明します。
 
-//table[tbl2][]{
-データ型	説明
------------------
 keyword	いわゆるString型です。後述するtext型もString型に相当します。しかしkeyword型の場合、そのフィールドへアナライザは適用されません。
 text	String型に相当します。text型を指定したフィールドはアナライザと呼ばれるElasticsearchの高度な検索機能を利用した検索が可能となります。
 date	日付型です。Elasticsearchへのデータ投入はJSONを介して行うため、実際にデータを投入する際はdateフォーマットに即した文字列を投入することになります。
-//}
 
 
 keyword型とtext型は両者ともString型に相当します。その違いはアナライザを設定できるか否かです。
