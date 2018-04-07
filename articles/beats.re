@@ -101,30 +101,21 @@ $ tail -f /var/log/nginx/access.log
 === Filebeat Module
 
 
-Filebeatの設定ファイルを編集する前に、"filebeat.yml"のファイル置き換えとファイル名変更を行います。
-理由は、"filebeat.reference.yml"にすべてのModuleなどが記載されているため、簡易的に利用できるためです。
+Filebeatの設定ファイルを編集する前に、@@<code>{filebeat.yml}を@@<code>{filebeat.reference.yml}に置き換えます。
+このとき@@<code>{filebeat.reference.yml}という名前から@@<code>{filebeat.yml}に名前を合わせて変更します。
+@@<code>{filebeat.reference.yml}にModulesの設定が記載されているため、これを利用した方がより簡単にBeatsのセットアップが行えるからです。
 
-
-//list[][bash]{
+//cmd{
 ### Change file name
 mv /etc/filebeat/filebeat..yml /etc/filebeat/filebeat.yml_origin
 mv /etc/filebeat/filebeat.reference.yml /etc/filebeat/filebeat.yml
 //}
 
 
-"filebeat.yml"の編集を行い、Nginxの有効化、"Output"をElasticsearchに設定を行います。
-また、起動時にKibanaのDashboardを作成するよう設定します。
+@@<code>{filebeat.yml}の編集を行い、Nginxの有効化を行います。Nginxのパス設定ですが、インストールした状態（デフォルト）のまま
+利用するのであればパスの変更は不要です。今回はデフォルト設定のまま利用しています。
 
-
-
-"filebeat.yml"でNginxのModuleを有効化します。
-ログのパスはデフォルトから変更してなければ、変更不要です。
-今回は、デフォルトから変更していないため、変更しません。
-
-
-//list{
-### Activate Nginx module
-$vim /etc/filebeat/filebeat.yml
+//list[beats-07][filebeat.ymlの編集]{
 #-------------------------------- Nginx Module -------------------------------
 - module: nginx
   # Access logs
@@ -153,12 +144,10 @@ $vim /etc/filebeat/filebeat.yml
 //}
 
 
-"Output"をElasticsearchにするため、有効化します。
+合わせて、OutputをElasticsearchに変更します。
 
 
-//list[][bash]{
-### Activate Elasticsearch output
-$vim /etc/filebeat/filebeat.yml
+//list[beats-08][Elasticsearchをデータ転送先にする]{
 #-------------------------- Elasticsearch output -------------------------------
 output.elasticsearch:
   # Boolean flag to enable or disable the output module.
@@ -175,7 +164,7 @@ output.elasticsearch:
 最後にKibanaのDashboardを起動時にセットアップする設定を有効化します。
 
 
-//list[][bash]{
+//list[beats-09][KibanaのDashboardを自動で作成する]{
 ### Activate Dashboards
 #============================== Dashboards =====================================
 # These settings control loading the sample dashboards to the Kibana index. Loading
@@ -185,13 +174,12 @@ setup.dashboards.enabled: true
 //}
 
 
-"filebeat.reference.yml"をベースに作成しているため、デフォルトでkafkaが"enabled: true"になっています。
+@@<code>{filebeat.reference.yml}をベースに@@<code>{filebeat.yml}を作成しているため、
+デフォルトでkafkaが@@<code>{enabled: true}になっています。
 このまま起動するとエラーが発生するためコメントアウトします。
 
 
-//list[][bash]{
-### Comment out kafka module
-$ vim /etc/filebeat/filebeat.yml
+//list[beats-10][kafkaのmodulesを利用しない]{
 #-------------------------------- Kafka Module -------------------------------
 #- module: kafka
   # All logs
@@ -200,34 +188,16 @@ $ vim /etc/filebeat/filebeat.yml
 //}
 
 
-設定が完了したらFilebeatを起動します。
+では、いよいよFilebeatを起動します。
 
 
-//list[][bash]{
-### Start Filebeat
-service filebeat start
-Starting filebeat: 2018-xx-xxTxx:xx:xx.xxxZ INFO    instance/beat.go:468    Home path: [/usr/share/filebeat] Config path: [/etc/filebeat] Data path: [/var/lib/filebeat] Logs path: [/var/log/filebeat]
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    instance/beat.go:475    Beat UUID: e54958f0-6705-4586-8f9f-1d3599e568c0
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    instance/beat.go:213    Setup Beat: filebeat; Version: 6.2.2
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    elasticsearch/client.go:145 Elasticsearch url: http://localhost:9200
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    pipeline/module.go:76   Beat name: ip-172-31-50-36
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    beater/filebeat.go:62   Enabled modules/filesets: nginx (access, error), osquery (result),  ()
-Config OK
-                                                           [  OK  ]
+//list[beats-11][Filebeatの起動]{
+sudo service filebeat start
 //}
 
 
-あとは、データが取り込まれているかをKibanaを開いて確認します。
+あとは、データが取り込まれているかをKibana@<href>{http://{Global_IP\\}:5601}を開いて確認します。
 
-
-
-ブラウザを開いてKibanaへアクセスします。
-
-
-//quote{
-http://{Global_IP}:5601
-
-//}
 
 
 以下のトップページが開きます。
