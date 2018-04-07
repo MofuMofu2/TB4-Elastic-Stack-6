@@ -767,11 +767,11 @@ func main() {
 ==== Multi Fields
 
 
-Multi Fields機能を利用することで一つのフィールドに対してことなるデータ型やAnalyze設定を指定することができます。
+Multi Fields機能を利用することで一つのフィールドに対して異なるデータ型やAnalyze設定を指定することができます。
 といってもすぐにピンとこないかもしれませんので、実際にMulti Fieldsの設定をしているMapping定義をみてみましょう。
 
 
-//list{
+//list[elasticsearch-list17][Multi Fieldsの設定がされているMapping定義の参照]{
 
 {
   "mappings": {
@@ -794,8 +794,8 @@ Multi Fields機能を利用することで一つのフィールドに対して�
 
 
 userフィールドのtypeにmulti_fieldを指定しています。以下のようにフィールドを指定して操作することができます。
-* user：Analyzeされていない
-* user.analyzed：Analyzeされている
+ * user：Analyzeされていない
+ * user.analyzed：Analyzeされている
 
 
 
@@ -805,11 +805,11 @@ userフィールドのtypeにmulti_fieldを指定しています。以下のよ�
 ==== Alias
 
 
-Aliasを利用することでインデックスに別名をつけてアクセスすることができる機能です。任意の検索条件を指定したエイリアスも作成することが可能で、RDBのビューのような機能も利用できます。
-olivere/elasticではAliasServiceを経由して操作することができます。
+AliasはIndexに別名をつけてアクセスすることができる機能です。任意の検索条件を指定したエイリアスも作成することが可能で、RDBのビューのような機能も利用できます。
+@@<code>{Elastic:An Elasticsearch client for the Go}ではAliasServiceを経由して操作することができます。
 
 
-//list{
+//list[elasticsearch-list18][AliasServiceを利用してIndexを操作]{
 package main
 
 import (
@@ -849,10 +849,10 @@ func main() {
 
 
 最後にエラーハンドリングについて記載します。
-olivere/elasticではelastic.Error経由で詳細なエラー情報を取得できます。これをもとにしてエラーハンドリングを実装することができます。
+@@<code>{Elastic:An Elasticsearch client for the Go}では@@<code>{elastic.Error}経由で詳細なエラー情報を取得できます。これをもとにしてエラーハンドリングを実装することができます。
 
 
-//list[][Go]{
+//list[elasticsearch-list19][エラーハンドリング]{
  err := client.IndexExists("chat").Do()
 if err != nil {
     // Get *elastic.Error which contains additional information
