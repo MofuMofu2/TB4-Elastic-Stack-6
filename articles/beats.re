@@ -240,33 +240,24 @@ Logstashなどでログを取り込んだ場合は、Dashboardを一から作成
 
 == Metricbeat
 
-
-Metricbeatは、サーバのリソース(CPU/Mem/process..etc)を容易にモニタリングすることができます。
+Metricbeatは、サーバのリソース(CPU/Mem/process..など)を容易にモニタリングすることができます。
 その他にもDockerやElasticsaerchなども対応しており、様々なプロダクトをモニタリングが可能です。
 
+また、先ほどのFilebeatと同様にYAMLを編集するだけなので、学習コストもかかりません。
+今回は、サーバのメトリックをモニタリングできるところまで見たいと思います。それでは、早速インストールしていきます。
 
 
-また、先ほどのFilebeatと同様にYAMLを編集するだけなので、学習コストもほぼいらずに導入できます。
-今回は、サーバのメトリックをモニタリングできるところまで見たいと思います。
-
-
-
-それでは、早速インストールしていきます。
-
-
-//list[][bash]{
-### Install Metricbeat
-$ yum install metricbeat
+//list[filebeat06][Metricbeatのインストール]{
+sudo yum install metricbeat
 //}
 
 
-MetricbeatもFilebeat同様にベースの設定ファイル(metricbeat.reference.yml)があるのですが、デフォルト有効化されているModuleが多いため、以下の設定ファイルを使用します。
+MetricbeatもFilebeat同様にベースの設定ファイル@@<code>{metricbeat.reference.yml}があるのですが、
+デフォルト有効化されているModuleが多いため、以下の設定ファイルを使用します。
 既存で設定してある内容は全て上書きしてください。
 
 
-//list[][bash]{
-### Create metricbeat.yml
-$ vim /etc/metricbeat/metricbeat.yml
+//list[filebeat07][/etc/metricbeat/metricbeat.ymlの編集]{
 ##################### Metricbeat Configuration Example #######################
 
 # This file is an example configuration file highlighting only the most common
@@ -398,21 +389,11 @@ output.elasticsearch:
 #logging.selectors: ["*"]
 //}
 
-
 設定が完了したのでMetricbeatを起動します。
 
 
-//list[][bash]{
-### Start Metricbeat
-$ service metricbeat start
-Starting metricbeat: 2018-xx-xxTxx:xx:xx.xxxZ   INFO    instance/beat.go:468    Home path: [/usr/share/metricbeat] Config path: [/etc/metricbeat] Data path: [/var/lib/metricbeat] Logs path: [/var/log/metricbeat]
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    instance/beat.go:475    Beat UUID: 133de8d7-18b1-472e-ac24-79831b9203cf
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    instance/beat.go:213    Setup Beat: metricbeat; Version: 6.2.2
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    elasticsearch/client.go:145 Elasticsearch url: http://localhost:9200
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    pipeline/module.go:76   Beat name: ip-172-31-50-36
-2018-xx-xxTxx:xx:xx.xxxZ WARN   [cfgwarn]   socket/socket.go:49 BETA: The system collector metricset is beta
-Config OK
-                                                           [  OK  ]
+//list[filebeat08][Metricbeatの起動]{
+sudo service metricbeat start
 //}
 
 
