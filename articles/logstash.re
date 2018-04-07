@@ -272,7 +272,7 @@ kibana      0:off   1:off   2:on    3:on    4:on    5:on    6:off
 === Elasticsearchの環境準備
 
 
-設定を変更する前に、Elasticsaerchの設定ファイルが構成されているディレクトリの内容を確認しましょう。
+設定を変更する前に、Elasticsearchの設定ファイルが構成されているディレクトリの内容を確認しましょう。
 
 //cmd{
 /etc/elasticsearch/
@@ -292,7 +292,7 @@ Elasticsearchを構成する際に@<code>{jvm.options}と@<code>{elasticsearch.y
 
 ==== jvm.optionsについて
 
-Elasticsaerchのヒープサイズを変更したい場合、jvm.optionsを編集します。
+Elasticsearchのヒープサイズを変更したい場合、jvm.optionsを編集します。
 例えば、ヒープサイズの最大と最小を設定する場合は、@<code>{Xms(minimum heap size)}と@<code>{Xmx(maximum heap size)}を変更します。
 じゃあ、いくつに設定すればいいの？と思う方もいるかと思いますが、要件によって変わってくる項目です。
 公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html,Settings the heap size:}）にも考慮点が記載されているので、そちらも参考に値を決めてください。
@@ -314,7 +314,7 @@ vim /etc/elasticsearch/jvm.options
 
 ==== Elasticsearch.ymlについて
 
-Elasticsaerchでクラスタ構成をする場合などに設定するファイルです。
+Elasticsearchでクラスタ構成をする場合などに設定するファイルです。
 今回クラスタ構成はしないので、アクセス元制限の設定のみを行います。
 
 @<code>{network.host}を@<code>{0.0.0.0}に編集します。
@@ -336,7 +336,7 @@ No.	Item	Content
 5	discovery.zen.minimum.master.nodes	必要最低限のノード数を指定
 //}
 
-==== Elasticsaerchサービス起動
+==== Elasticsearchサービス起動
 
 Elasticsearchを起動し、動作確認をします。
 
@@ -355,7 +355,7 @@ curl localhost:9200
 //}
 
 
-Elasticsaerchからレスポンスが返ってきましたね。
+Elasticsearchからレスポンスが返ってきましたね。
 これでElasticsearchの設定は完了です。
 
 
