@@ -125,7 +125,7 @@ OpenJDK 64-Bit Server VM (build 25.161-b14, mixed mode)
 
 始めに、Elasticsearchなどのパッケージをダウンロードするため、GPGキーをインポートします。
 
-//list[logstash-03][GPGキーのインポート]{
+//list[logstash-003][GPGキーのインポート]{
  rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 //}
 
@@ -625,7 +625,7 @@ output {
 最初に実行した時と違って、いい感じにkey-valueの形になっていることがわかります。
 
 
-// cmd{
+//cmd{
 $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 {
                         "verb" => "GET",

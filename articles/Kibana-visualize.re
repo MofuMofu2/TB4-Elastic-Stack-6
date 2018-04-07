@@ -244,7 +244,7 @@ output {
 もふちゃんは@<code>{kibana.yml}を修正していないため、@<code>{localhost:5601}でKibanaは起動します。
 
 
-この状態でブラウザから@<herf>{http://localhost:5601/}にアクセスすると、@<img>{kibana01-img01}のような画面が見えているはずです。
+この状態でブラウザから@<hre	f>{http://localhost:5601/}にアクセスすると、@<img>{kibana01-img01}のような画面が見えているはずです。
 
 //image[kibana01-img01][Kibana（ver6.2）の画面]{
 //}
@@ -320,6 +320,10 @@ jsonのfieldごとにデータが別れて表示されるので、どのfieldに
 
 @<code>{Create a visualization}をクリックすると、@<img>{kibana01-img08}のようにグラフの種別を選択する画面が出てきます。
 まずは基本の線グラフを作成してみましょう。
+
+//image[kibana01-img08][グラフ種別の選択]{
+//}
+
 
 @<code>{Line}を選択すると、どのindexデータを利用するかを指定する画面になります。indexの設定画面で指定した名前をクリックして
 次に進みましょう。

@@ -256,7 +256,7 @@ No.	Item	Content
 特に中身に変更はありません。@@<code>{httpd}の部分とif文を削除しただけですね。
 
 
-//list[logstash_pipelines-08][/etc/logstash/conf/alb.cfg]{
+//list[logstash_pipelines-07][/etc/logstash/conf/alb.cfg]{
 input {
   s3 {
     tags => "alb"
