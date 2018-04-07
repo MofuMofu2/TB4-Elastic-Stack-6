@@ -178,12 +178,10 @@ drwxr-xr-x@ 16 mofumofu  staff   512  3  7 10:51 logstash-6.2.2
 //}
 
 
-=== Elasticserchの起動
+=== Elasticsearchの起動
 
 @<code>{elasticsearch-6.2.2}ディレクトリに移動した後、@<code>{bin/elasticsearch}でElasticsearchを起動しました。
-
 これも、出力結果を載せておきます。ここは本題ではありませんので、解説や特別な設定は行いません。
-#@#文章できたらリンクを貼る
 
 === Logstashの起動
 
@@ -222,10 +220,7 @@ output {
 @<code>{logstash.conf}を配置後、@<code>{bin/logstash -f config/conf.d/gitlog-logstash.conf}でLogstashを起動します。
 このとき、Elasticsearchと同様に@<code>{logstash-6.2.2}ディレクトリに移動してからコマンドを実行します。もふちゃんはiTerm2を利用しているので、別タブを開いて起動しました。
 @<code>{-f コンフィグの配置場所}でちゃんとファイルパス、ファイル名を指定しないと「configがないよーん」とエラーになりLogstashを起動できません。
-そこはトラブルになりやすいので気をつけたらいいと思います。
-
-これも参考として、出力結果を載せておきます。
-
+そこはトラブルになりやすいので気をつけるといいと思います。
 
 === Kibanaの起動
 
