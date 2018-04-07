@@ -15,8 +15,7 @@ Beatsは、シンプルなデータ取り込みツールです。
 
 == Beats Family
 
-
-冒頭の章で記載しましたが、改めてBeats Familyを以下に記載します。
+Beatsにはどんな種類があるのかを改めて記載します。
 
  * Filebeat
  * Metricbeat
@@ -25,9 +24,7 @@ Beatsは、シンプルなデータ取り込みツールです。
  * Auditbeat
  * Heartbeat
 
-
-
-この中でも以下のBeatsに触れていきたいと思います。
+今回は、3つのBeatsの利用方法について触れていきます。
 
  * Filebeat
  * Metricbeat
@@ -37,14 +34,13 @@ Beatsは、シンプルなデータ取り込みツールです。
 == Filebeat
 
 
-Filebeatを使用することで、Apache、Nginx、MySQLなどのログ収集、パースが容易にできます。
-また、KibanaのDashboardも生成するため、すぐにモニタリングを始めることができます。
-
+Filebeatを使用することで、Apache、Nginx、MySQLなどのログ収集・パースをすることが可能です。
+また、Modules機能を利用するととで、データの収集からKibanaを用いたデータの可視化までを一貫で行うことが可能です。
 
 === Filebeatをインストール
 
 
-Filebeatのインストールします。
+Filebeatをインストールします。@@<chapref>{logstash}でyumリポジトリの登録が完了していることを前提として進めます。
 
 
 //emlist[][bash]{
