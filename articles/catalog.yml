@@ -10,7 +10,7 @@ CHAPS:
   # Logstashを使ってみる
   - logstash.re
   # Logstashのマルチパイプラインを体験する
-  - logstash_pipeline.re
+  - logstash_pipelines.re
   # Beatsを体験する
   - beats.re
   # GitとKibanaで同人誌の進捗を可視化するぞ！

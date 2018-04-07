@@ -2,26 +2,20 @@
 = Beats
 
 
-Beatsは、シンプルなデータ取り込みツールです。@<br>{}
-あれ？Logstashは？と思う方もいると思いますが、Logstashは、豊富な機能を持ってます。@<br>{}
-前回の章で説明したGrokフィルダで複雑なログを取り込むことも可能ですし、"Input"のデータソースを多種多様に選択することが可能です。@<br>{}
-そのため、Logstashを利用するには、学習コストもそれなりに発生するので、手軽に利用することができません。  
+Beatsは、シンプルなデータ取り込みツールです。
+あれ？Logstashは？と思う方もいると思いますが、Logstashは、豊富な機能を持ってます。
+@<chapref>{logstash_pipelines}で説明したGrokフィルダで複雑なログを取り込むことも可能ですし、Inputのデータソースを多種多様に選択することが可能です。
+そのためLogstashを利用するには、学習コストもそれなりに発生します。手軽に利用しよう！というのは難しいツールです。
 
+そこで活躍するのがBeatsです。
+何が手軽かというと、設定ファイルがYAMLで全て完結するのです。
+しかも、設定箇所も複数存在するわけではなく、最低限の設定で十分な機能を提供します。
 
-
-そこで、手軽にデータを取り込みたい時に利用するのがBeatsです。@<br>{}
-何が手軽かというとYAMLで完結するのです。@<br>{}
-しかもほぼ設定する箇所はないです。
-
-
-
-この章ではBeatsに少しでも体験して頂ければと思います。
 
 
 == Beats Family
 
-
-冒頭の章で記載しましたが、改めてBeats Familyを以下に記載します。
+Beatsにはどんな種類があるのかを改めて記載します。
 
  * Filebeat
  * Metricbeat
@@ -30,9 +24,7 @@ Beatsは、シンプルなデータ取り込みツールです。@<br>{}
  * Auditbeat
  * Heartbeat
 
-
-
-この中でも以下のBeatsに触れていきたいと思います。
+今回は、3つのBeatsの利用方法について触れていきます。
 
  * Filebeat
  * Metricbeat
@@ -42,116 +34,66 @@ Beatsは、シンプルなデータ取り込みツールです。@<br>{}
 == Filebeat
 
 
-Filebeatを使用することで、Apache、Nginx、MySQLなどのログ収集、パースが容易にできます。@<br>{}
-また、KibanaのDashboardも生成するため、すぐにモニタリングを始めることができます。
-
+Filebeatを使用することで、Apache、Nginx、MySQLなどのログ収集・パースをすることが可能です。
+また、Modules機能を利用するととで、データの収集からKibanaを用いたデータの可視化までを一貫で行うことが可能です。
 
 === Filebeatをインストール
 
 
-Filebeatのインストールします。
+Filebeatをインストールします。@<chapref>{logstash}でyumリポジトリの登録が完了していることを前提として進めます。
 
 
-//emlist[][bash]{
-### Install Filebeat
-$ yum install filebeat
-$ /usr/share/filebeat/bin/filebeat --version
-Flag --version has been deprecated, version flag has been deprecated, use version subcommand
-filebeat version 6.2.2 (amd64), libbeat 6.2.2
+//list[beats-01][Filebeatsのインストール]{
+sudo yum install filebeat
 //}
 
 === Ingest Node Pluginをインストール
 
 
-UserAgent、GeoIP解析をするため、以下のプラグインをインストールします。
+UserAgent、GeoIPの解析をするため、@<code>{Ingest Node Plugin}と@<code>{Ingest GeoIP plugin}をインストールします。
 
 
-//emlist[][bash]{
-### Install ingest-user-agent
-$ /usr/share/elasticsearch/bin/elasticsearch-plugin install ingest-user-agent
--> Downloading ingest-user-agent from elastic
-[=================================================] 100%
--> Installed ingest-user-agent
+//list[beats-02][Ingest Node Pluginのインストール]{
+/usr/share/elasticsearch/bin/elasticsearch-plugin install ingest-user-agent
+//}
 
-### Install ingest-geoip
-$ /usr/share/elasticsearch/bin/elasticsearch-plugin install ingest-geoip
--> Downloading ingest-geoip from elastic
-[=================================================] 100%
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@     WARNING: plugin requires additional permissions     @
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-* java.lang.RuntimePermission accessDeclaredMembers
-* java.lang.reflect.ReflectPermission suppressAccessChecks
-See http://docs.oracle.com/javase/8/docs/technotes/guides/security/permissions.html
-for descriptions of what these permissions allow and the associated risks.
-
-Continue with installation? [y/N]y
--> Installed ingest-geoip
+//list[beats-03][Ingest GeoIP pluginのインストール]{
+/usr/share/elasticsearch/bin/elasticsearch-plugin install ingest-geoip
 //}
 
 
-問題なくインストールが完了したらElasticsearchを再起動します。
+インストールが完了したらElasticsearchを再起動します。
 
 
-//emlist[][bash]{
-$ service elasticsearch restart
-Stopping elasticsearch:                                    [  OK  ]
-Starting elasticsearch:                                    [  OK  ]
+//list[beats-04][Elasticsaerchの再起動]{
+sudo service elasticsearch restart
 //}
 
+今回は@<code>{Nginx Modules}を例にModulesを利用すると、どの位構築コストが減少するのかを
+検証します。@<chapref>{logstash}でKibanaをインストールしている環境を引き続き利用することを前提として
+話を進めますが、もし新しい環境で始める場合は@<chapref>{logstash}や@<chapref>{Kibana-visualize}を参考に
+環境構築を行なってください。
 
-FilebeatのNginx Moduleを使用して、どれだけ楽に構築できるかを触れたいと思います。@<br>{}
-そのほかのModuleについては、以下の公式ページに記載してあります。
-
-
-//quote{
-Filebeat Module: 
-https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules.html
-
-//}
-
-=== Kibanaをインストール
-
-
-KibanaのDashboardで取り込んだログを確認するところまで見るため、Kibanaをインストールします。  
-
-
-//emlist[][bash]{
-### Install Kibana
-$ yum install kibana
-//}
-
-
-Kibanaへのアクセス元の制限をしないため、"server.host"の設定を変更します。@<fn>{1}
-
-
-//emlist[][bash]{
-### Change server.host
-$ vim /etc/kibana/kibana.yml
-server.host: 0.0.0.0
-//}
 
 === Nginx環境を整える
 
+まず、Nginxをインストールします。
 
-Nginxをインストールし、Nginxのトップページが開くところまで実施します。
+//list[beats-05][Nginxのインストール]{
+sudo yum install nginx
+//}
 
+インストールが完了したら、Nginxを起動します。
 
-//emlist[][bash]{
-### Install Nginx
-$ yum install nginx
-### Start Nginx
-$ service nginx start
-Starting nginx:                                            [  OK  ]
+//list[beats-06][Nginxの起動]{
+sudo service nginx start
 //}
 
 
-curlを実行し、アクセスログが出力されているかを確認します。@<br>{}
-また、ステータスコード200が返ってきていることを確認します。
+Nginxに対してcurlを実行し、アクセスログが出力されているかを確認します。
+また、ステータスコード200が返ってきていることも合わせて確認します。
 
-
-//emlist[][bash]{
-### Check access.log
+//cmd{
 $ tail -f /var/log/nginx/access.log
 127.0.0.1 - - [xx/xxx/2018:xx:xx:xx +0000] "GET / HTTP/1.1" 200 3770 "-" "curl/7.53.1" "-"
 //}
@@ -159,30 +101,21 @@ $ tail -f /var/log/nginx/access.log
 === Filebeat Module
 
 
-Filebeatの設定ファイルを編集する前に、"filebeat.yml"のファイル置き換えとファイル名変更を行います。@<br>{}
-理由は、"filebeat.reference.yml"にすべてのModuleなどが記載されているため、簡易的に利用できるためです。
+Filebeatの設定ファイルを編集する前に、@<code>{filebeat.yml}を@<code>{filebeat.reference.yml}に置き換えます。
+このとき@<code>{filebeat.reference.yml}という名前から@<code>{filebeat.yml}に名前を合わせて変更します。
+@<code>{filebeat.reference.yml}にModulesの設定が記載されているため、これを利用した方がより簡単にBeatsのセットアップが行えるからです。
 
-
-//emlist[][bash]{
+//cmd{
 ### Change file name
 mv /etc/filebeat/filebeat..yml /etc/filebeat/filebeat.yml_origin
 mv /etc/filebeat/filebeat.reference.yml /etc/filebeat/filebeat.yml
 //}
 
 
-"filebeat.yml"の編集を行い、Nginxの有効化、"Output"をElasticsearchに設定を行います。@<br>{}
-また、起動時にKibanaのDashboardを作成するよう設定します。   
+@<code>{filebeat.yml}の編集を行い、Nginxの有効化を行います。Nginxのパス設定ですが、インストールした状態（デフォルト）のまま
+利用するのであればパスの変更は不要です。今回はデフォルト設定のまま利用しています。
 
-
-
-"filebeat.yml"でNginxのModuleを有効化します。@<br>{}
-ログのパスはデフォルトから変更してなければ、変更不要です。@<br>{}
-今回は、デフォルトから変更していないため、変更しません。
-
-
-//emlist{
-### Activate Nginx module
-$vim /etc/filebeat/filebeat.yml
+//list[beats-07][filebeat.ymlの編集]{
 #-------------------------------- Nginx Module -------------------------------
 - module: nginx
   # Access logs
@@ -211,12 +144,10 @@ $vim /etc/filebeat/filebeat.yml
 //}
 
 
-"Output"をElasticsearchにするため、有効化します。
+合わせて、OutputをElasticsearchに変更します。
 
 
-//emlist[][bash]{
-### Activate Elasticsearch output
-$vim /etc/filebeat/filebeat.yml
+//list[beats-08][Elasticsearchをデータ転送先にする]{
 #-------------------------- Elasticsearch output -------------------------------
 output.elasticsearch:
   # Boolean flag to enable or disable the output module.
@@ -233,7 +164,7 @@ output.elasticsearch:
 最後にKibanaのDashboardを起動時にセットアップする設定を有効化します。
 
 
-//emlist[][bash]{
+//list[beats-09][KibanaのDashboardを自動で作成する]{
 ### Activate Dashboards
 #============================== Dashboards =====================================
 # These settings control loading the sample dashboards to the Kibana index. Loading
@@ -243,13 +174,12 @@ setup.dashboards.enabled: true
 //}
 
 
-"filebeat.reference.yml"をベースに作成しているため、デフォルトでkafkaが"enabled: true"になっています。
+@<code>{filebeat.reference.yml}をベースに@<code>{filebeat.yml}を作成しているため、
+デフォルトでkafkaが@<code>{enabled: true}になっています。
 このまま起動するとエラーが発生するためコメントアウトします。
 
 
-//emlist[][bash]{
-### Comment out kafka module
-$ vim /etc/filebeat/filebeat.yml
+//list[beats-10][kafkaのmodulesを利用しない]{
 #-------------------------------- Kafka Module -------------------------------
 #- module: kafka
   # All logs
@@ -258,82 +188,50 @@ $ vim /etc/filebeat/filebeat.yml
 //}
 
 
-設定が完了したらFilebeatを起動します。
+では、いよいよFilebeatを起動します。
 
 
-//emlist[][bash]{
-### Start Filebeat
-service filebeat start
-Starting filebeat: 2018-xx-xxTxx:xx:xx.xxxZ INFO    instance/beat.go:468    Home path: [/usr/share/filebeat] Config path: [/etc/filebeat] Data path: [/var/lib/filebeat] Logs path: [/var/log/filebeat]
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    instance/beat.go:475    Beat UUID: e54958f0-6705-4586-8f9f-1d3599e568c0
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    instance/beat.go:213    Setup Beat: filebeat; Version: 6.2.2
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    elasticsearch/client.go:145 Elasticsearch url: http://localhost:9200
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    pipeline/module.go:76   Beat name: ip-172-31-50-36
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    beater/filebeat.go:62   Enabled modules/filesets: nginx (access, error), osquery (result),  ()
-Config OK
-                                                           [  OK  ]
+//list[beats-11][Filebeatの起動]{
+sudo service filebeat start
 //}
 
 
-あとは、データが取り込まれているかをKibanaを開いて確認します。  
+あとは、データが取り込まれているかをKibana@<href>{http://{Global_IP\\}:5601}を開いて確認します。
 
 
 
-ブラウザを開いてKibanaへアクセスします。
+以下のトップページが開きます。
+左ペインにあるManagementをクリックします。
 
 
-//quote{
-http://{Global_IP}:5601
-
+//image[filebeat01][Managementをクリック]{
 //}
 
+Index Patternsをクリックします。
 
-以下のトップページが開きます。@<br>{}
-左ペインにある"Management"をクリックします。  
-
-
-
-[filebeat01.png]
-
-
-
-"Index Patterns"をクリックします。
-
-
-
-[filebeat02.png]
-
-
+//image[filebeat02][Indexを選択]{
+//}
 
 Filebeatのインデックスパターンが登録されていることがわかります。
 
+//image[filebeat03][Filebeatのインデックスパターンを確認]{
+//}
 
-
-[filebeat03.png]
-
-
-
-左ペインにある"Dashboard"をクリックします。@<br>{}
-様々なDashboardが登録されていることがわかります。@<br>{}
+左ペインにある@<code>{Dashboard}をクリックします。
+様々なDashboardが登録されていることがわかります。
 Logstashなどでログを取り込んだ場合は、Dashboardを一から作成する必要がありますが、Beatsの場合は、あらかじめ用意されてます。
 
+//image[filebeat04][Dashboardの確認]{
+//}
 
-
-[filebeat04.png]
-
-
-
-今回は、Nginxの"[Filebeat Nginx] Overview"というDashboardをクリックします。@<br>{}
+今回は、Nginxの@<code>{Filebeat Nginx Overview}というDashboardをクリックします。
 取り込んだログがDashboardに表示されていることがわかります。
 
+//image[filebeat05][Filebeat Nginx Overview]{
+//}
 
-
-[filebeat05.png]
-
-
-
-いかがでしたか？@<br>{}
-他にも取り込みたいログがあれば、"filebeat.yml"のModuleを有効化するだけで容易にモニタリングができるようになります。  
+いかがでしたか？
+他にも取り込みたいログがあれば、@<code>{filebeat.yml}のModuleを有効化するだけで容易にモニタリングができるようになります。
 
 
 
@@ -342,33 +240,24 @@ Logstashなどでログを取り込んだ場合は、Dashboardを一から作成
 
 == Metricbeat
 
+Metricbeatは、サーバのリソース(CPU/Mem/process..など)を容易にモニタリングすることができます。
+その他にもDockerやElasticsaerchなども対応しており、様々なプロダクトをモニタリングが可能です。
 
-Metricbeatは、サーバのリソース(CPU/Mem/process..etc)を容易にモニタリングすることができます。@<br>{}
-その他にもDockerやElasticsaerchなども対応しており、様々なプロダクトをモニタリングが可能です。  
-
-
-
-また、先ほどのFilebeatと同様にYAMLを編集するだけなので、学習コストもほぼいらずに導入できます。@<br>{}
-今回は、サーバのメトリックをモニタリングできるところまで見たいと思います。  
+また、先ほどのFilebeatと同様にYAMLを編集するだけなので、学習コストもかかりません。
+今回は、サーバのメトリックをモニタリングできるところまで見たいと思います。それでは、早速インストールしていきます。
 
 
-
-それでは、早速インストールしていきます。
-
-
-//emlist[][bash]{
-### Install Metricbeat
-$ yum install metricbeat
+//list[filebeat06][Metricbeatのインストール]{
+sudo yum install metricbeat
 //}
 
 
-MetricbeatもFilebeat同様にベースの設定ファイル(metricbeat.reference.yml)があるのですが、デフォルト有効化されているModuleが多いため、以下の設定ファイルを使用します。@<br>{}
+MetricbeatもFilebeat同様にベースの設定ファイル@<code>{metricbeat.reference.yml}があるのですが、
+デフォルト有効化されているModuleが多いため、以下の設定ファイルを使用します。
 既存で設定してある内容は全て上書きしてください。
 
 
-//emlist[][bash]{
-### Create metricbeat.yml
-$ vim /etc/metricbeat/metricbeat.yml
+//list[filebeat07][/etc/metricbeat/metricbeat.ymlの編集]{
 ##################### Metricbeat Configuration Example #######################
 
 # This file is an example configuration file highlighting only the most common
@@ -500,91 +389,57 @@ output.elasticsearch:
 #logging.selectors: ["*"]
 //}
 
-
 設定が完了したのでMetricbeatを起動します。
 
 
-//emlist[][bash]{
-### Start Metricbeat
-$ service metricbeat start
-Starting metricbeat: 2018-xx-xxTxx:xx:xx.xxxZ   INFO    instance/beat.go:468    Home path: [/usr/share/metricbeat] Config path: [/etc/metricbeat] Data path: [/var/lib/metricbeat] Logs path: [/var/log/metricbeat]
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    instance/beat.go:475    Beat UUID: 133de8d7-18b1-472e-ac24-79831b9203cf
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    instance/beat.go:213    Setup Beat: metricbeat; Version: 6.2.2
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    elasticsearch/client.go:145 Elasticsearch url: http://localhost:9200
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    pipeline/module.go:76   Beat name: ip-172-31-50-36
-2018-xx-xxTxx:xx:xx.xxxZ WARN   [cfgwarn]   socket/socket.go:49 BETA: The system collector metricset is beta
-Config OK
-                                                           [  OK  ]
+//list[filebeat08][Metricbeatの起動]{
+sudo service metricbeat start
 //}
 
 
-Filebeatと同様にデータが取り込まれているかをKibanaを開いて確認します。@<br>{}
-ブラウザを開いてKibanaへアクセスします。
+Filebeatと同様にデータが取り込まれているかをKibanaを開いて確認します。
+ブラウザを開いてKibana（@<href>{http://{Global_IP\}:5601}）へアクセスします。
 
+Index Patternsの画面を開くとFilebeatのインデックスパターンの他にMetricbeatのインデックスパターンがあることがわかります
 
-//quote{
-http://{Global_IP}:5601
-
+//image[metricbeat01][Metricbeatのインデックスを確認その1]{
 //}
 
+Dashboardをクリックし、Metricbeatのインデックスを確認します。
 
-"Index Patterns"の画面を開くとFilebeatのインデックスパターンの他にMetricbeatのインデックスパターンがあることがわかります
+//image[metricbeat02][Metricbeatのインデックスを確認その2]{
+//}
 
-
-
-[metricbeat01.png]
-
-
-
-左ペインにある"Dashboard"をクリックします。@<br>{}
-検索ウィンドウから"Metricbeat"を入力すると様々なDashboardがヒットします。
-
-
-
-[metricbeat02.png]
-
-
-
-今回は、"[Metricbeat System] Host Overview"というDashboardをクリックします。@<br>{}
+今回は、@<code>{Metricbeat System Host Overview}というDashboardをクリックします。
 CPUやメモリ、プロセスの状態をニアリアルタイムにモニタリングができていることがわかります。
 
+//image[metricbeat03][MetricbeatのDashboard]{
+//}
 
-
-[metricbeat03.png]
-
-
-
-このようにサーバやコンテナなどにMetricbeatを導入することで一元的にモニタリングすることができます。@<br>{}
-次が最後ですが、監査ログを容易に取り込むための"Auditbeat"についてです。
+このようにサーバやコンテナなどにMetricbeatを導入することで一元的にサーバの状態をモニタリングすることができます。
+次が最後ですが、監査ログを容易に取り込むためのAuditbeatについてみていきます。
 
 
 == Auditbeat
 
-
-サーバの監査としてauditdが出力する"audit.log"をモニタリングしている方は多くいるのではないでしょうか。@<br>{}
-"audit.log"を保管するだけでなく、ニアリアルタイムにモニタリングするためにLogstashなどのツールを利用している方もいると思います。@<br>{}
-ただ、これから"audit.log"をモニタリングしたいという人からしたらハードルが高く、モニタリングするまでに時間を要してしまいます。@<br>{}
-そこで、Beatsには、Auditbeatというデータシッパーがあるので容易に導入することができます。@<br>{}
-ここまでFilbeatやMetricbeatを触ってきたらわかる通り、学習コストはほぼかからないでDashboardで閲覧するところまでできてしまいます。  
-
-
+サーバの監査としてauditdが出力する@<code>{audit.log}をモニタリングしている方は多くいるのではないでしょうか。
+@<code>{audit.log}を保管するだけでなく、ニアリアルタイムにモニタリングするためにLogstashなどのツールを利用している方もいると思います。
+ただ、これから@<code>{audit.log}をモニタリングしたいという人からしたらハードルが高く、モニタリングするまでに時間を要してしまいます。
+そこで、Beatsには、Auditbeatというデータシッパーがあるので容易に導入することができます。
+ここまでFilbeatやMetricbeatを触ってきたらわかる通り、学習コストはほぼかからないでDashboardで閲覧するところまでできてしまいます。
 
 それでは、ここからAuditbeatをインストールします。
 
 
-//emlist[][bash]{
-### Install Auditbeat
-$ yum install auditbeat
+//list[beats-09][Auditbeatのインストール]{
+sudo yum install auditbeat
 //}
 
-
-Auditbeatの設定ファイルは、以下を使用します。@<br>{}
-既存で設定してある内容は全て上書きしてください。
+@<list>{beats-10}の@<code>{auditbeat.yml}を既存で設定してある内容は全て上書きしてください。
 
 
-//emlist[][bash]{
-### Create auditbeat.yml
-$ vim /etc/auditbeat/auditbeat.yml
+//list[beats-10][/etc/auditbeat/auditbeat.ymlの編集]{
+
 ###################### Auditbeat Configuration Example #########################
 
 # This is an example configuration file highlighting only the most common
@@ -712,80 +567,41 @@ output.elasticsearch:
 設定が完了したので、Auditbeatを起動します。
 
 
-//emlist[][bash]{
-### Start Auditbeat
-$ service auditbeat start
-Starting auditbeat: 2018-xx-xxTxx:xx:xx.xxxZ    INFO    instance/beat.go:468    Home path: [/usr/share/auditbeat] Config path: [/etc/auditbeat] Data path: [/var/lib/auditbeat] Logs path: [/var/log/auditbeat]
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    instance/beat.go:475    Beat UUID: c8ed5e31-a553-4c66-a69d-401d9bf38c18
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    instance/beat.go:213    Setup Beat: auditbeat; Version: 6.2.2
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    elasticsearch/client.go:145 Elasticsearch url: http://localhost:9200
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    pipeline/module.go:76   Beat name: ip-172-31-50-36
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    [auditd]    auditd/audit_linux.go:65    auditd module is running as euid=0 on kernel=4.9.76-3.78.amzn1.x86_64
-2018-xx-xxTxx:xx:xx.xxxZ    INFO    [auditd]    auditd/audit_linux.go:88    socket_type=multicast will be used.
-Config OK
-                                                           [  OK  ]
+//list[beats-11][Auditbeatの起動]{
+sudo service auditbeat start
 //}
 
 
-データが取り込まれているかをKibanaを開いて確認します。@<br>{}
+データが取り込まれているかをKibanaを開いて確認します。
 ブラウザを開いてKibanaへアクセスします。
 
+@<code>{Index Patterns}の画面を開くとFilebeatのインデックスパターンの他にAuditbeatのインデックスパターンがあることがわかります。
 
-//quote{
-http://{Global_IP}:5601
-
+//image[auditbeat01][Auditbeatのインデックス確認]{
 //}
 
+左ペインにあるDashboardをクリックします。
+検索ウィンドウから@<code>{Auditbeat}と入力すると様々なDashboardがヒットします。
 
-"Index Patterns"の画面を開くとFilebeatのインデックスパターンの他にAuditbeatのインデックスパターンがあることがわかります
+//image[auditbeat02][AuditbeatのDashboardを確認]{
+//}
 
+@<code>{Auditbeat File Integrity Overview}や@<code>{Auditbeat Auditd Overview}からモニタリングが可能です。
 
+//image[auditbeat03][Auditbeatを用いたモニタリング]{
+//}
 
-[auditbeat01.png]
-
-
-
-左ペインにある"Dashboard"をクリックします。@<br>{}
-検索ウィンドウから"Auditbeat"を入力すると様々なDashboardがヒットします。
-
-
-
-[auditbeat02.png]
-
-
-
-"[Auditbeat File Integrity] Overview"や"[Auditbeat Auditd] Overview"からモニタリングが可能です。
-
-
-
-[auditbeat03.png]
-
-
-
-これまでBeatsを見てきていかがでしたか？@<br>{}
-モニタリングしたいModuleを有効化するだけで容易にモニタリングできる環境が手に入ります。@<br>{}
-この他にもWidnowsを対象にしたものや、サービスの死活監視としてのBeatsなどがあります。@<br>{}
-同じような学習コストで体験できるので、体験して頂ければと思います。  
+Beatsの機能、いかがだったでしょうか？
+Moduleを有効化するだけで、簡単にサーバの情報を可視化できる環境が手に入ります。
+他のBeatsについては今回扱いませんが、少ない学習コストで情報の可視化が可能です。みなさんもぜひ試してみてはいかがでしょうか。
 
 
 = まとめ
 
 
-いかがでしたか？@<br>{}
-LogstashとBeatsの両方を体験することで、ログ収集時の選択肢が増えたのではないでしょうか。@<br>{}
-また、LogstashとBeatsの違いがわからないという方々にお会いすることがあるので、少しでも違いを理解頂ければ幸いです。  
-
-
-
-最後となりますが、ここまでお付き合い頂きありがとうございます。  
-
-
-
-これからもみなさんがログと素敵な時間を過ごせることを願ってます。
-
-
+いかがでしたか？
+LogstashとBeatsの両方を操作できると、ログ収集時の選択肢が増えます。
+2つのプロダクトの違いを理解できると、状況に合わせて適切なプロダクトの使い分けが可能となります。
+みなさんがログと素敵な時間を過ごせることを願っています。
 
 @micci184
-
-
-//footnote[1][AWSのSecurityGroup側で制限はかけているので、Kibana側では制限しないようにしています]

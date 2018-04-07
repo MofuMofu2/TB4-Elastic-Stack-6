@@ -1,22 +1,23 @@
-
 = 複数のデータソースを取り扱う
 
 
-5章では、LogstashでS3にあるALBのログを取得し、Elasticsearchにストアしました。@<br>{}
-ElasticsearchにインデクシングされたデータをKibanaでビジュアライズするところまで実施しました。@<br>{}
-実際の運用を考えると複数のデータソースを取り扱うケースが多くあると思います。本章では、複数のデータソースを取り扱う場合のパイプラインファイルの定義方法について説明します。
+@<chapref>{logstash}では、LogstashでS3にあるALBのログを取得し、Elasticsearchに送付しました。
+ElasticsearchにインデクシングされたデータをKibanaで可視化するところまで実施しました。
+
+しかし、実際に何かのサービスを運用する際は、複数のデータソースを取り扱うケースが多いです。
+本章では、複数のデータソースを取り扱う場合のパイプラインファイルの設定方法について説明します。
 
 
 == 複数データソースを取り扱うための準備
 
-
-データソースを二つ取得している環境を想定します。@<br>{}
-ALBのアクセスログとApacheのアクセスログの二つを取り込むケースです。ALBのアクセスログは、5章と同様にS3をデータソースとし、Apacheは、ローカルファイルとします。@<br>{}
+データソースを二つ取得している環境を想定します。
+ALBのアクセスログとApacheのアクセスログの2つを取得するケースです。
+ALBのアクセスログは、@<chapref>{logstash}と同様にS3をデータソースとし、Apacheのアクセスログ@<code>{httpd_access.log}は
+ローカルのディレクトリに配置したものを取得します。
 以下にディレクトリ構成を記載します。
 
 
-//emlist[][bash]{
-### Logstash directory
+//cmd{
 /etc/logstash/
  ┣ conf.d
  ┃ ┗ alb_httpd.conf
@@ -33,13 +34,10 @@ ALBのアクセスログとApacheのアクセスログの二つを取り込む�
 //}
 
 
-パイプラインファイルを"alb@<b>{httpd.conf"というファイル名にします。また、Apacheのアクセスログは、"/etc/logstash/log/"配下に"httpd}access.log"を配置している前提とします。@<br>{}
-実際にパイプラインファイルの中身を見ていきたいと思います。
+パイプラインファイルを@<code>{alb_httpd.conf}というファイル名にします。
+また、Apacheのアクセスログは、@<code>{/etc/logstash/log/}配下に@<code>{httpd_access.log}を配置している前提とします。
 
-
-//emlist[][ruby]{
-### Sample pipeline_file
-$ vim /etc/logstash/conf/alb_httpd.conf
+//list[logstash_pipelines-01][alb_httpd.confの編集]{
 input {
   s3 {
     tags => "alb"
@@ -106,41 +104,17 @@ output {
 //}
 
 
-今までのパイプラインファイルより、少し複雑になってますね。@<br>{}
-どのような処理がされているかを"Input"、"Filter"、"Output"に分けて説明していきます。
+今までのパイプラインファイルより、少し複雑になっています。
+どのような処理がされているかをInput、Filter、Outputに分けて説明します。
 
 
-=== Input処理内容について
+=== Inputの処理内容
 
+Inputは、データソースの取り込み部分の定義箇所ですね。
+今回は、S3とローカルファイルのため、@<code>{S3 input plugin}と@<code>{File input pulgin}を使用します。
+@<code>{File input plugin}で利用しているオプションの詳細を@<table>{logstash_pipelines-02}にまとめました。
 
-Inputは、データソースの取り込み部分の定義箇所ですね。@<br>{}
-今回は、S3とローカルファイルのため、"S3 input plugin"と"File input pulgin"を使用します。@<br>{}
-"File input pulgin"は、デフォルトインストールされているので、すぐに使えます。
-
-
-//emlist[][ruby]{
-input {
-  s3 {
-    tags => "alb"
-    bucket => "hoge"
-    region => "ap-northeast-1"
-    prefix => "hoge/"
-    interval => "60"
-    sincedb_path => "/var/lib/logstash/sincedb_alb"
-  }
-  file {
-    path => "/etc/logstash/log/httpd_access.log"
-    tags => "httpd"
-    start_position => "beginning"
-    sincedb_path => "/var/lib/logstash/sincedb_httpd"
-  }
-}
-//}
-
-
-"File"で定義しているオプションについて説明します。  
-
-//table[tbl1][]{
+//table[logstash_pipelines-02][File input pluginのオプション]{
 No.	Item	Content
 -----------------
 1	path	ファイルが格納されているパスを指定
@@ -150,169 +124,98 @@ No.	Item	Content
 //}
 
 
-"S3"にも"File"にも共通して、"tags"を定義していることがわかります。この"tags"の値を元にif文で分岐させることができます。@<br>{}
-ここでは、ALBのアクセスログのため、"alb"という値を"tags"に与えます。また、Apacheのアクセスログは、"httpd"という値を与えます。
+また、@<code>{S3 input plugin}、@<code>{File input plugin}の設定でどちらも
+@<code>{tags}を定義しいます。@<code>{tags}の値を元に後の処理内容をif分岐させることができます。
+ここでは、ALBのアクセスログには@<code>{alb}という@<code>{tags}を設定しました。
+また、Apacheのアクセスログは、@<code>{httpd}という@<code>{tags}を設定しています。
 
 
 === Filter処理内容について
 
+本章では、Inputで定義した@<code>{tags}をベースにif分岐を用いた処理を行ないました。
+if文の記述方法はRubyの記法で記述します。
 
-"Filter"では、様々なフィルタをかけられることを5章で体験したかと思います。今回は、タグをベースにif文による分岐を行なっています。@<br>{}
-if文の文法は、rubyに則ったかたちです。
-
-
-//emlist[][ruby]{
-filter {
-  if "alb" in [tags] {
-    grok {
-      patterns_dir => ["/etc/logstash/patterns/alb_patterns"]
-      match => { "message" => "%{ALB_ACCESS}" }
-      add_field => { "date" => "%{date01} %{time}" }
-    }
-    date {
-      match => [ "date", "ISO8601" ]
-      timezone => "Asia/Tokyo"
-      target => "@timestamp"
-    }
-    geoip {
-      source => "client_ip"
-    }
-  else if "httpd" in [tags] {
-    grok {
-      patterns_dir => ["/etc/logstash/patterns/httpd_patterns"]
-      match => { "message" => "%{HTTPD_COMBINED_LOG}" }
-    }
-    geoip {
-      source => "clientip"
-    }
-    date {
-      match => [ "date", "dd/MMM/YYYY:HH:mm:ss Z" ]
-      locale => "en"
-      target => "timestamp"
-    }
-    useragent {
-    source => "agent"
-    target => "useragent"
-    }
-    mutate {
-      remove_field => [ "path", "host", "date" ]
-    }
-  }
-}
-//}
+ここでもGrok処理を行なっているのですが、Apache用のパターンファイルを準備できていないので@<code>{httpd_patterns}を作成します。
 
 
-ここで新たにApache用のパターンファイルを準備できていないので、作成します。  
-
-
-//emlist[][ruby]{
-$ vim /etc/logstash/patterns/httpd_patterns
-# Access_log
+//list[logstash_pipelines-03][Apacheのアクセスログ用パターンファイル]{
 HTTPDUSER %{EMAILADDRESS}|%{USER}
-HTTPD_COMMON_LOG %{IPORHOST:clientip} %{HTTPDUSER:ident} %{HTTPDUSER:auth} \[%{HTTPDATE:timestamp}\] "(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})" %{NUMBER:response} (?:%{NUMBER:bytes}|-)
+HTTPD_COMMON_LOG %{IPORHOST:clientip} %{HTTPDUSER:ident} （紙面の都合により改行）
+%{HTTPDUSER:auth} \[%{HTTPDATE:timestamp}\] "(?:%{WORD:verb} （紙面の都合により改行）
+%{NOTSPACE:request}(?: HTTP/%{NUMBER:httpversion})?|%{DATA:rawrequest})" （紙面の都合により改行）
+%{NUMBER:response} (?:%{NUMBER:bytes}|-)
 HTTPD_COMBINED_LOG %{HTTPD_COMMONLOG} %{QS:referrer} %{QS:agent}
 //}
 
-
-これで、Apacheのアクセスログに対しての"grok-filter"をかけることが可能になりました。@<br>{}
-今回新しい"Filter"で使用しているオプションについて説明します。
-
+これでGrok処理を実施するための準備ができました。
 
 ==== Useragent filter plugin
 
-
-"useragent-filter"を使用することで、サイトにアクセスしてきたデバイス情報や、ブラウザのバージョンなどの情報を構造化してくれます。
-"grok-filter"をかけると、"agent"のフィールドにユーザエージェントのデータがあるので、このフィールドに対してフィルタをかけています。@<br>{}
-また、元データもとっておくため、"target"指定で別フィールドの"useragent"に出力しています。
-
-
-//emlist[][ruby]{
-useragent {
-source => "agent"
-target => "useragent"
-}
-//}
+@<code>{Useragent file plugin}を利用すると、Webサイトにアクセスしてきたデバイスの情報や、
+アクセス時に利用していたブラウザのバージョンなどの情報を構造化できます。
+この処理の前にGrok処理を行なっているので、フィールド@<code>{agent}にユーザエージェントのデータがパースされた状態になります。
+このフィールドに対してフィルタをかけています。
+また、元データを保持したいので、@<code>{target}オプションで元データを別フィールドの@<code>{useragent}に出力しています。
 
 ==== Mutate filter plugin
 
 
-5章で"mutate-filter"を利用すれば、不要なフィールドの削除ができるという説明をしています。@<br>{}
-実際にフィールド削除を行なう場合は、以下のように記載します。今回は、"path"、"host"、"date"を削除対象としています。
+5章で"mutate-filter"を利用すれば、不要なフィールドの削除ができるという説明をしています。
+実際にフィールド削除を行なう場合は、以下のように記載します。今回は、@@<code>{path}、@@<code>{host}、@@<code>{date}を削除対象としています。
 
-
-//emlist[][ruby]{
-mutate {
-  remove_field => [ "path", "host", "date" ]
-}
-//}
 
 === Output処理内容について
 
 
-5章では、インデックスをデフォルト（"logstash-YYYY.MM.DD"）にしていましたが、複数の場合は、個々でインデックスを指定する必要があります。@<br>{}
-理由は、別々の用途で利用するログのため、インデックスを分ける必要があるためです。@<br>{}
-本来は、一つのログしか取り扱わない場合でもインデックスを指定する方がいいです（Logstashというインデックス名だと、どのような用途のインデックスがわかりにくいため）  
+5章では、インデックスをデフォルト（@@<code>{logstash-YYYY.MM.DD}）にしていましたが、複数の場合は、個々でインデックスを指定する必要があります。
+ログの用途が異なるため、インデックスを分けた方が管理がしやすいです。
+本来は1つのログしか取り扱わない場合でもインデックスを指定したほうが良いです。インデックス名で用途がすぐ把握できる方が管理しやすいためです。
 
-
-//emlist[][ruby]{
-output {
-  if "alb" in [tags] {
-    elasticsearch {
-      hosts => [ "localhost:9200" ]
-      index => "alb-logs-%{+YYYYMMdd}"
-    }
-  }
-  else if "httpd" in [tags] {
-    elasticsearch {
-      hosts => [ "localhost:9200" ]
-      index => "httpd-logs-%{+YYYYMMdd}"
-    }
-  }
-//}
-
-
-"output"でも、if文によるタグ分岐をすることで、出力先を指定することが可能です。@<br>{}
-"alb"タグが付与されているデータは、"alb-logs-%{+YYYYMMdd}"でインデクシングされます。また、"httpd"タグが付与されている場合は、"httpd-logs-%{+YYYYMMdd}"でインデクシングされます。  
+Outputの中でもif文処理の記述が可能です。今回はif分岐を利用してログの出力先インデックスを分けています。
+@@<code>{tags}に@@<code>{alb}が付与されているデータは、@@<code>{alb-logs-%{+YYYYMMdd}というインデックスへデータを転送します。
+また、@@<code>{tags}に@@<code>{httpd}タグが付与されている場合は、@@<code>{httpd-logs-%{+YYYYMMdd}というインデックスへデータを転送します。
 
 
 === 準備が整ったので実行するよ
 
+複数のログファイルを取得する準備が整ったので、Logstashを再起動します。
 
-複数のログファイルを取り込める準備が整ったので、Logstashを再起動します。
-
-
-//emlist[][ruby]{
-### Restart logstash service
-$ initctl restart logstash
+//list[logstash_pipelines-04][Logstashの再起動]{
+sudo initctl restart logstash
 //}
 
 
-ここまでやって如何でしたか？これで複数のログを取り込むことができるようになりました。@<br>{}
-お気付きになった方もいるかと思いますが、更にログが増えた場合に、どんどんif文が増えて、可読性が悪くなっていきます。これは、ツラミでしかないです。@<br>{}
-また、ログは、種類によってログ量やフィルタの内容も異なってきます。そのため、使用するリソースもバラバラとなります。しかし、5系までのLogstashでは、柔軟にリソースの振り分けを行うことができませんでした。
-でも大丈夫です！Logstashの6系からできるようになりました！@<br>{}
-てことで、ここから、イケてる"Multiple Pipelines"について説明していきます。
+これで複数のログを取り込むことができるようになりました。
+
+お気付きになった方もいるかと思いますが、このままだと取得したいログが増えると、どんどんif文が増えてコンフィグの可読性が悪くなっていきます。
+これはツラミでしかないです。
+
+またログの種類によっても、ログ量やフィルタの内容は異なります。
+そのため、Logstashが処理に必要とするリソースもログごとに異なってきます。
+しかし、5系までのLogstashではデータの処理に利用するリソースの振り分けを行うことができませんでした。
+
+でも大丈夫です！Logstashの6系からはデータごとにLogstashが利用するリソースを配分することが可能となりました！
+ここからは、今1番イケてる@@<code>{Multiple Pipelines}について説明していきます。
 
 
 == Multiple Pipelinesについて
 
 
-先程まで、一つのファイルにパイプラインファイルを記載していました。@<br>{}
-しかし、"Multiple Pipelines"を使用することで、データソース毎にパイプラインファイルを分けて定義することができます。@<br>{}
+先程まで、一つのファイルにパイプラインファイルを記載していました。
+しかし、"Multiple Pipelines"を使用することで、データソース毎にパイプラインファイルを分けて定義することができます。
 また、リソースの配分もログの種類毎にできます。それでは、具体的にどのような設定をする必要があるかを見ていきます。
 
 
 === Multiple Pipelinesの定義をしてみる
 
 
-"Multiple Pipelines"の定義ファイルは、"pipelines.yml"です。@<br>{}
-"pipelines.yml"にパイプラインファイルを指定するだけです。その際に、リソースの指定もできます。
-それでは、"pipelines.yml"に、ALBとApacheのアクセスログを取り込むパイプラインファイルを設定したいと思います。
+Multiple Pipelinesの設定をするために利用する定義ファイルは@@<code>{pipelines.yml}です。
+@@<code>{pipelines.yml}にパイプラインファイルを指定するだけでリソースの指定ができるのです。
+
+それでは、@@<code>{pipelines.yml}に、ALBとApacheのアクセスログを取り込むパイプラインファイルを設定したいと思います。
 
 
-//emlist[][ruby]{
-### pipelines.yml
-vim /etc/logstash/pipelines.yml
+//list[logstash_pipelines-05][/etc/logstash/pipelines.yml]{
 - pipeline.id: alb
   pipeline.batch.size: 125
   path.config: "/etc/logstash/conf.d/alb.cfg"
@@ -323,10 +226,12 @@ vim /etc/logstash/pipelines.yml
   pipeline.workers: 1
 //}
 
+設定したオプションについての説明を@@<table>{logstash_pipelines-06}に記載します。
+公式ドキュメント（@<href>{https://www.elastic.co/guide/en/logstash/6.x/logstash-settings-file.html}）も
+合わせて参考にしてみてください。
 
-それでは、各オプションについて見ていきたいと思います。
 
-//table[tbl2][]{
+//table[logstash_pipelines-06][pipelines.ymlの設定]{
 No.	Item	Content
 -----------------
 1	pipeline.id	任意のパイプラインIDを付与できます
@@ -335,31 +240,23 @@ No.	Item	Content
 4	pipeline.worker	ワーカーの数を指定
 //}
 
-
-@<href>{https://www.elastic.co/guide/en/logstash/6.x/logstash-settings-file.html,オプションについて}
-
-
-
-これで"Multiple Pipelines"の定義は完了です。@<br>{}
-ただ、これでは動かないので"Multiple Pipelines"への対応として、パイプラインファイルの分割とファイル名（拡張子）を変更します。
+これでMultiple Pipelinesの定義は完了です。
+ただ、これではLogstashは動作しません。Multiple Pipelinesへの対応として、パイプラインファイルの分割とファイル名（拡張子）を変更します。
 
 
 === パイプラインファイルの分割
 
 
-パイプラインファイルの"alb_httpd.conf"を分割します。@<br>{}
-まず、ALB用のパイプラインファイルとして、"alb.cfg"にします。@<br>{}
-拡張子を"conf"から"cfg"に変更します。拡張子を"conf"のままでも問題ないのですが、公式ドキュメントに則って"cfg"にします。
+パイプラインファイルの@@<code>{alb_httpd.conf}を分割します。
+まず、ALB用のパイプラインファイルとして、@@<code>{alb.cfg}にします。
+拡張子を@@<code>{conf}から@@<code>{cfg}に変更します。拡張子@@<code>{conf}のままでも問題ないのですが、
+ここでは公式ドキュメントに則って@@<code>{cfg}にします。
+
+@@<list>{logstash_pipelines-07}は@@<code>{alb_httpd.cfg}の内容です。
+特に中身に変更はありません。@@<code>{httpd}の部分とif文を削除しただけですね。
 
 
-
-以下のように"alb.cfg"を作成します。@<br>{}
-特に中身は変わらず、"httpd"の部分とif文を削除しただけですね。
-
-
-//emlist[][ruby]{
-### pipeline_file
-$ vim /etc/logstash/conf/alb.cfg
+//list[logstash_pipelines-08][/etc/logstash/conf/alb.cfg]{
 input {
   s3 {
     tags => "alb"
@@ -393,12 +290,10 @@ output {
 //}
 
 
-あわせて"httpd.cfg"も作成します。
+同様に、@@<code>{httpd.cfg}も作成します。
 
 
-//emlist[][ruby]{
-### pipeline_file
-$ vim /etc/logstash/conf/httpd.cfg
+//list[logstash_pipelines-09][/etc/logstash/conf/httpd.cfg]{
 input {
   file {
     path => "/etc/logstash/log/httpd_access.log"
@@ -433,22 +328,23 @@ output {
 //}
 
 
-これで分割とファイル名の変更が完了しましたので、Logstashを再起動します。
+これで分割とファイル名の変更が完了しました。
+Logstashを再起動し、設定ファイルの反映をおこないます。
 
 
-//emlist[][ruby]{
-### Restart logstash service
-$ initctl restart logstash
+//list[logstash_pipelines-10][Logstashの再起動]{
+sudo initctl restart logstash
 //}
 
 === ログの確認
 
 
-Logstashがうまく動いてくれないなどがある場合は、ログを見ましょう。
-ログは、"/var/log/logstash/"配下に出力されます。したがいまして、Logstashを起動した時に"tail"で起動がうまくいっているかの確認をすると良いです。
+Logstashがうまく動かない場合、まずログを見ましょう。
+Logstashの動作ログは、@@<code>{/var/log/logstash/}配下に出力されます。
 
+Logstashを起動し、ログファイルを@@<code>{tail}コマンドなどで確認しつつ、原因を突き止めていきましょう。
 
-//emlist[][bash]{
+//cmd{
 ### Check Log
 $ tail -f /var/log/logstash/logstash-plain.log
 [2018-xx-xxTxx:xx:xx,xxx][INFO ][logstash.agent           ] Pipelines running {:count=>1, :pipelines=>["alb"]}
@@ -456,6 +352,5 @@ $ tail -f /var/log/logstash/logstash-plain.log
 
 
 いかがでしたか？
-ここまで動かせたらLogstashをかなり理解できたのではと思います。
-次の章では、Logstashより簡易にログを取り込んで、ビジュアライズまでやりたいというニーズに応えることができるBeatsというプロダクトを説明していきます。
-
+ここまで動かせたらLogstashをかなり理解できているはずです。
+次は、Logstashより簡易にログを取り込みビジュアライズまでやりたい、というニーズに応えることができるBeatsというプロダクトについて説明していきます。
