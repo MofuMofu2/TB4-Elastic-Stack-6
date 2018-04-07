@@ -396,7 +396,7 @@ No.	Item	Content
 
 このファイルでは、パイプラインのバッチサイズやディレイ設定を行います。
 Logstashの動作についてのハンドリングをすることが可能です。
-ymlファイルのため、階層やフラットな構成で記述できます。
+ymlファイルのため、階層がフラットな構成で記述できます。
 
 //list[logstash-20][logstash.yml]{
 # hierarchical form
@@ -421,8 +421,8 @@ Logstashは@<code>{Input}、@<code>{Filter}、@<code>{Output}の3つで構成さ
 ==== Logstashのパイプラインを実行する
 
 実際にLogstashを動かすためにパイプラインファイルを設定します。
-Logstashの起動方法は、コマンド起動とサービス起動2種類が存在します。
-最終的にはサービス起動で起動したほうが利便性も高いですが、最初はコマンド起動を利用してLogstashの操作に慣れると良いでしょう。
+Logstashの起動方法は、コマンド起動とサービス起動の2種類が存在します。
+最終的にはサービス起動を利用したほうが利便性も高いですが、最初はコマンド起動を利用してLogstashの操作に慣れると良いでしょう。
 
 早速、パイプラインファイルを作成します。
 このパイプラインは、単純に標準入力からLogstashを通して標準出力を行うものです。
@@ -457,12 +457,13 @@ Logstashを起動後、任意の文字を標準入力します。
 ALBのログは、AWS公式ページ（@<href>{https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html,Access Logs for Your Application Load Balancer:}
 ）に記載されているサンプルログを利用します。
 
-//emlist[logstash-23][ALBのサンプルログ]{
+//list[logstash-23][ALBのサンプルログ]{
 https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188
 192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57
 "GET https://www.example.com:443/ HTTP/1.1" "curl/7.46.0" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2
 arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067
-"Root=1-58337281-1d84f3d73c47ec4e58577259" www.example.com arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012
+"Root=1-58337281-1d84f3d73c47ec4e58577259" www.example.com
+arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012
 //}
 
 
