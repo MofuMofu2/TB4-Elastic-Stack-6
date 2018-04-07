@@ -77,25 +77,23 @@ sudo service elasticsearch restart
 
 === Nginx環境を整える
 
+まず、Nginxをインストールします。
 
-Nginxをインストールし、Nginxのトップページが開くところまで実施します。
+//list[beats-05][Nginxのインストール]{
+sudo yum install nginx
+//}
 
+インストールが完了したら、Nginxを起動します。
 
-//list[][bash]{
-### Install Nginx
-$ yum install nginx
-### Start Nginx
-$ service nginx start
-Starting nginx:                                            [  OK  ]
+//list[beats-06][Nginxの起動]{
+sudo service nginx start
 //}
 
 
-curlを実行し、アクセスログが出力されているかを確認します。
-また、ステータスコード200が返ってきていることを確認します。
+Nginxに対してcurlを実行し、アクセスログが出力されているかを確認します。
+また、ステータスコード200が返ってきていることも合わせて確認します。
 
-
-//list[][bash]{
-### Check access.log
+//cmd{
 $ tail -f /var/log/nginx/access.log
 127.0.0.1 - - [xx/xxx/2018:xx:xx:xx +0000] "GET / HTTP/1.1" 200 3770 "-" "curl/7.53.1" "-"
 //}
