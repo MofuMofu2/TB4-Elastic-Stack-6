@@ -5,10 +5,10 @@ Elastic Stackは、Elasticsearch社が提供するプロダクトです。
 しかし、Beatsという新たなプロダクトが増えたことにより、ELKでは違和感があるのと、ELKにうまい具合にB（Beatsの頭文字）を追加することも難しいという事態が発生しました。
 そこで、ELKをやめて、Elastic Stackという名前に統合し、以下の4つがプロダクトとして構成されています。
 
-* Elasticserch
-* Logstash
-* Beats
-* Kibana
+ * Elasticsearch
+ * Logstash
+ * Beats
+ * Kibana
 
 この辺りが有名どころ、かつOSSとして利用できるプロダクトですね。特に検索エンジンとしてのElasticsearchは競合がいないのでは？というくらい
 よく使われているミドルウェアです。
@@ -37,18 +37,18 @@ Elasticsearchは、Javaで作られている分散処理型の検索エンジン
 
 //footnote[introES-fn01][技術書典シリーズって名前で察した方も多いかと思いますが、これは技術書典2でもふもふちゃんがElastic Stack5の同人誌を書いたらインプレスR&Dさんが商業本にしてくれました。KindleでElasticて打つと検索トップに出てくるからびびるんだけど。]
 
-昔は自分たちでElasticsearchを構築・運用するか、AWSの機能として@<code>{Amazon Elasticserch Service}（@<href>{https://aws.amazon.com/jp/elasticsearch-service/}）を利用するしかありませんでした。
+昔は自分たちでElasticsearchを構築・運用するか、AWSの機能として@<code>{Amazon Elasticsearch Service}（@<href>{https://aws.amazon.com/jp/elasticsearch-service/}）を利用するしかありませんでした。
 しかし、Elastic Stack5からはElastic社が提供するクラウドサービス@<code>{Elastic Cloud}（@<href>{https://www.elastic.co/jp/cloud}）を利用することでElasticsearchの管理・バージョンアップ・
 データのバックアップなども柔軟に行うことができるようになりました。基盤の持ち方の選択肢が増えるのはありがたいですよね。
 
-Elasticserchは独自のクエリを使用してデータの問い合わせをおこなうことが特徴です。が、今後のアップデートでSQLを利用してデータの問い合わせをできるようになることが発表されています@<href>{https://www.elastic.co/jp/elasticon/conf/2017/sf/elasticsearch-sql}。
+Elasticsearchは独自のクエリを使用してデータの問い合わせをおこなうことが特徴です。が、今後のアップデートでSQLを利用してデータの問い合わせをできるようになることが発表されています（@<href>{https://www.elastic.co/jp/elasticon/conf/2017/sf/elasticsearch-sql}）。
 SQLの方が普及率も高いので、さらにElasticsearchを便利に利用することができそうです。
 
 === Logstash
 
 世の中にはたくさんのログやデータがあります。サーバ運用など、いろんなかたちで携わっている方が多いのではないでしょうか。
 例を挙げると、Webサービスのログから分析用途として使用するときや、障害対応でログの調査を行うときに関わりますね。
-ログに何らかの形で携わったことがある人は、一度はログやデータの解析は面倒な作業だと思ったのではないでしょうか。@@<fn>{introES-fn03}
+ログに何らかの形で携わったことがある人は、一度はログやデータの解析は面倒な作業だと思ったのではないでしょうか。@<fn>{introES-fn03}
 
 //footnote[introES-fn03][micciはあるっていってました。もふもふちゃんは面倒臭そうな作業は苦手ですが、パワーポイント作る方が苦手です。]
 
@@ -61,21 +61,19 @@ Logstashは各環境に散らばっているログを集め、指定した対象
 
 ログの取得というとファイルからの取得を思い浮かべますが、プラグインを利用することでAmazon s3やTwitterから直接データを取得することも可能です。
 
-類似プロダクトとしてはTresure Data社製のOSS@<code>{fluentd}（URL:@<href>{https://www.fluentd.org}）が存在します。
+類似プロダクトとしてはTresure Data社製のOSSである、@<code>{fluentd}（@<href>{https://www.fluentd.org}）が存在します。
 エラーのわかりやすさ、環境構築の簡単さを取るのであればfluentdを、Elastic Stackとしてプロダクトをセットで運用するのであればLogstashを利用すると良いでしょう。
 
 Logstashはバージョン6からLogstashのプロセスを@<code>{Multiple pipeline}として分割できるようになりました。これを利用すると、AのデータとBのデータをLogstashで取得したいときに
 Logstashプロセスを2つ作ることができます。片方のプロセスがお亡くなりになってももう片方のデータ連携は継続して行うことができるので、対障害性が上がりますね。
-詳しくはXXを参照してください。
-
-#@# todo 参照するぞ
+詳しくは@<chapref>{logstash}を参照してください。
 
 === Beats
 
-Beatsは用途に合わせてデータを簡単に送ることができる軽量データシッパーです@<fn>{introES-fn03}。Go言語で作成されており、動作に必要なリソースが他プロダクトと比較して少ないことが特徴です。
+Beatsは用途に合わせてデータを簡単に送ることができる軽量データシッパーです@<fn>{introES-fn04}。Go言語で作成されており、動作に必要なリソースが他プロダクトと比較して少ないことが特徴です。
 用途に合わせてXXBeatsというように、名前が異なります。ドキュメントも種別ごとに異なりますので、注意が必要です。
 
-//footnote[introES-fn03][https://www.elastic.co/guide/en/beats/libbeat/current/beats-reference.html]
+//footnote[introES-fn04][https://www.elastic.co/guide/en/beats/libbeat/current/beats-reference.html]
 
 Elastic Stack6からは@<code>{Modules}という機能が追加されました。Modulesを利用すると、Elasticsearchへのデータ連携とKibanaのグラフ作成を自動で行ってくれます。
 Apacheのaccess.logなど、利用できるデータは限られています。公式ドキュメント、またはKibanaのGUIで確認してください。
@@ -84,7 +82,7 @@ Apacheのaccess.logなど、利用できるデータは限られています。�
 
 
 大量のサーバのログファイルなどのファイルを一箇所に集約する用途で用います。
-また、集約だけでなく、転送時にあらかじめ用意されたモジュールを利用することで、自動でパース処理を行い、ElasticserchやLogstashに転送することが可能です。
+また、集約だけでなく、転送時にあらかじめ用意されたモジュールを利用することで、自動でパース処理を行い、ElasticsearchやLogstashに転送することが可能です。
 さらに取り込んだデータをビジュアライズするためのダッシュボードも用意されているため、簡単に導入することができます。
 
 
@@ -122,7 +120,7 @@ Windowsの動作ログを取得したい場合、1番導入が簡単で手軽な
 
 
 サーバの監査ログを収集することができます。
-通常、auditdのログを監査ログとして利用する場面が多いと思いますが、Auditbeatを使用することで、必要な情報をグルーピングし、Elasticserchに転送することができます（要は意識せずストアまでやってくれます）。
+通常、auditdのログを監査ログとして利用する場面が多いと思いますが、Auditbeatを使用することで、必要な情報をグルーピングし、Elasticsearchに転送することができます（要は意識せずストアまでやってくれます）。
 また、Modulesに対応しているため、導入からKibanaを用いたデータの可視化までを一括で行うことができます。
 
 

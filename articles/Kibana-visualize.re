@@ -1,4 +1,4 @@
-= Kibanaを使ってデータを見えるかしてみるぞい！
+= Kibanaを使ってデータを見える化してみるぞい！
 
 今日もいちにちがんばるぞい！と監視やらデータ分析やらする人は多いかと思います。しかし、テキストのデータの傾向を
 テキストのまま分析するのはつらつらたんですよね。
@@ -56,14 +56,14 @@ b4b18e9 [add] 著者リストを追加
 あれ？なんだか出力内容が減っていますね。@<code>{--oneline}オプションをつけると、コミットのハッシュ値とコミットログ（1行目）しか出力されません。
 これは少し不便です。
 
-せめて、次の情報がないといつ、だれが、どんなコミットを作成したのかわかりません。ハッシュ値は必要ありませんが、コミットの特定ができると
+せめて次の情報がないと、いつ、だれが、どんなコミットを作成したのかわかりません。ハッシュ値は必要ありませんが、コミットの特定ができると
 変更内容を確認しやすいので情報として持っておきたいところです。
 
-* ハッシュ値（コミットの特定の為に必要）
-* Author（だれがコミットしたのか特定する為に必要）
-* Authorのメールアドレス（なくてもいいけど、連絡は楽になりますよね）
-* コミット時刻（いつコミットしたのかを特定する為に必要）
-* コミットメッセージ（概要しりたいじゃん？）
+ * ハッシュ値（コミットの特定の為に必要）
+ * Author（だれがコミットしたのか特定する為に必要）
+ * Authorのメールアドレス（なくてもいいけど、連絡は楽になりますよね）
+ * コミット時刻（いつコミットしたのかを特定する為に必要）
+ * コミットメッセージ（概要しりたいじゃん？）
 
 
 これを実現するために@<code>{--pretty=format}オプションを利用します。@<code>{format}の引数にどんな情報を出力するのかを指定しています。
@@ -115,7 +115,7 @@ git log  --oneline --pretty=format:"%h, %an, %aI, %f, %s " >gitlog.json
 //cmd{
 cdbfc69, keigodasu, 2018-02-25T11:21:26+09:00, delete-unnecessary-file, delete unnecessary file
 e39b32e, keigodasu, 2018-02-25T11:19:48+09:00, writing, writing
-4aef633, keigodasu, 2018-02-24T13:05:42+09:00, add-sameple-source-directory, add sameple source directory
+4aef633, keigodasu, 2018-02-24T13:05:42+09:00, add-sameple-source-directory
 6d352ee, micci184, 2018-02-24T11:25:58+09:00, add, [add]プロダクト紹介追加
 9605c33, micci184, 2018-02-21T13:13:08+09:00, add, [add]はじめにを追加
 834051a, keigodasu, 2018-02-20T19:50:06+09:00, Writing, Writing
@@ -133,44 +133,36 @@ Authorのメールアドレスを書いておくと、他の著者2人から怒�
 実際の出力結果をみるとわかりやすいと思うので、まずは@<list>{kibana01-list05}を実行してみましょう。
 
 //list[kibana01-list05][Gitのコミットログをjsonっぽく整形する]{
-git log  --oneline --pretty=format:'{"commit_hash":"%h","author_name":"%an","author_date":"%aI","change_summary":"%f","subject":"%s"}' >gitlog.json
+git log  --oneline --pretty=format:'{"commit_hash":"%h","author_name":"%an",
+（ページの都合で改行）"author_date":"%aI","change_summary":"%f","subject":"%s"}'
+（ページの都合で改行）>gitlog.json
 //}
 
-実行すると、下記のようなファイルが生成されます。
+実行すると、下記のようなファイルが生成されます。紙面の都合上、途中で改行しています。
 
 //cmd{
-{"commit_hash":"fd7fef2","author_name":"MofuMofu2","author_date":"2018-03-04T20:49:57+09:00","change_summary":"update","subject":"[update] コマンドと出力結果の見せ方をわけた"}
-{"commit_hash":"ee03ea3","author_name":"MofuMofu2","author_date":"2018-03-04T20:49:14+09:00","change_summary":"update-list","subject":"[update] コマンドをlistにした"}
-{"commit_hash":"6ca8d4d","author_name":"MofuMofu2","author_date":"2018-03-04T20:33:41+09:00","change_summary":"add","subject":"[add] この章の目的を追加して、補足を入れた"}
-{"commit_hash":"89b032d","author_name":"MofuMofu2","author_date":"2018-03-04T20:23:50+09:00","change_summary":"add-Elastic-Stack","subject":"[add] Elastic Stackの基本機能を説明する章を追加"}
-{"commit_hash":"d39b109","author_name":"MofuMofu2","author_date":"2018-03-04T20:23:25+09:00","change_summary":"delete","subject":"[delete] テストファイルを削除"}
-{"commit_hash":"85c9d7b","author_name":"micci184","author_date":"2018-02-28T05:58:00+09:00","change_summary":"fix-logstash_beats.re","subject":"[fix]logstash_beats.re"}
-{"commit_hash":"663f1c1","author_name":"micci184","author_date":"2018-02-28T05:54:22+09:00","change_summary":"fix-logstash_beats.re","subject":"[fix]logstash_beats.re"}
-{"commit_hash":"f4e953c","author_name":"micci184","author_date":"2018-02-28T05:29:31+09:00","change_summary":"add-catalog.yml","subject":"[add]catalog.yml"}
-{"commit_hash":"0d54c49","author_name":"micci184","author_date":"2018-02-28T05:25:47+09:00","change_summary":"Convert-md-to-Re-VIEW","subject":"Convert md to Re:VIEW"}
-{"commit_hash":"05cb0dc","author_name":"micci184","author_date":"2018-02-28T05:20:03+09:00","change_summary":"typo","subject":"typo"}
-{"commit_hash":"7f806cb","author_name":"micci184","author_date":"2018-02-28T04:43:48+09:00","change_summary":"add-capture","subject":"[add]capture"}
+{"commit_hash":"fd7fef2","author_name":"MofuMofu2","author_date":"2018-03-04T20:49:57+09:00",
+"change_summary":"update","subject":"[update] コマンドと出力結果の見せ方をわけた"}
 //}
 
 jsonっぽいですね！これをKibanaで利用するサンプルデータとしたいと思います。
 
-@<code>{git-log-to-json}というnpmパッケージを利用すると@<href>{https://www.npmjs.com/package/git-log-to-json}、Node.jsを
-利用してgit logをjson形式で出力できるようです。今回は本題から外れるので扱いませんが、またどこかで記事を公開したいですねー。
+@<code>{git-log-to-json}というnpmパッケージを利用すると（@<href>{https://www.npmjs.com/package/git-log-to-json}）、Node.jsを
+利用してgit logをjson形式で出力できるようです。今回は本題から外れるので扱いませんが、どこかで知見をためて公開したいですねー。
 
 == Elastic Stackの環境構築
 
 テストデータが準備できたので、いよいよKibanaを起動しましょう。
 本章のElastic Stack環境は全てzipファイルをダウンロード＆展開して構築しています。
 
-詳細な構築方法は@<b>{Elastic Stackとは}の章を参考にしてください。
-もふもふちゃんはMacに@<code>{Elastic-Stack}という名前でディレクトリを作成し、その中に各プロダクトを配置しました。
+もふちゃんはMacに@<code>{Elastic-Stack}という名前でディレクトリを作成し、その中に各プロダクトを配置しました。
 
-//emlist[もふもふちゃんのElastic-Stack実行環境]{
+//emlist[もふちゃんのElastic-Stack実行環境]{
 Elastic-Stack--logstash-6.2.2
-							|
-							-elasticsearch-6.2.2
-							|
-							-kibana-6.2.2-darwin-x86_64
+             |
+             -elasticsearch-6.2.2
+             |
+             -kibana-6.2.2-darwin-x86_64
 //}
 
 @<code>{ls}コマンドで確認した結果も参考として載せておきます。
@@ -186,12 +178,10 @@ drwxr-xr-x@ 16 mofumofu  staff   512  3  7 10:51 logstash-6.2.2
 //}
 
 
-=== Elasticserchの起動
+=== Elasticsearchの起動
 
 @<code>{elasticsearch-6.2.2}ディレクトリに移動した後、@<code>{bin/elasticsearch}でElasticsearchを起動しました。
-
 これも、出力結果を載せておきます。ここは本題ではありませんので、解説や特別な設定は行いません。
-#@#文章できたらリンクを貼る
 
 === Logstashの起動
 
@@ -199,7 +189,7 @@ Kibanaで閲覧するGitのコミットログをElasticsearchに投入するた�
 Kibana5.4（beta版）ではKibanaのUIからCSVをElasticsearchに投入できる機能があったのですが、いつの間にか廃止されていました…。なので、
 （仕方なく）Logstashを利用します。この辺はこだわりがありませんので、何らかの形でElasticsearchにデータを投入しましょう。
 
-もふもふちゃんは@<code>{config/conf.d}フォルダに@<code>{gitlog-logstash.conf}を作成しました。
+もふちゃんは@<code>{config/conf.d}フォルダに@<code>{gitlog-logstash.conf}を作成しました。
 
 //list[kibana01-list06][gitlog-logstash.conf]{
 input {
@@ -230,10 +220,7 @@ output {
 @<code>{logstash.conf}を配置後、@<code>{bin/logstash -f config/conf.d/gitlog-logstash.conf}でLogstashを起動します。
 このとき、Elasticsearchと同様に@<code>{logstash-6.2.2}ディレクトリに移動してからコマンドを実行します。もふちゃんはiTerm2を利用しているので、別タブを開いて起動しました。
 @<code>{-f コンフィグの配置場所}でちゃんとファイルパス、ファイル名を指定しないと「configがないよーん」とエラーになりLogstashを起動できません。
-そこはトラブルになりやすいので気をつけたらいいと思います。
-
-これも参考として、出力結果を載せておきます。
-
+そこはトラブルになりやすいので気をつけるといいと思います。
 
 === Kibanaの起動
 
@@ -244,7 +231,7 @@ output {
 もふちゃんは@<code>{kibana.yml}を修正していないため、@<code>{localhost:5601}でKibanaは起動します。
 
 
-この状態でブラウザから@<hre	f>{http://localhost:5601/}にアクセスすると、@<img>{kibana01-img01}のような画面が見えているはずです。
+この状態でブラウザから@<href>{http://localhost:5601/}にアクセスすると、@<img>{kibana01-img01}のような画面が見えているはずです。
 
 //image[kibana01-img01][Kibana（ver6.2）の画面]{
 //}
@@ -254,7 +241,7 @@ output {
 == Kibanaを使ってGitのコミット状況を閲覧する
 
 では、早速Gitのコミットログ（以降git logとします）をグラフにしていきましょう。
-まずはKibana@<href>{http://localhost:5601}にアクセスします。@<code>{kibana.yml}でURLを変更していた場合、
+まずはKibana（@<href>{http://localhost:5601}）にアクセスします。@<code>{kibana.yml}でURLを変更していた場合、
 自分で設定したURLへアクセスしてください。
 
 アクセスすると、@<img>{kibana01-img01}が見えていますね。まずは画面左端にある歯車アイコンを押して@<code>{Management}画面を開きましょう。
@@ -294,7 +281,7 @@ index名の指定をするときは、@<code>{*（アスタリスク）}を利�
 この場合、@<b>{今の時刻から}15分前までにコミットがあったデータ（＝@<code>{author_date}の時刻が現在から15分前のもの）を閲覧する状態となっています。
 
 条件に当てはまるデータが存在しない場合、@<img>{kibana01-img04}のようにデータが存在しないことを示す画面が表示されます。顔文字がなんかちょっと腹たつような感じですね。
-この場合、時計マークをクリックして時刻の範囲を変更しましょう。時刻を広めにとると何かしらのデータが表示されるはずです。それでもダメであれば、Elasticserchにデータが
+この場合、時計マークをクリックして時刻の範囲を変更しましょう。時刻を広めにとると何かしらのデータが表示されるはずです。それでもダメであれば、Elasticsearchにデータが
 保存されていない可能性があります。データの連携がきちんとできているか、再度見直しましょう。
 
 //image[kibana01-img05][時刻を調整してgit logがDiscover画面に表示された]{
@@ -310,7 +297,7 @@ jsonのfieldごとにデータが別れて表示されるので、どのfieldに
 
 == Visualizeで同人誌の進捗を観察する
 
-では、早速新しいグラフを作成します。画面左端の棒グラフアイコンをクリックして<code>{Visualize}を開きましょう。
+では、早速新しいグラフを作成します。画面左端の棒グラフアイコンをクリックして@<code>{Visualize}を開きましょう。
 開くと@<img>{kibana01-img07}のように、グラフを選択する画面が開きます。
 すでにグラフが存在すれば、ここから詳細を閲覧することができますが、今回は何もグラフが存在しないので新しくグラフを作るしかありません。
 @<code>{Create a visualization}をクリックしてグラフを作成しましょう。
@@ -319,7 +306,7 @@ jsonのfieldごとにデータが別れて表示されるので、どのfieldに
 //}
 
 @<code>{Create a visualization}をクリックすると、@<img>{kibana01-img08}のようにグラフの種別を選択する画面が出てきます。
-まずは基本の線グラフを作成してみましょう。
+まずは基本の折れ線グラフを作成してみましょう。
 
 //image[kibana01-img08][グラフ種別の選択]{
 //}
@@ -342,7 +329,7 @@ jsonのfieldごとにデータが別れて表示されるので、どのfieldに
 
 ==== X軸（横軸）の設定を行う
 
-線グラフなので、時系列でどのようにコミット数が遷移しているかわかると気持ちがいいですよね。というわけで
+折れ線グラフなので、時系列でどのようにコミット数が遷移しているかわかると気持ちがいいですよね。というわけで
 X軸の基準を時間に変更したいと思います。
 
 @<code>{Buckets}の@<code>{X-Axis}をクリックして、詳細画面を開きましょう。
@@ -365,10 +352,10 @@ X軸の基準を時間に変更したいと思います。
 
 ==== Y軸（縦軸）の設定を行う
 
-今度はY軸の設定を行います。とはいえ、今回は「いつどのくらいコミットがあったかをみたい」ことが目的なので、
+今度はY軸の設定を行います。今回は「いつどのくらいコミットがあったかをみたい」ことが目的なので、
 コミット数が時系列にプロットされていれば良いですよね。あまりいじくる必要はなさそうです。
 
-とはいえ、データのの平均を見たいときは困りますね。@<code>{Metrics}の@<code>{Aggregation}をクリックすると
+とはいえ、データの平均を見たいときは困りますね。@<code>{Metrics}の@<code>{Aggregation}をクリックすると
 今度はどんな方法でデータの数を数えるか変更することができます。デフォルトは@<code>{Count}なのでデータの数を縦にプロットしますが、
 @<code>{Average}に変更すると、データの平均をプロットすることが可能です。SQLのように、MAX・MIN・Sumといった演算をすることも可能です。
 ただし、これら数値を扱うような設定は、indexに保存されているデータに数値型のものがないと利用できません。今回は文字列型のデータばかりですから、
@@ -379,11 +366,11 @@ X軸の基準を時間に変更したいと思います。
 
 ==== コミッターごとにグラフの線を分ける
 
-現時点でもだいぶ日によるコミット量に差がある、ということがわかり面白いのですが、コミッターごとにグラフを分割できたほうが
-もっと面白いですよね。micci184がサボってる！とか、もふもふちゃんは駆け込み型ですね、とかkeigodasumは締め切り直前に駆け込む型ですね
+現時点でもだいぶ日によってコミット量に差がある、ということがわかり面白いのですが、コミッターごとにグラフを分割できたほうが
+もっと面白いですよね。micci184がサボってる！とか、もふちゃんは駆け込みコミット型ですね、とかkeigodasumは締め切り直前に超駆け込みコミット型ですね
 とかが分かった方が「こらー！」ってしやすくなります。
 
-というわけで、線グラフをコミッターごとに分割しましょう。
+というわけで、折れ線グラフをコミッターごとに分割しましょう。
 
 @<code>{Buckets}の下側にある@<code>{Add sub-buckets}をクリックします。@<code>{Select buckets type}の画面が出てきて
 次の2種類が選択できるようになります。
@@ -391,8 +378,8 @@ X軸の基準を時間に変更したいと思います。
  * Split Series
  * Split Chart
 
-fieldの値ごとに線グラフを分けて表示したい場合は@<code>{Split Series}を、1つの線グラフをfieldの値ごとに分割したいときは@<code>{Split Chart}を利用します。
-今回はコミッターごとに線グラフを分けたいので@<code>{Split Series}を編集していきます。どちらも編集の流れは同じなので、@<code>{Split Chart}を利用したい人も
+fieldの値ごとに折れ線グラフを分けて表示したい場合は@<code>{Split Series}を、1つの折れ線グラフをfieldの値ごとに分割したいときは@<code>{Split Chart}を利用します。
+今回はコミッターごとに折れ線グラフを分けたいので@<code>{Split Series}を編集していきます。どちらも編集の流れは同じなので、@<code>{Split Chart}を利用したい人も
 これ以降の編集の流れを参照してみてください。
 
 @<code>{Sub Aggregation}ではグラフを分割する基準を決めることができます。今回はgit logの@<code>{author_name}で分割したいので、
@@ -409,19 +396,19 @@ Order Byというと、SQLのORDER BY句を連想しますが、KibanaのOrder B
 例えば今回の場合、もし10人コミッターがいたとしても@<img>{kibana01-img13}の設定ではコミット数上位5名しか表示されません。
 このように、Kibanaのグラフを作成するときは自分が可視化したいデータの特性をちゃんと把握しておくことが重要になります。
 
-//image[kibana01-img13][コミッターごとに線グラフを表示]{
+//image[kibana01-img13][コミッターごとに折れ線グラフを表示]{
 //}
 
 === できたグラフの様子を観察
 
-ちょっと時間軸も長めに設定してみました（2ヶ月ぶんくらいにしてます）。もふもふちゃんが散々「2月中に初稿をかけい！」と
-脅したせいかわかりませんが、2月末だけ明らかにコミット量が増えてますね。そのあとは個人の好き好きに修正をかけたりしてる感じです。
+ちょっと時間軸も長めに設定してみました（2ヶ月分くらいにしています）。もふちゃんが散々「2月中に初稿を書けよ！」と
+脅したせいかはわかりませんが、2月末だけ明らかにコミット量が増えています。そのあとは個人の好き好きに修正をかけたりしている感じです。
 ちゃっかりElastic社のJun Ohtaniさんの名前がありますが、typoの修正をPull Requestしていただいたので名前が出てきている感じです。
 
 ってか！みんなちゃんとやれよ感あってはずかしい！
 
 これを@<code>{Metrics & Axces}オプションから棒グラフ（@<code>{bar}）にしてみると、@<img>{kibana01-img14}のようになります。
-やはりコミット数の推移を見たいのであれば、線グラフのようなプロット型の物を利用した方がわかりやすいですね。
+やはりコミット数の推移を見たいのであれば、折れ線グラフのようなプロット型の物を利用した方がわかりやすいですね。
 
 //image[kibana01-img14][コミッターごとのコミット数を棒グラフにしてみた]{
 //}
@@ -431,11 +418,11 @@ Order Byというと、SQLのORDER BY句を連想しますが、KibanaのOrder B
 
 == この章のまとめ
 
-どうでしょう？明らかにみんな締め切り駆け込み型なのがわかりました…じゃなくて、大量のデータを分析するのに
+どうでしょう？明らかにみんな締め切り近くに駆け込みコミット型なのがわかりました…じゃなくて、大量のデータを分析するのに
 Kibanaは結構便利だよねということが分かっていただけたでしょうか？
 
 なるべく元データをLogstashやfluentdで取得しやすい形に加工しておくことと、データの特性をちゃんと見て
-グラフを作成していくのがポイントなのでは？ともふもふちゃんは思います。
+グラフを作成していくのがポイントなのでは？ともふちゃんは思います。
 
 データのパースにはそれなりのリソースを消費しますから、なるべくならデータはjsonとかの階層がある形式にしておきたいものですね。
 

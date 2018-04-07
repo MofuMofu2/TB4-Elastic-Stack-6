@@ -4,8 +4,8 @@
 
 Beatsは、シンプルなデータ取り込みツールです。
 あれ？Logstashは？と思う方もいると思いますが、Logstashは、豊富な機能を持ってます。
-@<chapref>{logstash_pipelines}で説明したGrokフィルダで複雑なログを取り込むことも可能ですし、Inputのデータソースを多種多様に選択することが可能です。
-そのためLogstashを利用するには、学習コストもそれなりに発生します。手軽に利用しよう！というのは難しいツールです。
+@<chapref>{logstash_pipelines}で説明したGrokフィルタで複雑なログを取り込むことも可能ですし、Inputのデータソースを多種多様に選択することが可能です。
+そのためLogstashを利用するには、学習コストもそれなりに発生します。手軽に利用しよう！という方には難しいツールです。
 
 そこで活躍するのがBeatsです。
 何が手軽かというと、設定ファイルがYAMLで全て完結するのです。
@@ -72,7 +72,7 @@ sudo service elasticsearch restart
 今回は@<code>{Nginx Modules}を例にModulesを利用すると、どの位構築コストが減少するのかを
 検証します。@<chapref>{logstash}でKibanaをインストールしている環境を引き続き利用することを前提として
 話を進めますが、もし新しい環境で始める場合は@<chapref>{logstash}や@<chapref>{Kibana-visualize}を参考に
-環境構築を行なってください。
+環境構築を行ってください。
 
 
 === Nginx環境を整える
@@ -102,7 +102,7 @@ $ tail -f /var/log/nginx/access.log
 
 Filebeatの設定ファイルを編集する前に、@<code>{filebeat.yml}を@<code>{filebeat.reference.yml}に置き換えます。
 このとき@<code>{filebeat.reference.yml}という名前から@<code>{filebeat.yml}に名前を合わせて変更します。
-@<code>{filebeat.reference.yml}にModulesの設定が記載されているため、これを利用した方がより簡単にBeatsのセットアップが行えるからです。
+@<code>{filebeat.reference.yml}にModulesの設定が記載されているため、これを利用するとより簡単にBeatsのセットアップを行うことができるからです。
 
 //cmd{
 ### Change file name
@@ -218,7 +218,7 @@ Filebeatのインデックスパターンが登録されていることがわか
 
 左ペインにある@<code>{Dashboard}をクリックします。
 様々なDashboardが登録されていることがわかります。
-Logstashなどでログを取り込んだ場合は、Dashboardを一から作成する必要がありますが、Beatsの場合は、あらかじめ用意されてます。
+Logstashなどでログを取り込んだ場合は、Dashboardを一から作成する必要がありますが、Beatsの場合は、あらかじめ用意されています。
 
 //image[filebeat04][Dashboardの確認]{
 //}
@@ -234,13 +234,13 @@ Logstashなどでログを取り込んだ場合は、Dashboardを一から作成
 
 
 
-次は、サーバのリソースを容易にモニタリングを可能とする"Metricbeat"についてです。
+次は、サーバのリソースを容易にモニタリングすることを可能とするMetricbeatについてです。
 
 
 == Metricbeat
 
 Metricbeatは、サーバのリソース(CPU/Mem/process..など)を容易にモニタリングすることができます。
-その他にもDockerやElasticsaerchなども対応しており、様々なプロダクトをモニタリングが可能です。
+その他にもDockerやElasticsaerchなどにも対応しており、様々なプロダクトをモニタリングすることが可能です。
 
 また、先ほどのFilebeatと同様にYAMLを編集するだけなので、学習コストもかかりません。
 今回は、サーバのメトリックをモニタリングできるところまで見たいと思います。それでは、早速インストールしていきます。
@@ -399,7 +399,7 @@ sudo service metricbeat start
 Filebeatと同様にデータが取り込まれているかをKibanaを開いて確認します。
 ブラウザを開いてKibana（@<href>{http://{Global_IP\}:5601}）へアクセスします。
 
-Index Patternsの画面を開くとFilebeatのインデックスパターンの他にMetricbeatのインデックスパターンがあることがわかります
+Index Patternsの画面を開くとFilebeatのインデックスパターンの他にMetricbeatのインデックスパターンがあることがわかります。
 
 //image[metricbeat01][Metricbeatのインデックスを確認その1]{
 //}
@@ -416,7 +416,7 @@ CPUやメモリ、プロセスの状態をニアリアルタイムにモニタ�
 //}
 
 このようにサーバやコンテナなどにMetricbeatを導入することで一元的にサーバの状態をモニタリングすることができます。
-次が最後ですが、監査ログを容易に取り込むためのAuditbeatについてみていきます。
+最後に、監査ログを容易に取り込むためのAuditbeatについてみていきます。
 
 
 == Auditbeat
