@@ -130,7 +130,7 @@ No.	Item	Content
 また、Apacheのアクセスログは、@<code>{httpd}という@<code>{tags}を設定しています。
 
 
-=== Filter処理内容について
+=== Filter処理内容について
 
 本章では、Inputで定義した@<code>{tags}をベースにif分岐を用いた処理を行ないました。
 if文の記述方法はRubyの記法で記述します。
@@ -164,7 +164,7 @@ HTTPD_COMBINED_LOG %{HTTPD_COMMONLOG} %{QS:referrer} %{QS:agent}
 実際にフィールド削除を行なう場合は、以下のように記載します。今回は、@<code>{path}、@<code>{host}、@<code>{date}を削除対象としています。
 
 
-=== Output処理内容について
+=== Output処理内容について
 
 
 5章では、インデックスをデフォルト（@<code>{logstash-YYYY.MM.DD}）にしていましたが、複数の場合は、個々でインデックスを指定する必要があります。

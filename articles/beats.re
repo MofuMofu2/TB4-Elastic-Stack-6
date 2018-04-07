@@ -100,7 +100,6 @@ $ tail -f /var/log/nginx/access.log
 
 === Filebeat Module
 
-
 Filebeatの設定ファイルを編集する前に、@<code>{filebeat.yml}を@<code>{filebeat.reference.yml}に置き換えます。
 このとき@<code>{filebeat.reference.yml}という名前から@<code>{filebeat.yml}に名前を合わせて変更します。
 @<code>{filebeat.reference.yml}にModulesの設定が記載されているため、これを利用した方がより簡単にBeatsのセットアップが行えるからです。
@@ -196,7 +195,7 @@ sudo service filebeat start
 //}
 
 
-あとは、データが取り込まれているかをKibana@<href>{http://{Global_IP\\}:5601}を開いて確認します。
+あとは、データが取り込まれているかをKibana@<href>{http://{Global_IP\}:5601}を開いて確認します。
 
 
 
