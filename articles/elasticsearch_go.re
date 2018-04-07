@@ -120,7 +120,7 @@ RDBMSで例えると以下に相当します。
 
 その際は投入したJSONデータにあわせたMappingが自動で作成されます。
 実際のアプリケーションでElasticsearchを利用する場合、Mapping定義によりデータスキーマを固めて利用することの方が多いかと思います。
-また、Mapping定義を作成することにより、各フィールド単位でより細かな検索設定をおこなえるため、本章では動的Mappingは利用せず、Mapping定義を作成し利用します。
+また、Mapping定義を作成することにより、各フィールド単位でより細かな検索設定をおこなうことが可能です。本章では動的Mappingは利用せず、Mapping定義を1から作成し利用します。
 
 
 === 本章で利用するMapping定義
@@ -158,9 +158,11 @@ Elasticsearchを操作するにあたり利用するMapping定義を@@<list>{ela
 今回は@@<code>{chat}というTypeへドキュメントを登録していきます。また、@@<code>{properties}にフィールドの項目を設定します。
 フィールド名とそのデータ型を@@<code>{type}で指定していきます。今回指定しているデータ型について説明します。
 
-keyword	いわゆるString型です。後述するtext型もString型に相当します。しかしkeyword型の場合、そのフィールドへアナライザは適用されません。
-text	String型に相当します。text型を指定したフィールドはアナライザと呼ばれるElasticsearchの高度な検索機能を利用した検索が可能となります。
-date	日付型です。Elasticsearchへのデータ投入はJSONを介して行うため、実際にデータを投入する際はdateフォーマットに即した文字列を投入することになります。
+@@<code>{keyword}はいわゆるString型です。後述するtext型もString型に相当します。しかしkeyword型の場合、そのフィールドへアナライザは適用されません。
+
+@@<code>{text}はString型に相当します。text型を指定したフィールドはアナライザと呼ばれるElasticsearchの高度な検索機能を利用した検索が可能となります。
+
+@@<code>{date}は日付型です。Elasticsearchへのデータ投入はJSONを介して行うため、実際にデータを投入する際はdateフォーマットに即した文字列を投入することになります。
 
 
 keyword型とtext型は両者ともString型に相当します。その違いはアナライザを設定できるか否かです。
@@ -168,14 +170,8 @@ keyword型とtext型は両者ともString型に相当します。その違いは
 
 
 
-Elasticsearch 6系のデータ型の詳細は本家ドキュメントを参照してみてください。
+Elasticsearch 6系のデータ型の詳細は公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html}）を参照してみてください。
 多くのデータ型が標準でサポートされていています。
-
-
-//quote{
-https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html
-
-//}
 
 === Hello, Elasticsearch with GO
 
