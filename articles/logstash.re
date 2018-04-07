@@ -298,7 +298,7 @@ Elasticsaerchのヒープサイズを変更したい場合、jvm.optionsを編�
 公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html,Settings the heap size:}）にも考慮点が記載されているので、そちらも参考に値を決めてください。
 
  * 最小ヒープサイズ(Xms)と最大ヒープサイズ(Xmx)の値を等しくする
- * ヒープサイズを上げすぎるとGCの休止をまねく可能性がある
+ * ヒープサイズを上げすぎるとGCの休止を招く可能性がある
  * Xmxは、物理メモリの50%を割り当てて、ファイルシステム側にも十分に残すようにする
  * 割り当てるメモリは、32GB以下にする
 
@@ -331,7 +331,7 @@ No.	Item	Content
 -----------------
 1	cluster.name: my-application	クラスタ名の指定
 2	node.name	ノード名の指定
-3	network.host	アクセス元のネットワークアドレスを指定することで制限をかけることが可能
+3	network.host	アクセス元のネットワークアドレスを指定することで制限をかける
 4	discovery.zen.ping.unicast.hosts	クラスタを組む際にノードを指定
 5	discovery.zen.minimum.master.nodes	必要最低限のノード数を指定
 //}
@@ -346,7 +346,7 @@ service elasticsearch start
 //}
 
 
-動作確認としてELasticsearchに対して、@<code>{curl}コマンドを発行します。
+動作確認としてElasticsearchに対して、@<code>{curl}コマンドを発行します。
 Elasticsearchは、ローカル環境に構築しているので@<code>{localhost}を接続先とします。
 ポートは設定を変更していない限り@<code>{9200}です。今回はデフォルト設定のままです。
 
