@@ -235,10 +235,13 @@ Multiple Pipelinesの設定をするために利用する定義ファイルは@<
 No.	Item	Content
 -----------------
 1	pipeline.id	任意のパイプラインIDを付与できます
-2	pipeline.batch	個々のワーカースレッドのバッチサイズの指定。サイズを大きくすれば効率的に処理が可能だが、メモリオーバヘッドが増加する可能性がある。また、ヒープサイズにも影響する。
+2	pipeline.batch	個々のワーカースレッドのバッチサイズの指定。
 3	path.config:	パイプラインファイルのパス指定
 4	pipeline.worker	ワーカーの数を指定
 //}
+
+@<code>{pipeline.batch}ですが、サイズを大きくすれば効率的に処理が可能です。
+しかし、メモリオーバヘッドが増加する可能性があります。また、ヒープサイズにも影響があるため慎重に設定しましょう。
 
 これでMultiple Pipelinesの定義は完了です。
 ただ、これではLogstashは動作しません。Multiple Pipelinesへの対応として、パイプラインファイルの分割とファイル名（拡張子）を変更します。
@@ -247,10 +250,11 @@ No.	Item	Content
 === パイプラインファイルの分割
 
 
-パイプラインファイルの@<code>{alb_httpd.conf}を分割します。
-まず、ALB用のパイプラインファイルとして、@<code>{alb.cfg}にします。
-拡張子を@<code>{conf}から@<code>{cfg}に変更します。拡張子@<code>{conf}のままでも問題ないのですが、
-ここでは公式ドキュメントに則って@<code>{cfg}にします。
+ALBログとApacheのアクセスログ、それぞれの処理用にパイプラインを作成したいので、今ある@<code>{alb_httpd.conf}を分割して設定ファイルを作成します。
+
+まず、ALB用のパイプラインファイルとして、@<code>{alb.cfg}を作成し、@<code>{alb_httpd.conf}の該当部分をコピーします。
+このとき拡張子を@<code>{conf}から@<code>{cfg}に変更します。拡張子@<code>{conf}のままでも問題ないのですが、
+ここでは公式ドキュメントに則って@<code>{cfg}に設定します。
 
 @<list>{logstash_pipelines-07}は@<code>{alb_httpd.cfg}の内容です。
 特に中身に変更はありません。@<code>{httpd}の部分とif文を削除しただけですね。
