@@ -9,7 +9,7 @@ Elasticsearchの入門の多くはREST APIを使ったものが多いですが�
 
 そこで、本章ではElasticsearchの基本操作をGo言語を利用して体験していきます。Elasticsearchの基本的な操作を中心に、ちょっとしたTipsについても触れていきます。
 Elasticsearchはとても多くの機能を有しています。そのため、全ての機能をカバーすることは難しいです。よって、代表的な機能について本章では記載します。
-また本章ではElasticsearchのAPIを主に扱います。Elasticsearchのクラスタリング機能などについては、最低限の情報しか記載していません。
+また本章ではElasticsearchのAPIを主に扱います。Elasticsearchのクラスタリング機能などについては、最低限の情報しか記載していません	。
 
 
 == Elasticsearch環境の準備
@@ -24,29 +24,31 @@ docker pull docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 //}
 
 
-下記コマンドで取得したDockerイメージが起動できるかを確認します。
+Dockerイメージが起動できるかを確認します。
 
 
-//list{
-# docker run -p 9200:9200  -e "discovery.type=single-node" -e "network.publish_host=localhost" docker.elastic.co/elasticsearch/elasticsearch:6.2.2
+//list[elasticsearch-list02][Dockerイメージの起動]{
+docker run -p 9200:9200  -e "discovery.type=single-node" -e "network.publish_host=localhost"
+（紙面の都合により改行）docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 //}
 
 
-起動に成功するとプロンプト上に起動ログが出力されます。
+起動に成功すると、プロンプト上に起動ログが出力されます。
 ポートマッピングで指定している9200ポートはElasticsearchへのAPIを実行するためのエンドポイントです。
-Elastic社のDockerイメージはDocker起動時に環境変数経由で設定を変更できます。
-本章で指定しているオプションは以下の通りです。
+Elastic社のDockerイメージを利用すると、Docker起動時に環境変数経由で設定を変更できます。
+起動時にいくつかオプションを指定しているため解説します。
 
-//table[tbl1][]{
-オプション	値	説明
------------------
-discovery.type	single-node	このElasticsearchはクラスタを構成せず、シングルノード構成であることを明示します。そうすることで起動時に自分自信をマスタノードとして設定し起動します。
-network.publish_host	localhost	ElasticsearchのAPIエンドポイントとして公開するIPアドレスを指定します。指定しなかった場合、Dockerコンテナ内部のプライベートIPアドレスになります。そのため、ローカルホストから直接エンドポイントへ接続することができないため、この設定を入れています。
-//}
+まず、オプション@@<code>{discovery.type}を@@<code>{single-node}に設定しています。
+このElasticsearchはクラスタを構成せず、シングルノード構成であることを明示します。すると、起動時に自分自身をマスタノードとして設定し起動します。
+
+次に、@@<code>{network.publish_host}を@@<code>{loccalhost}に設定しました。
+ElasticsearchのAPIエンドポイントとして公開するIPアドレスを指定します。
+指定しなかった場合、Dockerコンテナ内部のプライベートIPアドレスになります。
+ローカルホストから直接エンドポイントへ接続することができないため、この設定を入れています。
 
 
-正常に起動しているか確認してみましょう。さきほどマッピングした9200ポートでElasticsearchはREST APIのエンドポインを公開しています。
-下記コマンドによりElasticsearchの基本情報について取得できるか確認してみてください。
+Dockerが正常に起動しているか確認してみましょう。さきほどマッピングした9200ポートでElasticsearchはREST APIのエンドポイントを公開しています。
+下記コマンドによりElasticsearchの基本情報について取得できるか確認してください。
 
 
 //list{
