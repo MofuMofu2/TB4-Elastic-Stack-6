@@ -89,8 +89,8 @@ Elastic社の公式クライアント@<href>{https://github.com/elastic/go-elast
 今回はgo getでインストールしますが、実際のプロダクト利用時はdepなどのパッケージ管理ツールの利用をおすすめします。
 
 
-//list{
-# go get "github.com/olivere/elastic"
+//list[elasticsearch-list04][Elasticクライアントのインストール]{
+go get "github.com/olivere/elastic"
 //}
 
 == Goで始めるElasticsearch
