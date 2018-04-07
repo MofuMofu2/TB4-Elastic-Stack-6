@@ -125,12 +125,13 @@ OpenJDK 64-Bit Server VM (build 25.161-b14, mixed mode)
 
 始めに、Elasticsearchなどのパッケージをダウンロードするため、GPGキーをインポートします。
 
-//list[logstash-003][GPGキーのインポート]{
- rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+//list[logstash-GPG][GPGキーのインポート]{
+rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 //}
 
+
 キーの登録が完了したので、YUMリポジトリを追加します。
-@<chap>{/etc/yum.repo/}配下に@<code>{elasticstack.repo}というファイルを作成します。
+@<code>{/etc/yum.repo/}配下に@<code>{elasticstack.repo}というファイルを作成します。
 公式ドキュメントでは、logstash.repoとなっていますが、今回はElasticsearchなども一緒にインストールするため、Elastic Stackという名前にしました。
 ファイル名は自由につけてよい、ということです。
 
@@ -839,7 +840,7 @@ No.	Item	Content
 
 
 今回は、AWSのアクセスキーとシークレットキーを指定せず、IAM Role
-（@<href>{https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html,IAM Role}）をインスタンスに割り当てています。
+（@<href>{https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html}）をインスタンスに割り当てています。
 オプションで指定することも可能ですが、セキュリティ面からIAM Roleで制御してます。
 
 ===== Outputの編集
@@ -904,10 +905,10 @@ output {
 
 ==== Logstashサービス起動
 
-それでは実行させるのですが、最後は、サービスで動かしたいと思います。
+最後はLogstashをサービスコマンドで起動します。
 
 //list[logstash-37][AWSでLogstashをサービス起動する]{
-initctl start logstash
+sudo initctl start logstash
 //}
 
 

@@ -1,32 +1,20 @@
 = この本の著者・編集者リスト
 
-== keigodasu / @keigodasu
+== keigodasu / @keigodasu（第2章）
 
- * @<chapref>{elasticserch_go}
-
-#@#コメントをどうぞ
-
-== みっち / @micci184
-
- * @<chapref>{logstash}
- * @<chapref>{logstash_pipelines}
 
 #@#コメントをどうぞ
 
-== もふもふ / @froakie0021
+== みっち / @micci184（第3章・第4章・第5章）
 
- * 本の編集・校閲
- * @<chapref>{introduction}
- * @<chapref>{introduction-Elastic_Stack}
- * @<chapref>{Kibana-visualize}
- * @<chapref>{Kibana-alpha}
+#@#コメントをどうぞ
+
+== もふもふ / @froakie0021（本の編集・校閲・はじめに・第１章・第6章・第7章）
 
 わたし、この原稿終わったらゼルダやるんだ…。
 
-== ☆4リコちゃんがでない / ひみつ
+== ☆4リコちゃんがでない / ひみつ（本の校閲）
 
- * 本の校閲@<fn>{fn01}
-
-キュアップ・ラパパ！日本語よ、正しくなりなさい！
+キュアップ・ラパパ！日本語よ、正しくなりなさい！@<fn>{fn01}
 
 //footnote[fn01][もふもふちゃんがお願いして日本語の校閲手伝ってもらいました。☆4リコでるといいね。]
