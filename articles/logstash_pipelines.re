@@ -132,7 +132,7 @@ No.	Item	Content
 
 === Filter処理内容について
 
-@<list>{logstash_pipelines-02}では、Inputで定義した@<code>{tags}をベースにif分岐を用いた処理を行いました。
+@<list>{logstash_pipelines-01}では、Inputで定義した@<code>{tags}をベースにif分岐を用いた処理を行いました。
 if文の記述方法はRubyの記法で記述します。
 
 ここでもGrok処理を行なっているのですが、Apache用のパターンファイルを準備できていないので@<code>{httpd_patterns}を作成します。
