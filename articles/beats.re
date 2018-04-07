@@ -40,7 +40,7 @@ Filebeatを使用することで、Apache、Nginx、MySQLなどのログ収集�
 === Filebeatをインストール
 
 
-Filebeatをインストールします。@@<chapref>{logstash}でyumリポジトリの登録が完了していることを前提として進めます。
+Filebeatをインストールします。@<chapref>{logstash}でyumリポジトリの登録が完了していることを前提として進めます。
 
 
 //list[beats-01][Filebeatsのインストール]{
@@ -50,7 +50,7 @@ sudo yum install filebeat
 === Ingest Node Pluginをインストール
 
 
-UserAgent、GeoIPの解析をするため、@@<code>{Ingest Node Plugin}と@@<code>{Ingest GeoIP plugin}をインストールします。
+UserAgent、GeoIPの解析をするため、@<code>{Ingest Node Plugin}と@<code>{Ingest GeoIP plugin}をインストールします。
 
 
 //list[beats-02][Ingest Node Pluginのインストール]{
@@ -69,9 +69,9 @@ UserAgent、GeoIPの解析をするため、@@<code>{Ingest Node Plugin}と@@<co
 sudo service elasticsearch restart
 //}
 
-今回は@@<code>{Nginx Modules}を例にModulesを利用すると、どの位構築コストが減少するのかを
-検証します。@@<chapref>{logstash}でKibanaをインストールしている環境を引き続き利用することを前提として
-話を進めますが、もし新しい環境で始める場合は@@<chapref>{logstash}や@@<chapref>{Kibana-visualize}を参考に
+今回は@<code>{Nginx Modules}を例にModulesを利用すると、どの位構築コストが減少するのかを
+検証します。@<chapref>{logstash}でKibanaをインストールしている環境を引き続き利用することを前提として
+話を進めますが、もし新しい環境で始める場合は@<chapref>{logstash}や@<chapref>{Kibana-visualize}を参考に
 環境構築を行なってください。
 
 
