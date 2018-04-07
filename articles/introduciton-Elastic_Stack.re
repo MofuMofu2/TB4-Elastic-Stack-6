@@ -5,10 +5,10 @@ Elastic Stackは、Elasticsearch社が提供するプロダクトです。
 しかし、Beatsという新たなプロダクトが増えたことにより、ELKでは違和感があるのと、ELKにうまい具合にB（Beatsの頭文字）を追加することも難しいという事態が発生しました。
 そこで、ELKをやめて、Elastic Stackという名前に統合し、以下の4つがプロダクトとして構成されています。
 
-* Elasticserch
-* Logstash
-* Beats
-* Kibana
+ * Elasticsearch
+ * Logstash
+ * Beats
+ * Kibana
 
 この辺りが有名どころ、かつOSSとして利用できるプロダクトですね。特に検索エンジンとしてのElasticsearchは競合がいないのでは？というくらい
 よく使われているミドルウェアです。
@@ -37,11 +37,11 @@ Elasticsearchは、Javaで作られている分散処理型の検索エンジン
 
 //footnote[introES-fn01][技術書典シリーズって名前で察した方も多いかと思いますが、これは技術書典2でもふもふちゃんがElastic Stack5の同人誌を書いたらインプレスR&Dさんが商業本にしてくれました。KindleでElasticて打つと検索トップに出てくるからびびるんだけど。]
 
-昔は自分たちでElasticsearchを構築・運用するか、AWSの機能として@<code>{Amazon Elasticserch Service}（@<href>{https://aws.amazon.com/jp/elasticsearch-service/}）を利用するしかありませんでした。
+昔は自分たちでElasticsearchを構築・運用するか、AWSの機能として@<code>{Amazon Elasticsearch Service}（@<href>{https://aws.amazon.com/jp/elasticsearch-service/}）を利用するしかありませんでした。
 しかし、Elastic Stack5からはElastic社が提供するクラウドサービス@<code>{Elastic Cloud}（@<href>{https://www.elastic.co/jp/cloud}）を利用することでElasticsearchの管理・バージョンアップ・
 データのバックアップなども柔軟に行うことができるようになりました。基盤の持ち方の選択肢が増えるのはありがたいですよね。
 
-Elasticserchは独自のクエリを使用してデータの問い合わせをおこなうことが特徴です。が、今後のアップデートでSQLを利用してデータの問い合わせをできるようになることが発表されています@<href>{https://www.elastic.co/jp/elasticon/conf/2017/sf/elasticsearch-sql}。
+Elasticsearchは独自のクエリを使用してデータの問い合わせをおこなうことが特徴です。が、今後のアップデートでSQLを利用してデータの問い合わせをできるようになることが発表されています@<href>{https://www.elastic.co/jp/elasticon/conf/2017/sf/elasticsearch-sql}。
 SQLの方が普及率も高いので、さらにElasticsearchを便利に利用することができそうです。
 
 === Logstash
@@ -84,7 +84,7 @@ Apacheのaccess.logなど、利用できるデータは限られています。�
 
 
 大量のサーバのログファイルなどのファイルを一箇所に集約する用途で用います。
-また、集約だけでなく、転送時にあらかじめ用意されたモジュールを利用することで、自動でパース処理を行い、ElasticserchやLogstashに転送することが可能です。
+また、集約だけでなく、転送時にあらかじめ用意されたモジュールを利用することで、自動でパース処理を行い、ElasticsearchやLogstashに転送することが可能です。
 さらに取り込んだデータをビジュアライズするためのダッシュボードも用意されているため、簡単に導入することができます。
 
 
@@ -122,7 +122,7 @@ Windowsの動作ログを取得したい場合、1番導入が簡単で手軽な
 
 
 サーバの監査ログを収集することができます。
-通常、auditdのログを監査ログとして利用する場面が多いと思いますが、Auditbeatを使用することで、必要な情報をグルーピングし、Elasticserchに転送することができます（要は意識せずストアまでやってくれます）。
+通常、auditdのログを監査ログとして利用する場面が多いと思いますが、Auditbeatを使用することで、必要な情報をグルーピングし、Elasticsearchに転送することができます（要は意識せずストアまでやってくれます）。
 また、Modulesに対応しているため、導入からKibanaを用いたデータの可視化までを一括で行うことができます。
 
 
