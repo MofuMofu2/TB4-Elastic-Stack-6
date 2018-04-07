@@ -5,10 +5,11 @@
 
 
 Elasticsearchの入門の多くはREST APIを使ったものが多いですが、実際にアプリケーション作成する際は何らかの言語のSDKを利用するかと思います。
-そうした際に意外と「あれ、これってどうやるんだ？」というのが多いものです。
-そこで、本章ではElasticsearchの基本操作をGo言語を通じて体験していきます。基本的な操作を中心にちょっとしたTipsについても触れていきます。
-Elasticsearchはとても多くの機能を有しています。そのため、全ての機能をカバーすることは難しいので代表的な機能について本章では記載していきます。
-また本章ではElasticsearchのAPIを主に扱うため、Elasticsearchのクラスタリング機能といった機能については最低限触れていきます。
+そうした際に意外と「あれ、これってどうやるんだ？」となる場合が多いものです。
+
+そこで、本章ではElasticsearchの基本操作をGo言語を利用して体験していきます。Elasticsearchの基本的な操作を中心に、ちょっとしたTipsについても触れていきます。
+Elasticsearchはとても多くの機能を有しています。そのため、全ての機能をカバーすることは難しいです。よって、代表的な機能について本章では記載します。
+また本章ではElasticsearchのAPIを主に扱います。Elasticsearchのクラスタリング機能などについては、最低限の情報しか記載していません。
 
 
 == Elasticsearch環境の準備
@@ -18,15 +19,15 @@ Elasticsearchはとても多くの機能を有しています。そのため、�
 下記のコマンドを実行してDockerイメージを取得してください。
 
 
-//emlist{
-# docker pull docker.elastic.co/elasticsearch/elasticsearch:6.2.2
+//list[elasticsearch-list01][Dockerイメージの取得]{
+docker pull docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 //}
 
 
 下記コマンドで取得したDockerイメージが起動できるかを確認します。
 
 
-//emlist{
+//list{
 # docker run -p 9200:9200  -e "discovery.type=single-node" -e "network.publish_host=localhost" docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 //}
 
@@ -48,7 +49,7 @@ network.publish_host	localhost	ElasticsearchのAPIエンドポイントとして
 下記コマンドによりElasticsearchの基本情報について取得できるか確認してみてください。
 
 
-//emlist{
+//list{
 # curl http://localhost:9200
 {
   "name" : "WlZn3XP",
@@ -104,7 +105,7 @@ https://github.com/olivere/elastic
 今回はgo getでインストールしますが、実際のプロダクト利用時はdepなどのパッケージ管理ツールの利用をおすすめします。
 
 
-//emlist{
+//list{
 # go get "github.com/olivere/elastic"
 //}
 
@@ -152,7 +153,7 @@ https://www.elastic.co/guide/en/elasticsearch/reference/master/removal-of-types.
 Elasticsearchを操作するにあたり利用するMapping定義は以下の通りです。
 
 
-//emlist{
+//list{
 {
   "mappings": {
     "chat": {
@@ -209,7 +210,7 @@ https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.ht
 まずはさきほどDockerで起動したElasticsearchへの接続確認も兼ねて、Elasticsearchのバージョン情報などを取得してみましょう。
 
 
-//emlist[][Go]{
+//list[][Go]{
 package main
 
 import (
@@ -261,7 +262,7 @@ Elasticsearchのバージョン情報といったシステム情報を取得す�
 なので、今回サンプルとして利用するChat Mappingに対応するStructを定義します。
 
 
-//emlist{
+//list{
 type Chat struct {
     User    string    `json:"user"`
     Message string    `json:"message"`
@@ -280,7 +281,7 @@ IDの振り方には登録時にクライアント側で設定するか、Elasti
 さきほど作成したクライアントセッションを利用して操作をおこなっていきましょう。
 
 
-//emlist[][Go]{
+//list[][Go]{
 package main
 
 import (
@@ -333,7 +334,7 @@ func main() {
 olivere/elasticでは取得したドキュメントはStrucrtに詰め直し、そのStructのフィールドを経由してデータを取得できます。
 
 
-//emlist[][Go]{
+//list[][Go]{
 
 type Chat struct {
   User string `json:"user"`,
@@ -362,7 +363,7 @@ func main() {
 ドキュメントIDをもとに登録したドキュメントを削除してみます。
 
 
-//emlist[][Go]{
+//list[][Go]{
 package main
 
 import (
@@ -459,7 +460,7 @@ Analyzerは以下の要素から構成されています。これらを組み合
 さきほどのChat Mappingのmessageフィールドに日本語形態素解析プラグインであるKuromojiを適用してみましょう。
 
 
-//emlist{
+//list{
 {
   "settings": {
     "analysis": {
@@ -526,7 +527,7 @@ Chatマッピングのmessageフィールドのanalyzerにさきほど作成し�
 ここではMapping定義を再作成します。
 
 
-//emlist{
+//list{
 # curl -XDELETE 'http://localhost:9200/chat'
 # curl -XPUT 'http://localhost:9200/chat' -H "Content-Type: application/json" -d @mapping.json
 //}
@@ -543,7 +544,7 @@ Searchメソッドはelastic.SearchServiceのQueryメソッドに検索条件を
 取得できたドキュメントをStruct経由で操作する際はreflectパッケージを使って操作します。
 
 
-//emlist{
+//list{
 package main
 
 import (
@@ -601,7 +602,7 @@ olivere/elasticでTermクエリを利用する際はTerm Queryはelastic.TermQue
 elastic.NewTermQueryは検索対象のフィールドと検索文字列を指定します。
 
 
-//emlist{
+//list{
 package main
 
 import (
@@ -669,7 +670,7 @@ must_not	NOTに相当します。	boolQuery := elastic.NewBoolQuery() <br> boolQ
 userが「佐藤」で、messageに「Elasticsearch」が含まれるが「Solor」が含まれないドキュメントを検索するクエリは以下の通りです。
 
 
-//emlist{
+//list{
 package main
 
 import (
@@ -748,7 +749,7 @@ Scroll APIを利用することで、スクロールタイプのページング�
 使い方もとても簡単で、elastic.ScrollServiceを介して操作することができます。
 
 
-//emlist{
+//list{
 package main
 
 import (
@@ -800,7 +801,7 @@ Multi Fields機能を利用することで一つのフィールドに対して�
 といってもすぐにピンとこないかもしれませんので、実際にMulti Fieldsの設定をしているMapping定義をみてみましょう。
 
 
-//emlist{
+//list{
 
 {
   "mappings": {
@@ -838,7 +839,7 @@ Aliasを利用することでインデックスに別名をつけてアクセス
 olivere/elasticではAliasServiceを経由して操作することができます。
 
 
-//emlist{
+//list{
 package main
 
 import (
@@ -881,7 +882,7 @@ func main() {
 olivere/elasticではelastic.Error経由で詳細なエラー情報を取得できます。これをもとにしてエラーハンドリングを実装することができます。
 
 
-//emlist[][Go]{
+//list[][Go]{
  err := client.IndexExists("chat").Do()
 if err != nil {
     // Get *elastic.Error which contains additional information
