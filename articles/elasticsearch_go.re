@@ -48,10 +48,14 @@ ElasticsearchのAPIエンドポイントとして公開するIPアドレスを�
 
 
 Dockerが正常に起動しているか確認してみましょう。さきほどマッピングした9200ポートでElasticsearchはREST APIのエンドポイントを公開しています。
-下記コマンドによりElasticsearchの基本情報について取得できるか確認してください。
+@@<list>{elasticsearch-list03}を用いてElasticsearchの基本情報について取得できるか確認してください。
 
 
-//list{
+//list[elasticsearch-list03][Elasticsearchの起動確認]{
+curl http://localhost:9200
+//}
+
+//cmd{
 # curl http://localhost:9200
 {
   "name" : "WlZn3XP",
@@ -69,13 +73,7 @@ Dockerが正常に起動しているか確認してみましょう。さきほ�
 //}
 
 
-ElasticsearchのDockerイメージの細かなオプションなどは下記に記載があります。
-
-
-//quote{
-https://hub.docker.com/_/elasticsearch/
-
-//}
+ElasticsearchのDockerイメージの起動オプションなどはDockerHubのドキュメント（@<href>{https://hub.docker.com/_/elasticsearch/}）に記載があります。
 
 == クライアントライブラリの選定
 
