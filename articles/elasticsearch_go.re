@@ -398,7 +398,7 @@ Elasticsearchは多くの検索機能をサポートしていますが、本章�
  * Term Query
  ** 指定した文字列での検索をおこないますが、Match Queryとは違い検索指定文字列がAnalyzeされません。例えば、タグ検索のように指定した文字列で完全一致させたドキュメントを探したい時などはTerm Queryを利用するといったケースです。
  * Bool Query
- ** AND/OR/NOTによる検索がおこなえます。実際にはmust/should/must_notといったElasticsearch独自の指定方法を利用します。検索条件をネストさせることも可能で、より複雑な検索クエリを組み立てることができます。
+ ** AND/OR/NOTによる検索がおこなえます。実際にはmust/should/must_notといったElasticsearch独自の指定方法を利用します。検索条件をネストさせることも可能で、より複雑な検索Queryを組み立てることができます。
 
 
 ==== Match Query
@@ -413,12 +413,12 @@ MatchQueryは全文検索の肝です。MatchQueryでは、指定した検索文
 
 
 Analyzerは以下の要素から構成されています。これらを組み合わせることでより柔軟な検索のためのインデックスを作成できます。
-* Tokenizer
-  * ドキュメントをどうトークン分割するかを定義します。トークン分割には様々な方法があり、有名なものだと形態素解析やN-Gramなどがあります。Tokenizerにより分割されたトークンをもとに検索文字列との比較がおこなわれます。各Analyzerは1つのTokenizerを持つことができます。
-* Character filters
-  * Tokenizerによるトークン分割がされる前に施す処理を定義します。例えば検索文字列のゆらぎを吸収するために、アルファベットの大文字・小文字を全て小文字に変換したり、カタカナの全角・半角を全て半角に統一したりといった処理をトークン分割の前処理として実施します。
-* Token filters
-  * Tokenizerによるトークン分割がされた後に施す処理を定義します。例えば、形態素解析のように品詞をもとにトークン分割するような場合、分割後のトークンから検索には不要そうな助詞を取り除いたりといった処理が該当します。
+ * Tokenizer
+  ** ドキュメントをどうトークン分割するかを定義します。トークン分割には様々な方法があり、有名なものだと形態素解析やN-Gramなどがあります。Tokenizerにより分割されたトークンをもとに検索文字列との比較がおこなわれます。各Analyzerは1つのTokenizerを持つことができます。
+ * Character filters
+  ** Tokenizerによるトークン分割がされる前に施す処理を定義します。例えば検索文字列のゆらぎを吸収するために、アルファベットの大文字・小文字を全て小文字に変換したり、カタカナの全角・半角を全て半角に統一したりといった処理をトークン分割の前処理として実施します。
+ * Token filters
+  ** Tokenizerによるトークン分割がされた後に施す処理を定義します。例えば、形態素解析のように品詞をもとにトークン分割する場合、分割後のトークンから検索には不要と思われる助詞を取り除くといった処理が該当します。
 
 
 
@@ -430,7 +430,7 @@ Analyzerは以下の要素から構成されています。これらを組み合
 さきほどのChat Mappingのmessageフィールドに日本語形態素解析プラグインであるKuromojiを適用してみましょう。
 
 
-//list{
+//list[elasticsearch-list11][Analyzerの設定]{
 {
   "settings": {
     "analysis": {
@@ -485,12 +485,12 @@ Analyzerの設定はMapping定義のanalysisでおこないます。tokenizerで
  ** kuromoji_tokenizer: xxxxxxxxxxx
  * 適用Filter
  ** kuromoji_base: xxxxxxxxxxx
- ** kuromoji@<b>{part}of_speech: xxxxxxxxxxx
+ ** kuromoji_part_of_speech: xxxxxxxxxxx
 
 
 
 作成したAnalyzerを適用したいMappingフィールドに指定することで、そのフィールドにAnalyzerで指定したインデクシングを施すことができます。
-Chatマッピングのmessageフィールドのanalyzerにさきほど作成したAnalyzerを指定することで適用します。
+Chatマッピングの１階層下に存在する、messageフィールドのanalyzerにさきほど作成したAnalyzerを指定することで適用します。
 
 
 
@@ -503,7 +503,7 @@ Chatマッピングのmessageフィールドのanalyzerにさきほど作成し�
 //}
 
 
-これで準備が整いました！それではここの詳細にうつっていきましょう。
+これで準備が整いました！それではここの詳細に移っていきましょう。
 
 
 ==== Match Query
@@ -567,8 +567,8 @@ func main() {
 ==== Term Query
 
 
-Termクエリを利用することで、指定した文字列を完全に含むドキュメントを検索することができます。
-olivere/elasticでTermクエリを利用する際はTerm Queryはelastic.TermQueryを利用します。
+TermQueryを利用することで、指定した文字列を完全に含むドキュメントを検索することができます。
+Elastic:An Elasticsearch client for the GoでTermQueryを利用する際はTerm Queryは@@<code>{elastic.TermQuery}を利用します。
 elastic.NewTermQueryは検索対象のフィールドと検索文字列を指定します。
 
 
@@ -625,15 +625,15 @@ func main() {
 ==== Bool Query
 
 
-BoolクエリではAND/OR/NOTによる検索がおこなえます。検索条件をネストさせることも可能で、より複雑な検索クエリを組み立てることができます。
+BoolQueryではAND/OR/NOTによる検索がおこなえます。検索条件をネストさせることも可能で、より複雑な検索Queryを組み立てることができます。
 実際にはmust/should/must_notといったElasticsearch独自の指定方法を利用します。
 
 //table[tbl3][]{
-クエリ	説明	oliver/elasticでの指定方法
+Query	説明	oliver/elasticでの指定方法
 -----------------
-must	ANDに相当します。	boolQuery := elastic.NewBoolQuery() <br> boolQuery.Must(elastic.NewTermQuery("field", "value")
-should	ORに相当します。	boolQuery := elastic.NewBoolQuery() <br> boolQuery.Should(elastic.NewTermQuery("field", "value")
-must_not	NOTに相当します。	boolQuery := elastic.NewBoolQuery() <br> boolQuery.MustNot(elastic.NewTermQuery("field", "value")
+must	ANDに相当	boolQuery := elastic.NewBoolQuery() <br> boolQuery.Must(elastic.NewTermQuery("field", "value")
+should	ORに相当	boolQuery := elastic.NewBoolQuery() <br> boolQuery.Should(elastic.NewTermQuery("field", "value")
+must_not	NOT	boolQuery := elastic.NewBoolQuery() <br> boolQuery.MustNot(elastic.NewTermQuery("field", "value")
 //}
 
 
