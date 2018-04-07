@@ -50,52 +50,27 @@ sudo yum install filebeat
 === Ingest Node Pluginをインストール
 
 
-UserAgent、GeoIP解析をするため、以下のプラグインをインストールします。
+UserAgent、GeoIPの解析をするため、@@<code>{Ingest Node Plugin}と@@<code>{Ingest GeoIP plugin}をインストールします。
 
 
-//list[][bash]{
-### Install ingest-user-agent
-$ /usr/share/elasticsearch/bin/elasticsearch-plugin install ingest-user-agent
--> Downloading ingest-user-agent from elastic
-[=================================================] 100%
--> Installed ingest-user-agent
+//list[beats-02][Ingest Node Pluginのインストール]{
+/usr/share/elasticsearch/bin/elasticsearch-plugin install ingest-user-agent
+//}
 
-### Install ingest-geoip
-$ /usr/share/elasticsearch/bin/elasticsearch-plugin install ingest-geoip
--> Downloading ingest-geoip from elastic
-[=================================================] 100%
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-@     WARNING: plugin requires additional permissions     @
-@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-* java.lang.RuntimePermission accessDeclaredMembers
-* java.lang.reflect.ReflectPermission suppressAccessChecks
-See http://docs.oracle.com/javase/8/docs/technotes/guides/security/permissions.html
-for descriptions of what these permissions allow and the associated risks.
-
-Continue with installation? [y/N]y
--> Installed ingest-geoip
+//list[beats-03][Ingest GeoIP pluginのインストール]{
+/usr/share/elasticsearch/bin/elasticsearch-plugin install ingest-geoip
 //}
 
 
-問題なくインストールが完了したらElasticsearchを再起動します。
+インストールが完了したらElasticsearchを再起動します。
 
 
-//list[][bash]{
-$ service elasticsearch restart
-Stopping elasticsearch:                                    [  OK  ]
-Starting elasticsearch:                                    [  OK  ]
+//list[beats-04][Elasticsaerchの再起動]{
+sudo service elasticsearch restart
 //}
 
-
-FilebeatのNginx Moduleを使用して、どれだけ楽に構築できるかを触れたいと思います。
-そのほかのModuleについては、以下の公式ページに記載してあります。
-
-
-//quote{
-Filebeat Module:
-https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-modules.html
-
-//}
+今回は@@<code>{Nginx Modules}を例にModulesを利用すると、どの位構築コストが減少するのかを
+検証します。
 
 === Kibanaをインストール
 
