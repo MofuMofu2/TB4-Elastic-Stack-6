@@ -115,7 +115,7 @@ git log  --oneline --pretty=format:"%h, %an, %aI, %f, %s " >gitlog.json
 //cmd{
 cdbfc69, keigodasu, 2018-02-25T11:21:26+09:00, delete-unnecessary-file, delete unnecessary file
 e39b32e, keigodasu, 2018-02-25T11:19:48+09:00, writing, writing
-4aef633, keigodasu, 2018-02-24T13:05:42+09:00, add-sameple-source-directory, add sameple source directory
+4aef633, keigodasu, 2018-02-24T13:05:42+09:00, add-sameple-source-directory
 6d352ee, micci184, 2018-02-24T11:25:58+09:00, add, [add]プロダクト紹介追加
 9605c33, micci184, 2018-02-21T13:13:08+09:00, add, [add]はじめにを追加
 834051a, keigodasu, 2018-02-20T19:50:06+09:00, Writing, Writing
@@ -133,44 +133,36 @@ Authorのメールアドレスを書いておくと、他の著者2人から怒�
 実際の出力結果をみるとわかりやすいと思うので、まずは@<list>{kibana01-list05}を実行してみましょう。
 
 //list[kibana01-list05][Gitのコミットログをjsonっぽく整形する]{
-git log  --oneline --pretty=format:'{"commit_hash":"%h","author_name":"%an","author_date":"%aI","change_summary":"%f","subject":"%s"}' >gitlog.json
+git log  --oneline --pretty=format:'{"commit_hash":"%h","author_name":"%an",
+（ページの都合で改行）"author_date":"%aI","change_summary":"%f","subject":"%s"}'
+（ページの都合で改行）>gitlog.json
 //}
 
-実行すると、下記のようなファイルが生成されます。
+実行すると、下記のようなファイルが生成されます。紙面の都合上、途中で改行しています。
 
 //cmd{
-{"commit_hash":"fd7fef2","author_name":"MofuMofu2","author_date":"2018-03-04T20:49:57+09:00","change_summary":"update","subject":"[update] コマンドと出力結果の見せ方をわけた"}
-{"commit_hash":"ee03ea3","author_name":"MofuMofu2","author_date":"2018-03-04T20:49:14+09:00","change_summary":"update-list","subject":"[update] コマンドをlistにした"}
-{"commit_hash":"6ca8d4d","author_name":"MofuMofu2","author_date":"2018-03-04T20:33:41+09:00","change_summary":"add","subject":"[add] この章の目的を追加して、補足を入れた"}
-{"commit_hash":"89b032d","author_name":"MofuMofu2","author_date":"2018-03-04T20:23:50+09:00","change_summary":"add-Elastic-Stack","subject":"[add] Elastic Stackの基本機能を説明する章を追加"}
-{"commit_hash":"d39b109","author_name":"MofuMofu2","author_date":"2018-03-04T20:23:25+09:00","change_summary":"delete","subject":"[delete] テストファイルを削除"}
-{"commit_hash":"85c9d7b","author_name":"micci184","author_date":"2018-02-28T05:58:00+09:00","change_summary":"fix-logstash_beats.re","subject":"[fix]logstash_beats.re"}
-{"commit_hash":"663f1c1","author_name":"micci184","author_date":"2018-02-28T05:54:22+09:00","change_summary":"fix-logstash_beats.re","subject":"[fix]logstash_beats.re"}
-{"commit_hash":"f4e953c","author_name":"micci184","author_date":"2018-02-28T05:29:31+09:00","change_summary":"add-catalog.yml","subject":"[add]catalog.yml"}
-{"commit_hash":"0d54c49","author_name":"micci184","author_date":"2018-02-28T05:25:47+09:00","change_summary":"Convert-md-to-Re-VIEW","subject":"Convert md to Re:VIEW"}
-{"commit_hash":"05cb0dc","author_name":"micci184","author_date":"2018-02-28T05:20:03+09:00","change_summary":"typo","subject":"typo"}
-{"commit_hash":"7f806cb","author_name":"micci184","author_date":"2018-02-28T04:43:48+09:00","change_summary":"add-capture","subject":"[add]capture"}
+{"commit_hash":"fd7fef2","author_name":"MofuMofu2","author_date":"2018-03-04T20:49:57+09:00",
+"change_summary":"update","subject":"[update] コマンドと出力結果の見せ方をわけた"}
 //}
 
 jsonっぽいですね！これをKibanaで利用するサンプルデータとしたいと思います。
 
-@<code>{git-log-to-json}というnpmパッケージを利用すると@<href>{https://www.npmjs.com/package/git-log-to-json}、Node.jsを
-利用してgit logをjson形式で出力できるようです。今回は本題から外れるので扱いませんが、またどこかで記事を公開したいですねー。
+@<code>{git-log-to-json}というnpmパッケージを利用すると（@<href>{https://www.npmjs.com/package/git-log-to-json}）、Node.jsを
+利用してgit logをjson形式で出力できるようです。今回は本題から外れるので扱いませんが、どこかで知見をためて公開したいですねー。
 
 == Elastic Stackの環境構築
 
 テストデータが準備できたので、いよいよKibanaを起動しましょう。
 本章のElastic Stack環境は全てzipファイルをダウンロード＆展開して構築しています。
 
-詳細な構築方法は@<b>{Elastic Stackとは}の章を参考にしてください。
 もふちゃんはMacに@<code>{Elastic-Stack}という名前でディレクトリを作成し、その中に各プロダクトを配置しました。
 
 //emlist[もふちゃんのElastic-Stack実行環境]{
 Elastic-Stack--logstash-6.2.2
-							|
-							-elasticsearch-6.2.2
-							|
-							-kibana-6.2.2-darwin-x86_64
+             |
+             -elasticsearch-6.2.2
+             |
+             -kibana-6.2.2-darwin-x86_64
 //}
 
 @<code>{ls}コマンドで確認した結果も参考として載せておきます。
