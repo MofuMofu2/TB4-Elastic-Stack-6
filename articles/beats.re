@@ -70,28 +70,10 @@ sudo service elasticsearch restart
 //}
 
 今回は@@<code>{Nginx Modules}を例にModulesを利用すると、どの位構築コストが減少するのかを
-検証します。
+検証します。@@<chapref>{logstash}でKibanaをインストールしている環境を引き続き利用することを前提として
+話を進めますが、もし新しい環境で始める場合は@@<chapref>{logstash}や@@<chapref>{Kibana-visualize}を参考に
+環境構築を行なってください。
 
-=== Kibanaをインストール
-
-
-KibanaのDashboardで取り込んだログを確認するところまで見るため、Kibanaをインストールします。
-
-
-//list[][bash]{
-### Install Kibana
-$ yum install kibana
-//}
-
-
-Kibanaへのアクセス元の制限をしないため、"server.host"の設定を変更します。@<fn>{1}
-
-
-//list[][bash]{
-### Change server.host
-$ vim /etc/kibana/kibana.yml
-server.host: 0.0.0.0
-//}
 
 === Nginx環境を整える
 
