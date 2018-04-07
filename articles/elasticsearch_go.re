@@ -38,17 +38,17 @@ docker run -p 9200:9200  -e "discovery.type=single-node" -e "network.publish_hos
 Elastic社のDockerイメージを利用すると、Docker起動時に環境変数経由で設定を変更できます。
 起動時にいくつかオプションを指定しているため解説します。
 
-まず、オプション@@<code>{discovery.type}を@@<code>{single-node}に設定しています。
+まず、オプション@<code>{discovery.type}を@<code>{single-node}に設定しています。
 このElasticsearchはクラスタを構成せず、シングルノード構成であることを明示します。すると、起動時に自分自身をマスタノードとして設定し起動します。
 
-次に、@@<code>{network.publish_host}を@@<code>{loccalhost}に設定しました。
+次に、@<code>{network.publish_host}を@<code>{loccalhost}に設定しました。
 ElasticsearchのAPIエンドポイントとして公開するIPアドレスを指定します。
 指定しなかった場合、Dockerコンテナ内部のプライベートIPアドレスになります。
 ローカルホストから直接エンドポイントへ接続することができないため、この設定を入れています。
 
 
 Dockerが正常に起動しているか確認してみましょう。さきほどマッピングした9200ポートでElasticsearchはREST APIのエンドポイントを公開しています。
-@@<list>{elasticsearch-list03}を用いてElasticsearchの基本情報について取得できるか確認してください。
+@<list>{elasticsearch-list03}を用いてElasticsearchの基本情報について取得できるか確認してください。
 
 
 //list[elasticsearch-list03][Elasticsearchの起動確認]{
@@ -82,7 +82,7 @@ ElasticsearchのDockerイメージの起動オプションなどはDockerHubの�
 Elastic社の公式クライアント@<href>{https://github.com/elastic/go-elasticsearch}もあるのですが、現時点では絶賛開発中なうえにあまり活発にメンテナンスもされていません…。
 
 
-今回は@@<code>{Elastic:An Elasticsearch client for the Go}（@<href>{https://github.com/olivere/elastic}）を利用します。
+今回は@<code>{Elastic:An Elasticsearch client for the Go}（@<href>{https://github.com/olivere/elastic}）を利用します。
 こちらのクライアントは開発も活発で、Elasticの早いバージョンアップにもいち早く対応されています。
 
 それではクライアントをインストールしましょう。
@@ -128,7 +128,7 @@ RDBMSで例えると以下に相当します。
 
 本章ではChatアプリケーションを想定したIndex/Typeをもとに操作をおこなっていきます。
 
-Elasticsearchを操作するにあたり利用するMapping定義を@@<list>{elasticsearch-list05}に記述しました。
+Elasticsearchを操作するにあたり利用するMapping定義を@<list>{elasticsearch-list05}に記述しました。
 
 
 //list[elasticsearch-list05][Mapping定義]{
@@ -155,14 +155,14 @@ Elasticsearchを操作するにあたり利用するMapping定義を@@<list>{ela
 //}
 
 
-今回は@@<code>{chat}というTypeへドキュメントを登録していきます。また、@@<code>{properties}にフィールドの項目を設定します。
-フィールド名とそのデータ型を@@<code>{type}で指定していきます。今回指定しているデータ型について説明します。
+今回は@<code>{chat}というTypeへドキュメントを登録していきます。また、@<code>{properties}にフィールドの項目を設定します。
+フィールド名とそのデータ型を@<code>{type}で指定していきます。今回指定しているデータ型について説明します。
 
-@@<code>{keyword}はいわゆるString型です。後述するtext型もString型に相当します。しかしkeyword型の場合、そのフィールドへアナライザは適用されません。
+@<code>{keyword}はいわゆるString型です。後述するtext型もString型に相当します。しかしkeyword型の場合、そのフィールドへアナライザは適用されません。
 
-@@<code>{text}はString型に相当します。text型を指定したフィールドはアナライザと呼ばれるElasticsearchの高度な検索機能を利用した検索が可能となります。
+@<code>{text}はString型に相当します。text型を指定したフィールドはアナライザと呼ばれるElasticsearchの高度な検索機能を利用した検索が可能となります。
 
-@@<code>{date}は日付型です。Elasticsearchへのデータ投入はJSONを介して行うため、実際にデータを投入する際はdateフォーマットに即した文字列を投入することになります。
+@<code>{date}は日付型です。Elasticsearchへのデータ投入はJSONを介して行うため、実際にデータを投入する際はdateフォーマットに即した文字列を投入することになります。
 
 
 keyword型とtext型は両者ともString型に相当します。その違いはアナライザを設定できるか否かです。
@@ -208,10 +208,10 @@ func main() {
 //}
 
 
-@@<code>{elastic.NewClient}でクライアントを作成します。その際に@@<code>{elastic.ClientOptionFunc}で複数の設定を引数とすることが可能です。
-@@<list>{elasticsearch-list07}では@@<code>{elastic.SetURL()}にて接続する先のElasticsearchのエンドポイントを指定しています。
+@<code>{elastic.NewClient}でクライアントを作成します。その際に@<code>{elastic.ClientOptionFunc}で複数の設定を引数とすることが可能です。
+@<list>{elasticsearch-list07}では@<code>{elastic.SetURL()}にて接続する先のElasticsearchのエンドポイントを指定しています。
 クライアントを作成すると、そのオブジェクトを通じてElasticsearchを操作することができるようになります。
-Elasticsearchのバージョン情報といったシステム情報を取得する際は@@<code>{Ping}を利用します。
+Elasticsearchのバージョン情報といったシステム情報を取得する際は@<code>{Ping}を利用します。
 
 
 === 単純なCRUD操作
@@ -245,7 +245,7 @@ type Chat struct {
 
 
 まずは単一のドキュメントを登録します。
-Elasticsearchは登録されたドキュメントに対して、ドキュメントを一意に識別するための@@<code>{ドキュメントID}を付与します。
+Elasticsearchは登録されたドキュメントに対して、ドキュメントを一意に識別するための@<code>{ドキュメントID}を付与します。
 IDの振り方には登録時にクライアント側で設定するか、Elasticsearch側でランダムに振ってもらうかの2通りがあります。
 今回は登録時にクライアント側でドキュメントIDを指定します。
 さきほど作成したクライアントセッションを利用して操作をおこなっていきましょう。
@@ -300,7 +300,7 @@ func main() {
 ==== ドキュメントIDによる取得
 
 
-次に先ほど登録したドキュメントを、@@<code>{ドキュメントID}を指定して取得します。
+次に先ほど登録したドキュメントを、@<code>{ドキュメントID}を指定して取得します。
 @<code>{Elastic:An Elasticsearch client for the Go}では取得したドキュメントはStrucrtに保存し直し、そのStructのフィールドを経由してデータを取得できます。
 
 
