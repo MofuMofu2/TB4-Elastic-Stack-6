@@ -100,7 +100,7 @@ curl -XGET localhost:9200/_cat/indices/logstash-*
 //image[kibana02-devtools02][Queryの入力予測が出力される]{
 //}
 
-@@<img>{kibana02-devtools02}のように、Queryの入力予測が画面に表示されます。
+@<img>{kibana02-devtools02}のように、Queryの入力予測が画面に表示されます。
 毎度Queryを調べる必要がなくなりますし、コマンドラインで複雑なQueryを発行するよりも圧倒的に利便性が高いです。
 
 Queryを発行するためには緑の@<code>{▶︎}ボタンをクリックします。
@@ -111,7 +111,7 @@ Queryを発行するためには緑の@<code>{▶︎}ボタンをクリックし
 
 jsonで値が帰ってくる場合、自動でシンタックスハイライトが適用されているので、可読性も高いです。
 
-//image[kibana02-devtools03][jsonでデータが返却されたとき]{
+//image[kibana02-devtools04][jsonでデータが返却されたとき]{
 //}
 
 
@@ -150,7 +150,7 @@ Kibanaの良いところは気軽にグラフを作成・削除できること�
 
 これのことです。
 
-Kibana5までは検索用Queryを入力する窓には何も書いてありませんでした。@@<code>{Kibana Discover}でインターネットの画像検索をしてみると
+Kibana5までは検索用Queryを入力する窓には何も書いてありませんでした。@<code>{Kibana Discover}でインターネットの画像検索をしてみると
 Kibana4・Kibana5の画面が出てきますので気になる方はどうぞ。
 
 今までは検索用Queryがわからないとき、ブラウザを開いてQueryの記述方法を調べるか、データが存在しない時刻を表示してQueryが記載されている画面を出すしかありませんでした。
