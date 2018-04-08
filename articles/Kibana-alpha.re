@@ -71,6 +71,25 @@ Visualizeを利用すると、自分でグラフを作成できるというの�
 
 === Vega
 
+@<code>{Vega}（@<href>{https://vega.github.io/vega/}）は、The UW Interactive Data Lab（@<href>{http://idl.cs.washington.edu/about}）が作成・開発している、データを
+グラフに描画するためのツールです。
+
+Kibanaと同じなのでは？と思う方もいるかもしれませんが、Vegaはグラフを描画するためのデータ・グラフを描画するための設定をjsonで管理します。一方、Kibanaはグラフ描画に利用するデータは
+Elasticsearchから取得しますし、グラフの描画はGUIを用いて行います。
+
+また、Vegaで描画できるグラフの種類（@<href>{https://vega.github.io/vega/examples/}）はKibanaよりも多いです。特にデータ分析を行う場合に利用することが多い
+棒線グラフに標準偏差を記述することが可能です。
+
+しかし、せっかくElasticsearchに投入されているデータが大量にあるのですから、それをより詳しく分析したいですよね。ということで、ベータ版ではありますがKibanaのGUIから
+Vegaの機能を呼び出して利用することができるようになりました。それがVisualize画面のVegaです。
+
+//image[kibana02-vega01][Vega]{
+//}
+
+
+注意してほしいのは、このグラフはベータ版なので開発が中止されたりしれっと無くなったりする可能性があります。むしろこの際Vegaを極めても良いかもしれませんね。
+
+
 == 何気に嬉しいお便利機能
 
 これから紹介する機能はもふちゃんが「あら便利！むかしよりも進化してるわ！」と思ったけれど、そんなに推し推しされていない機能です。
@@ -100,7 +119,7 @@ curl -XGET localhost:9200/_cat/indices/logstash-*
 //image[kibana02-devtools02][Queryの入力予測が出力される]{
 //}
 
-@@<img>{kibana02-devtools02}のように、Queryの入力予測が画面に表示されます。
+@<img>{kibana02-devtools02}のように、Queryの入力予測が画面に表示されます。
 毎度Queryを調べる必要がなくなりますし、コマンドラインで複雑なQueryを発行するよりも圧倒的に利便性が高いです。
 
 Queryを発行するためには緑の@<code>{▶︎}ボタンをクリックします。
@@ -111,7 +130,7 @@ Queryを発行するためには緑の@<code>{▶︎}ボタンをクリックし
 
 jsonで値が帰ってくる場合、自動でシンタックスハイライトが適用されているので、可読性も高いです。
 
-//image[kibana02-devtools03][jsonでデータが返却されたとき]{
+//image[kibana02-devtools04][jsonでデータが返却されたとき]{
 //}
 
 
@@ -150,7 +169,7 @@ Kibanaの良いところは気軽にグラフを作成・削除できること�
 
 これのことです。
 
-Kibana5までは検索用Queryを入力する窓には何も書いてありませんでした。@@<code>{Kibana Discover}でインターネットの画像検索をしてみると
+Kibana5までは検索用Queryを入力する窓には何も書いてありませんでした。@<code>{Kibana Discover}でインターネットの画像検索をしてみると
 Kibana4・Kibana5の画面が出てきますので気になる方はどうぞ。
 
 今までは検索用Queryがわからないとき、ブラウザを開いてQueryの記述方法を調べるか、データが存在しない時刻を表示してQueryが記載されている画面を出すしかありませんでした。
