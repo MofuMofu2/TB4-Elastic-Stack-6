@@ -80,21 +80,40 @@ Visualizeを利用すると、自分でグラフを作成できるというの�
 @<chapref>{elasticsearch_go}の章ではコンソール上で直接ElasticsearchにQueryを発行していました。
 しかし、KibanaのGUIには@<code>{Dev Tools}という画面があります。これがすんばらしいのです。
 
+//image[kibana02-devtools01][Dev Toolsの画面]{
+//}
+
+
 なにがすんばらしいのか？それは、Queryを入力する途中で入力補完が出てくるというところです。
 
 例えば、今Elasticsearchに存在するindexを出したいなーと思ったとします。
 
 コンソール上でQueryを発行するのであれば、次のように手で記載しますよね。
 
-#@# keigodasuに合わせるとおもったけど無理ぽ
+//list[kibana02-list01][Indexの存在を確認する]{
+curl -XGET localhost:9200/_cat/indices/logstash-*
+//}
+
 
 でも、Kibanaの@<code>{Dev Tools}で同じように記載しようとすると…？
 
-#@# キャプチャを貼る
+//image[kibana02-devtools02][Queryの入力予測が出力される]{
+//}
 
-あら！AtomやVSCodeのように予測が出てきました。
+@@<img>{kibana02-devtools02}のように、Queryの入力予測が画面に表示されます。
+毎度Queryを調べる必要がなくなりますし、コマンドラインで複雑なQueryを発行するよりも圧倒的に利便性が高いです。
 
-三角を押すと、そのままElasticsearchにQueryを発行できます。jsonにはシンタックスハイライトが適用されているので、可読性も高いです。
+Queryを発行するためには緑の@<code>{▶︎}ボタンをクリックします。
+
+//image[kibana02-devtools03][Queryを発行した状態]{
+//}
+
+
+jsonで値が帰ってくる場合、自動でシンタックスハイライトが適用されているので、可読性も高いです。
+
+//image[kibana02-devtools03][jsonでデータが返却されたとき]{
+//}
+
 
 作業用コンソールをいくつも立ち上げておくのは事故の元、と言いますが、Elasticsearchに限って言えば、@<code>{Dev Tools}を利用することで作業用ウィンドウを1つ節約できます。
 みなさんも使ってみてはいかがでしょうか。
