@@ -392,6 +392,8 @@ func main() {
 
 さて、基本的なCRUDを通じてElasticsearchの基本をおさえたところで、いよいよ検索処理についてみていきましょう。
 Elasticsearchは多くの検索機能をサポートしていますが、本章ではその中でも代表的な以下についてみていきます。
+Elasticsearchの高度な検索を支える仕組みにAnalyzerがあります。これらの検索クエリもAnalyzerの機能を利用することで、より柔軟な検索をおこなうことができます。
+まずはElasticsearchのAnalyzerについてみていきましょう。
 
  * Match Query
  ** 指定した文字列での全文検索をおこないます。検索時に指定した文字列はAnalyzerにより言語処理がなされたうえで、検索がおこなれます。
@@ -401,15 +403,11 @@ Elasticsearchは多くの検索機能をサポートしていますが、本章�
  ** AND/OR/NOTによる検索がおこなえます。実際にはmust/should/must_notといったElasticsearch独自の指定方法を利用します。検索条件をネストさせることも可能で、より複雑な検索Queryを組み立てることができます。
 
 
-==== Match Query
+==== Analyzerの基本
 
 
-MatchQueryは全文検索の肝です。MatchQueryでは、指定した検索文字列がAnalyzerにより言語処理がなされ検索がおこなわれます。
 ここでAnalyzerについて簡単に説明します。Analyzerの設定は全文検索処理の要です。そのため、設定内容も盛り沢山ですし、自然言語処理の知識も必要となってくるため、ここではあくまで触りだけを説明します。
 この本をきっかけにElasticsearchにもっと興味を持っていただけた方はAnalyzerを深掘ってみてください。
-
-
-==== Analyzerの基本
 
 
 Analyzerは以下の要素から構成されています。これらを組み合わせることでより柔軟な検索のためのインデックスを作成できます。
@@ -509,6 +507,7 @@ Chatマッピングの１階層下に存在する、messageフィールドのana
 ==== Match Query
 
 
+MatchQueryは全文検索の肝です。MatchQueryでは、指定した検索文字列がAnalyzerにより言語処理がなされ検索がおこなわれます。
 olivere/elasticで検索機能を利用する際は、client経由でSearchメソッドを実行します。
 Searchメソッドはelastic.SearchServiceのQueryメソッドに検索条件を指定したelastic.MatchQueryを渡します。
 取得できたドキュメントをStruct経由で操作する際はreflectパッケージを使って操作します。
