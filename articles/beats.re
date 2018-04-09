@@ -2,15 +2,15 @@
 = Beats
 
 
-Beatsは、シンプルなデータ取り込みツールです。
-あれ？Logstashは？と思う方もいると思いますが、Logstashは、豊富な機能を持ってます。
-@<chapref>{logstash_pipelines}で説明したGrokフィルタで複雑なログを取り込むことも可能ですし、Inputのデータソースを多種多様に選択することが可能です。
-そのためLogstashを利用するには、学習コストもそれなりに発生します。手軽に利用しよう！という方には難しいツールです。
-
-そこで活躍するのがBeatsです。
+Beatsは、Elastic Stakcのファミリーでさまざまな用途に対応可能なデータ取り込みツールです。
+Logstashと機能が被っているのでは？とお気付きになられた方もいるかと思います。
+改めてLogstashの役割を説明すると、さまざまなデータソースからデータを取得し、意味のあるフィールドに変換し、指定のOutput先にストリーミング処理をします。
+ETLとしてLogstashが必要な機能を持っているということが分かるかと思います。
+ではなぜ、Logstashだけでなく、Beatsが登場したかというと、パフォーマンス問題を抱えていたためです。
+Logstashは、複数のパイプラインや高度なフィルタリングを施すことができますが、その分メモリを多く消費します。
+そこで軽量で手軽に導入できるBeatsが登場しました。
 何が手軽かというと、設定ファイルがYAMLで全て完結するのです。
 しかも、設定箇所も複数存在するわけではなく、最低限の設定で十分な機能を提供します。
-
 
 
 == Beats Family
@@ -34,8 +34,32 @@ Beatsにはどんな種類があるのかを改めて記載します。
 == Filebeat
 
 
-Filebeatを使用することで、Apache、Nginx、MySQLなどのログ収集・パースをすることが可能です。
-また、Modules機能を利用するととで、データの収集からKibanaを用いたデータの可視化までを一貫で行うことが可能です。
+Filebeatは、ログを一箇所に転送する用途で使用します。
+また、TLS暗号化をサポートしているため、セキュアに転送することができます。
+たとえば、次の構成図がFilebeatのよくある構成です。
+
+//image[filebeat01][Filebeatの構成]{
+//}
+
+Filebeatをデータソースであるサーバに導入し、Logstashへ転送する構成です。
+Logstashに転送することでログを集約することができます。
+また、Filebeatから転送されたデータを分析しやすい構造に変換する処理を行い、Elasticsearchにストアします。
+
+
+この他にもFilebeatには、モジュールを利用することで一部のデータを分析しやすい構造に変換することもできます。
+モジュールについては、後ほど説明します。
+
+
+次からFilebeatがデータを取得し、Logstashに転送するところまでを実施していきたいと思います。
+
+=== こんな構成を準備するよ
+
+Filebeatを試す環境は、@<chapref>{logstash}を使用します。
+今回、新たに導入するのは、FilebeatとNginxで同居させる構成とします。
+NginxのアクセスログをFilebeatを起点にElasticsearchまで取り込めるかを見ていきたいと思います。
+
+//image[filebeat02][Filebeatの構成]{
+//}
 
 === Filebeatをインストール
 
@@ -46,6 +70,34 @@ Filebeatをインストールします。@<chapref>{logstash}でyumリポジト�
 //list[beats-01][Filebeatsのインストール]{
 sudo yum install filebeat
 //}
+
+
+=== Nginx環境を整える
+
+まず、Nginxをインストールします。
+
+//list[beats-05][Nginxのインストール]{
+sudo yum install nginx
+//}
+
+インストールが完了したら、Nginxを起動します。
+
+//list[beats-06][Nginxの起動]{
+sudo service nginx start
+//}
+
+
+Nginxに対してcurlを実行し、アクセスログが出力されているかを確認します。
+また、ステータスコード200が返ってきていることも合わせて確認します。
+
+//cmd{
+$ tail -f /var/log/nginx/access.log
+127.0.0.1 - - [xx/xxx/2018:xx:xx:xx +0000] "GET / HTTP/1.1" 200 3770 "-" "curl/7.53.1" "-"
+//}
+
+
+
+
 
 === Ingest Node Pluginをインストール
 
@@ -75,28 +127,16 @@ sudo service elasticsearch restart
 環境構築を行ってください。
 
 
-=== Nginx環境を整える
 
-まず、Nginxをインストールします。
+Filebeatを使用することで、Apache、Nginx、MySQLなどのログ収集・パースをすることが可能です。
+また、Modules機能を利用することで、データの収集からKibanaを用いたデータの可視化までを一貫で行うことが可能です。
 
-//list[beats-05][Nginxのインストール]{
-sudo yum install nginx
-//}
-
-インストールが完了したら、Nginxを起動します。
-
-//list[beats-06][Nginxの起動]{
-sudo service nginx start
-//}
+Filebeatの構成は
 
 
-Nginxに対してcurlを実行し、アクセスログが出力されているかを確認します。
-また、ステータスコード200が返ってきていることも合わせて確認します。
 
-//cmd{
-$ tail -f /var/log/nginx/access.log
-127.0.0.1 - - [xx/xxx/2018:xx:xx:xx +0000] "GET / HTTP/1.1" 200 3770 "-" "curl/7.53.1" "-"
-//}
+
+
 
 === Filebeat Module
 
@@ -203,30 +243,30 @@ sudo service filebeat start
 左ペインにあるManagementをクリックします。
 
 
-//image[filebeat01][Managementをクリック]{
+//image[filebeat03][Managementをクリック]{
 //}
 
 Index Patternsをクリックします。
 
-//image[filebeat02][Indexを選択]{
+//image[filebeat04][Indexを選択]{
 //}
 
 Filebeatのインデックスパターンが登録されていることがわかります。
 
-//image[filebeat03][Filebeatのインデックスパターンを確認]{
+//image[filebeat05][Filebeatのインデックスパターンを確認]{
 //}
 
 左ペインにある@<code>{Dashboard}をクリックします。
 様々なDashboardが登録されていることがわかります。
 Logstashなどでログを取り込んだ場合は、Dashboardを一から作成する必要がありますが、Beatsの場合は、あらかじめ用意されています。
 
-//image[filebeat04][Dashboardの確認]{
+//image[filebeat06][Dashboardの確認]{
 //}
 
 今回は、Nginxの@<code>{Filebeat Nginx Overview}というDashboardをクリックします。
 取り込んだログがDashboardに表示されていることがわかります。
 
-//image[filebeat05][Filebeat Nginx Overview]{
+//image[filebeat07][Filebeat Nginx Overview]{
 //}
 
 いかがでしたか？
@@ -246,7 +286,7 @@ Metricbeatは、サーバのリソース(CPU/Mem/process..など)を容易にモ
 今回は、サーバのメトリックをモニタリングできるところまで見たいと思います。それでは、早速インストールしていきます。
 
 
-//list[filebeat06][Metricbeatのインストール]{
+//list[filebeat10][Metricbeatのインストール]{
 sudo yum install metricbeat
 //}
 
