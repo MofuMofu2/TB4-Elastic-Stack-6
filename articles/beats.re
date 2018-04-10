@@ -54,12 +54,17 @@ Logstashに転送することでログを集約することができます。
 
 === こんな構成を準備するよ
 
-Filebeatを試す環境は、@<chapref>{logstash}を使用します。
-今回、新たに導入するのは、FilebeatとNginxで同居させる構成とします。
-NginxのアクセスログをFilebeatを起点にElasticsearchまで取り込めるかを見ていきたいと思います。
+Filebeatを試す環境は、@<chapref>{logstash}を元として構成します。
+新たに導入するのは、FilebeatとNginxを追加します。
+Nginxにアクセスした時に出力されるアクセスログをデータソースとして、Filebeatで取得し、Logstashに転送します。
+Logstashは、Filebeatから転送されたログをElasticsearchに取り込むところまでを見ていきたいと思います。
 
-//image[filebeat02][Filebeatの構成]{
+
+//image[filebeat02][サーバの構成について]{
 //}
+
+それでは、FilebeatとNginxのインストールを実施していきます。
+
 
 === Filebeatをインストール
 
@@ -68,22 +73,22 @@ Filebeatをインストールします。@<chapref>{logstash}でyumリポジト�
 
 
 //list[beats-01][Filebeatsのインストール]{
-sudo yum install filebeat
+$ sudo yum install filebeat
 //}
 
 
-=== Nginx環境を整える
+=== Nginxの環境を構築する
 
-まず、Nginxをインストールします。
+Nginxをインストールします。
 
-//list[beats-05][Nginxのインストール]{
-sudo yum install nginx
+//list[beats-02][Nginxのインストール]{
+$ sudo yum install nginx
 //}
 
 インストールが完了したら、Nginxを起動します。
 
-//list[beats-06][Nginxの起動]{
-sudo service nginx start
+//list[beats-03][Nginxの起動]{
+$ sudo service nginx start
 //}
 
 
@@ -91,11 +96,47 @@ Nginxに対してcurlを実行し、アクセスログが出力されている�
 また、ステータスコード200が返ってきていることも合わせて確認します。
 
 //cmd{
+### Access nginx
+$ curl localhost
+### Check access.log
 $ tail -f /var/log/nginx/access.log
 127.0.0.1 - - [xx/xxx/2018:xx:xx:xx +0000] "GET / HTTP/1.1" 200 3770 "-" "curl/7.53.1" "-"
 //}
 
 
+これでFilebeatとNginxの環境が構築できました。
+
+=== FilebeatからLogstashへ転送
+
+ここからはFIlebeatがNginxのアクセスログを取得し、Logstashに転送し、LogstashがElasticsearchに取り込む設定を行なっていきます。
+
+
+==== Filebeatの設定
+
+filebeat.ymlを編集します。
+filebeat.prospectorsを有効化し、Nginxのアクセスログのパスを指定します。
+output.logstashで転送先のLogstashを指定します。
+今回は、ローカルホストですが、ネットワーク越しの場合は、IPアドレスやホスト名を指定してください。
+
+//list[beats-04][filebeat.ymlの編集]{
+$ vim /etc/filebeat/filbeat.yml
+#=========================== Filebeat prospectors =============================
+filebeat.prospectors:
+- type: log
+  enabled: false
+  paths:
+    - /var/log/nginx/access.log
+#----------------------------- Logstash output ---------------------------------
+output.logstash:
+  hosts: ["localhost:5044"]
+//}
+
+
+次にLogstash側の設定を変更します。
+新しくパイプラインファイルを作成します。
+
+//list[beats-05][パイプラインファイルの作成]{
+//}
 
 
 
