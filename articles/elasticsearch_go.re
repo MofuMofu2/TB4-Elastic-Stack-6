@@ -495,9 +495,41 @@ Analyzerは以下の要素から構成されています。これらを組み合
 #@#//TODO: イメージ図をいれる
 
 
+Tokenizerで形態素解析を用いた場合の例は以下のようになります。
 
-ここでは先ほど作成したMapping定義をもとにAnalyzerの設定を加えてみます。
-さきほどのChat Mappingのmessageフィールドに日本語形態素解析プラグインであるKuromojiを適用してみましょう。
+
+#@#//TODO: イメージ図をいれる
+
+
+このようにTokenizerだけでなく任意のFiltersを組みわせることで、検索要件に適したAnalyzerを作成し適用することができます。
+本書では日本語形態素解析プラグインであるKuromojiを利用しAnalyzerの設定をおこなっていきます。
+
+
+==== Kuromojiプラグインの導入
+
+
+Kuromojiプラグインは標準ではElasticsearchに内蔵されていないため追加でプラグインをインストールする必要があります。
+稼働しているDockerのコンテナのコンテナIDを調べbashからプラグインのインストールをおこなっていきましょう。
+Elasticsearchではプラグインをインストールする際には@<code>{elasticsearch-plugin}を利用します。
+またプラグインを有効にするためにプラグインインストール後にコンテナの再起動をおこなってください。
+
+
+//cmd{
+# docker ps
+
+CONTAINER ID        IMAGE                                                     COMMAND                  CREATED             STATUS              PORTS                                            NAMES
+9a96bafde5bd        docker.elastic.co/elasticsearch/elasticsearch-oss:6.0.0   "/usr/local/bin/dock…"   2 hours ago         Up 2 hours          0.0.0.0:9200->9200/tcp, 0.0.0.0:9300->9300/tcp   agitated_haibt
+
+# docker exec -it 66cec7c14657 bash
+[root@9a96bafde5bd elasticsearch]# bin/elasticsearch-plugin install analysis-kuromoji
+//}
+
+
+==== MappingへのAnalyzerの適用
+
+
+先ほど作成したMapping定義をもとにAnalyzerの設定を加えていきましょう。
+Analyzerの設定は@<code>{settings}内でおこなっていきます。
 
 
 //list[elasticsearch-list11][Analyzerの設定]{
@@ -510,6 +542,7 @@ Analyzerは以下の要素から構成されています。これらを組み合
           "mode": "search",
           "discard_punctuation": "true"
         }
+        },
       },
       "analyzer": {
         "kuromoji_analyzer": {
