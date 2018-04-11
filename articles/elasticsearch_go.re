@@ -8,8 +8,7 @@ Elasticsearchの入門の多くはREST APIを使ったものが多いですが�
 そうした際に意外と「あれ、これってどうやるんだ？」となる場合が多いものです。
 
 そこで、本章ではElasticsearchの基本操作をGo言語を利用して体験していきます。Elasticsearchの基本的な操作を中心に、ちょっとしたTipsについても触れていきます。
-Elasticsearchはとても多くの機能を有しています。そのため、全ての機能をカバーすることは難しいです。よって、代表的な機能について本章では記載します。
-また本章ではElasticsearchのAPIを主に扱います。Elasticsearchのクラスタリング機能などについては、最低限の情報しか記載していません	。
+Elasticsearchはとても多くの機能を有しています。そのため、全ての機能をカバーすることは難しいです。よって、代表的な機能について本章では記載します。 また本章ではElasticsearchのAPIを主に扱います。Elasticsearchのクラスタリング機能などについては、最低限の情報しか記載していません	。
 
 
 == Elasticsearch環境の準備
@@ -58,15 +57,17 @@ curl http://localhost:9200
 //cmd{
 # curl http://localhost:9200
 {
-  "name" : "WlZn3XP",
+  "name" : "TiaRqEF",
   "cluster_name" : "docker-cluster",
-  "cluster_uuid" : "7Ltq7Ph_Tv-cLofAglwp_g",
+  "cluster_uuid" : "JMepnQSwQaGmI3fStZ_YTA",
   "version" : {
-    "number" : "5.6.4",
-    "build_hash" : "8bbedf5",
-    "build_date" : "2017-10-31T18:55:38.105Z",
+    "number" : "6.0.0",
+    "build_hash" : "8f0685b",
+    "build_date" : "2017-11-10T18:41:22.859Z",
     "build_snapshot" : false,
-    "lucene_version" : "6.6.1"
+    "lucene_version" : "7.0.1",
+    "minimum_wire_compatibility_version" : "5.6.0",
+    "minimum_index_compatibility_version" : "5.0.0"
   },
   "tagline" : "You Know, for Search"
 }
@@ -167,13 +168,67 @@ Elasticsearchを操作するにあたり利用するMapping定義を@<list>{elas
 
 keyword型とtext型は両者ともString型に相当します。その違いはアナライザを設定できるか否かです。
 後ほど詳細を説明しますが、アナライザを適用することでそのフィールドに対し高度な全文検索を行うことができます。一方でkeyword型はアナライザが適用されないため、完全一致での検索が求めらます。
-
+また、フィールドに対してソートをおこないたい場合はkeyword型を指定する必要があります。
 
 
 Elasticsearch 6系のデータ型の詳細は公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html}）を参照してみてください。
 多くのデータ型が標準でサポートされています。
 
-=== Hello, Elasticsearch with GO
+
+それでは、このMapping定義をElasticsearchへ投入します。先ほどのMapping定義を@<code>{mapping.json}として保存してください。
+本書ではcurlコマンドを利用しElasticsearchのAPIを実行します。
+
+
+//list[elasticsearch-list0][Mappingの作成]{
+curl -XPUT 'http://localhost:9200/<Index名>' -H "Content-Type: application/json" -d @mapping.json
+//}
+
+
+Index名に作成するIndexの名前を指定し、先ほど作成したMapping定義をPUTします。本書ではIndexとTypeの両方をchatとします。
+
+
+//cmd{
+# curl -XPUT http://localhost:9200/chat -H "Content-Type: application/json" -d @mapping.json
+{"acknowledged":true,"shards_acknowledged":true,"index":"chat"}⏎
+//}
+
+
+作成されたIndexを確認してみます。下記のエンドポイントから指定したIndex/TypeのMapping定義を確認できます。
+
+
+//list[elasticsearch-list00][Mappingの確認]{
+curl -XGET 'http://localhost:9200/<Index名>/_mapping/<Type名>?pretty'
+//}
+
+
+//cmd{
+# curl -XGET 'http://localhost:9200/chat/_mapping/chat?pretty'
+{                                                                                                         
+  "chat" : {                                                                                              
+    "mappings" : {                                                                                        
+      "chat" : {                                                                                          
+        "properties" : {                                                                                  
+          "created" : {                                                                                   
+            "type" : "date"                                                                               
+          },                                                                                              
+          "message" : {                                                                                   
+            "type" : "text"                                                                               
+          },                                                                                              
+          "tags" : {                                                                                      
+            "type" : "keyword"                                                                            
+          },                                                                                              
+          "user" : {                                                                                      
+            "type" : "keyword"                                                                            
+          }                                                                                               
+        }                                                                                                 
+      }                                                                                                   
+    }                                                                                                     
+  }                                                                                                       
+}  
+//}
+
+
+=== Hello, Elasticsearch with Go
 
 
 それではGoを使ってElasticsearchを触っていきましょう。
@@ -214,6 +269,18 @@ func main() {
 Elasticsearchのバージョン情報といったシステム情報を取得する際は@<code>{Ping}を利用します。
 
 
+では実行してみましょう!
+
+
+//list[elasticsearch-list08][Elasticsearchのバージョン情報を問い合わせる]{
+$ go run hello_elasticsearch.go
+Elasticsearch returned with code 200 and version 6.0.0
+//}
+
+
+ローカル環境で稼働させているElasticsearchのバージョンが表示されれば無事接続成功です。
+
+
 === 単純なCRUD操作
 
 
@@ -241,6 +308,11 @@ type Chat struct {
 }
 //}
 
+
+GoのクライアントとElasticsearch間はHTTP(S)で通信され、JSONでデータのやり取りがおこなわれます。
+そのため、StructにはMappingで定義したフィールド名をjsonタグで指定することでMapping定義上のフィールド名とマッピングします。
+
+
 ==== ドキュメントの登録
 
 
@@ -249,7 +321,6 @@ Elasticsearchは登録されたドキュメントに対して、ドキュメン�
 IDの振り方には登録時にクライアント側で設定するか、Elasticsearch側でランダムに振ってもらうかの2通りがあります。
 今回は登録時にクライアント側でドキュメントIDを指定します。
 さきほど作成したクライアントセッションを利用して操作をおこなっていきましょう。
-
 
 //list[elasticesearch-list08][クライアント側でドキュメントIDを付与する]{
 package main
@@ -392,6 +463,8 @@ func main() {
 
 さて、基本的なCRUDを通じてElasticsearchの基本をおさえたところで、いよいよ検索処理についてみていきましょう。
 Elasticsearchは多くの検索機能をサポートしていますが、本章ではその中でも代表的な以下についてみていきます。
+Elasticsearchの高度な検索を支える仕組みにAnalyzerがあります。これらの検索クエリもAnalyzerの機能を利用することで、より柔軟な検索をおこなうことができます。
+まずはElasticsearchのAnalyzerについてみていきましょう。
 
  * Match Query
  ** 指定した文字列での全文検索をおこないます。検索時に指定した文字列はAnalyzerにより言語処理がなされたうえで、検索がおこなれます。
@@ -401,15 +474,11 @@ Elasticsearchは多くの検索機能をサポートしていますが、本章�
  ** AND/OR/NOTによる検索がおこなえます。実際にはmust/should/must_notといったElasticsearch独自の指定方法を利用します。検索条件をネストさせることも可能で、より複雑な検索Queryを組み立てることができます。
 
 
-==== Match Query
+==== Analyzerの基本
 
 
-MatchQueryは全文検索の肝です。MatchQueryでは、指定した検索文字列がAnalyzerにより言語処理がなされ検索がおこなわれます。
 ここでAnalyzerについて簡単に説明します。Analyzerの設定は全文検索処理の要です。そのため、設定内容も盛り沢山ですし、自然言語処理の知識も必要となってくるため、ここではあくまで触りだけを説明します。
 この本をきっかけにElasticsearchにもっと興味を持っていただけた方はAnalyzerを深掘ってみてください。
-
-
-==== Analyzerの基本
 
 
 Analyzerは以下の要素から構成されています。これらを組み合わせることでより柔軟な検索のためのインデックスを作成できます。
@@ -421,33 +490,66 @@ Analyzerは以下の要素から構成されています。これらを組み合
   ** Tokenizerによるトークン分割がされた後に施す処理を定義します。例えば、形態素解析のように品詞をもとにトークン分割する場合、分割後のトークンから検索には不要と思われる助詞を取り除くといった処理が該当します。
 
 
+//image[analyzer_basic][Analyzerの構成要素]{
+//}
 
-#@#//TODO: イメージ図をいれる
+
+Tokenizerで形態素解析を用いた場合の例は以下のようになります。
 
 
+//image[analyzer_sample][Analyzerの仕組み]{
+//}
 
-ここでは先ほど作成したMapping定義をもとにAnalyzerの設定を加えてみます。
-さきほどのChat Mappingのmessageフィールドに日本語形態素解析プラグインであるKuromojiを適用してみましょう。
+
+このようにTokenizerだけでなく任意のFiltersを組みわせることで、検索要件に適したAnalyzerを作成し適用することができます。
+本書では日本語形態素解析プラグインであるKuromojiを利用しAnalyzerの設定をおこなっていきます。
+
+
+==== Kuromojiプラグインの導入
+
+
+Kuromojiプラグインは標準ではElasticsearchに内蔵されていないため追加でプラグインをインストールする必要があります。
+稼働しているDockerのコンテナのコンテナIDを調べbashからプラグインのインストールをおこなっていきましょう。
+Elasticsearchではプラグインをインストールする際には@<code>{elasticsearch-plugin}を利用します。
+またプラグインを有効にするためにプラグインインストール後にコンテナの再起動をおこなってください。
+
+
+//cmd{
+# docker ps
+
+CONTAINER ID        IMAGE                                                     COMMAND                  CREATED             STATUS              PORTS                                            NAMES
+9a96bafde5bd        docker.elastic.co/elasticsearch/elasticsearch-oss:6.0.0   "/usr/local/bin/dock…"   2 hours ago         Up 2 hours          0.0.0.0:9200->9200/tcp, 0.0.0.0:9300->9300/tcp   agitated_haibt
+
+# docker exec -it 66cec7c14657 bash
+[root@9a96bafde5bd elasticsearch]# bin/elasticsearch-plugin install analysis-kuromoji
+//}
+
+
+==== MappingへのAnalyzerの適用
+
+
+先ほど作成したMapping定義をもとにAnalyzerの設定を加えていきましょう。
+Analyzerの設定は@<code>{settings}内でおこなっていきます。Analyzerを適用したいフィールドに@<code>{analyzer}を指定することで適用できます。
 
 
 //list[elasticsearch-list11][Analyzerの設定]{
+
 {
   "settings": {
     "analysis": {
-      "tokenizer": {
-        "kuromoji_tokenizer_search": {
-          "type": "kuromoji_tokenizer",
-          "mode": "search",
-          "discard_punctuation": "true"
-        }
-      },
       "analyzer": {
         "kuromoji_analyzer": {
           "type": "custom",
-          "tokenizer": "kuromoji_tokenizer_search",
+          "tokenizer": "kuromoji_tokenizer",
+          "char_filter": [
+            "kuromoji_iteration_mark"
+          ],
           "filter": [
             "kuromoji_baseform",
-            "kuromoji_part_of_speech"
+            "kuromoji_part_of_speech",
+            "ja_stop",
+            "kuromoji_number",
+            "kuromoji_stemmer"
           ]
         }
       }
@@ -473,20 +575,25 @@ Analyzerは以下の要素から構成されています。これらを組み合
     }
   }
 }
-//}
 
+//}
 
 Analyzerの設定はMapping定義のanalysisでおこないます。tokenizerでトークン分割の方法を設定し、analyzerで設定したtoknenizerと各filter群を組み合わせて一つのAnalyzerを作ります。
 本書では以下の設定でAnalyzerを設定しました。
 
- * アナライザ名
- ** kuromoji_analyzer
- * 適用Tokenizer
- ** kuromoji_tokenizer: xxxxxxxxxxx
- * 適用Filter
- ** kuromoji_base: xxxxxxxxxxx
- ** kuromoji_part_of_speech: xxxxxxxxxxx
 
+  
+//table[analyzer][本書で利用するAnalyzer]{
+分類  分類  説明
+-------------------------------------------------------------
+Character Filters kuromoji_iteration_mark 踊り字を正規化します。e.g) すゝめ→すすめ
+Tokenizer kuromoji_tokenizer  日本語での形態素解析により文章をトークン化します。
+Token Filters kuromoji_baseform 動詞など活用になりかわる言葉を原形にします。e.g) 読め→読む
+Token Filters kuromoji_part_of_speech 検索時には利用されないような助詞などの品詞を削除します。
+Token Filters ja_stop 文章中に頻出するあるいは検索で利用されることがない言葉を削除します。e.g) あれ、それ
+Token Filters kuromoji_number 漢数字を数字に変更します。e.g) 五->5
+Token Filters kuromoji_stemmer  単語の末尾につく長音を削除します。e.g) サーバー→サーバ
+//}
 
 
 作成したAnalyzerを適用したいMappingフィールドに指定することで、そのフィールドにAnalyzerで指定したインデクシングを施すことができます。
@@ -503,12 +610,96 @@ Chatマッピングの１階層下に存在する、messageフィールドのana
 //}
 
 
+作成しなおしたインデックスに確認用のデータを登録します。(登録するデータがいささいか少ないですが、、すいません)
+
+
+//list[elasticesearch-list112][テストデータの登録]{
+package main
+
+import (
+    "context"
+    "time"
+
+    "github.com/olivere/elastic"
+)
+
+type Chat struct {
+    User    string    `json:"user"`
+    Message string    `json:"message"`
+    Created time.Time `json:"created"`
+    Tag     string    `json:"tag"`
+}
+
+const (
+    ChatIndex = "Chat"
+)
+
+func main() {
+    esUrl := "http://localhost:9200"
+    ctx := context.Background()
+
+    client, err := elastic.NewClient(
+        elastic.SetURL(esUrl),
+    )
+    if err != nil {
+        panic(err)
+    }
+
+    chatData01 := Chat{
+        User:    "user01",
+        Message: "明日は期末テストがあるけどなんにも勉強してない....",
+        Created: time.Now(),
+        Tag:     "tag01",
+    }
+    
+    chatData02 := Chat{
+        User:    "user02",
+        Message: "時々だけど勉強のやる気が出るけど長続きしない",
+        Created: time.Now(),
+        Tag:     "tag01",
+    }
+
+    chatData03 := Chat{
+        User:    "user03",
+        Message: "あと十年あれば期末テストもきっと満点がとれたんだろうな",
+        Created: time.Now(),
+        Tag:     "tag01",
+    }
+
+    chatData04 := Chat{
+        User:    "user04",
+        Message: "ドラえもんの映画で一番すきなのは夢幻三剣士だな",
+        Created: time.Now(),
+        Tag:     "tag01",
+    }
+
+    chatData05 := Chat{
+        User:    "user05",
+        Message: "世界記憶の概念、そうアカシックレコードを紐解くことで解は導かれるのかもしれない",
+        Created: time.Now(),
+        Tag:     "tag01",
+    }
+
+    _, err = client.Index().Index("chat").Type("chat").Id("1").BodyJson(&chatData01).Do(ctx)
+    _, err = client.Index().Index("chat").Type("chat").Id("2").BodyJson(&chatData02).Do(ctx)
+    _, err = client.Index().Index("chat").Type("chat").Id("3").BodyJson(&chatData03).Do(ctx)
+    _, err = client.Index().Index("chat").Type("chat").Id("4").BodyJson(&chatData04).Do(ctx)
+    _, err = client.Index().Index("chat").Type("chat").Id("5").BodyJson(&chatData05).Do(ctx)
+    if err != nil {
+        panic(err)
+    }
+}
+//}
+
+
+
 これで準備が整いました！それではここの詳細に移っていきましょう。
 
 
 ==== Match Query
 
 
+MatchQueryは全文検索の肝です。MatchQueryでは、指定した検索文字列がAnalyzerにより言語処理がなされ検索がおこなわれます。
 olivere/elasticで検索機能を利用する際は、client経由でSearchメソッドを実行します。
 Searchメソッドはelastic.SearchServiceのQueryメソッドに検索条件を指定したelastic.MatchQueryを渡します。
 取得できたドキュメントをStruct経由で操作する際はreflectパッケージを使って操作します。
@@ -548,6 +739,7 @@ func main() {
         panic(err)
     }
 
+    //messageフィールドに対して"テスト"という単語を含むドキュメントを検索
     query := elastic.NewMatchQuery("message", "テスト")
     results, err := client.Search().Index("chat").Query(query).Do(ctx)
     if err != nil {
@@ -563,6 +755,102 @@ func main() {
 }
 
 //}
+
+
+実行すると以下の２つのドキュメントがヒットします。(ファイル名をmain.goとして保存しています。)
+
+
+//cmd{
+# go run main.go
+Chat message is: あと十年あれば期末テストもきっと満点がとれたんだろうな
+Chat message is: 明日は期末テストがあるけどなんにも勉強してない....
+//}
+
+
+狙ったとおりのドキュメントを取得できました！では、この検索結果はどのように導かれたのでしょうか。
+AnalyzerこれらのドキュメントがどのようにAnalyzeされインデクシングされているのか確認してみます。
+
+
+
+//list[elasticsearch-list033][analyze api]{
+curl -XPOST "http://localhost:9200/<Index名>/_analyze?pretty" -H "Content-Type: application/json" -d
+  '{
+    "analyzer": "Analyzer名",
+    "text": "Analyzeしたい文字列"
+  }'
+//}
+
+//cmd{
+
+curl -XPOST "http://localhost:9200/chat/_analyze?pretty" -H "Content-Type: application/json" -d '{"analyzer": "kuromoji_analyzer", "text": "あと十年あれば期
+末テストもきっと満点がとれたんだろうな"}'
+{
+  "tokens" : [
+    {
+      "token" : "あと",
+      "start_offset" : 0,
+      "end_offset" : 2,
+      "type" : "word",
+      "position" : 0
+    },
+    {
+      "token" : "10",
+      "start_offset" : 2,
+      "end_offset" : 3,
+      "type" : "word",
+      "position" : 1
+    },
+    {
+      "token" : "年",
+      "start_offset" : 3,
+      "end_offset" : 4,
+      "type" : "word",
+      "position" : 2
+    },
+    {
+      "token" : "期末",
+      "start_offset" : 7,
+      "end_offset" : 9,
+      "type" : "word",
+      "position" : 5
+    },
+    {
+      "token" : "テスト",
+      "start_offset" : 9,
+      "end_offset" : 12,
+      "type" : "word",
+      "position" : 6
+    },
+    {
+      "token" : "きっと",
+      "start_offset" : 13,
+      "end_offset" : 16,
+      "type" : "word",
+      "position" : 8
+    },
+    {
+      "token" : "満点",
+      "start_offset" : 16,
+      "end_offset" : 18,
+      "type" : "word",
+      "position" : 9
+    },
+    {
+      "token" : "とれる",
+      "start_offset" : 19,
+      "end_offset" : 21,
+      "type" : "word",
+      "position" : 11
+    }
+  ]
+}
+
+//}
+
+
+「あと十年あれば期末テストもきっと満点がとれたんだろうな」は設定したAnalyzerによりこのようにトークン化されインデクシングされています。
+この中に「テスト」というトークンが含まれているために意図通りヒットしたというわけです。
+
 
 ==== Term Query
 
