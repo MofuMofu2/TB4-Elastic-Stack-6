@@ -610,6 +610,89 @@ Chatマッピングの１階層下に存在する、messageフィールドのana
 //}
 
 
+作成しなおしたインデックスに確認用のデータを登録します。(登録するデータがいささいか少ないですが、、すいません)
+
+
+//list[elasticesearch-list112][テストデータの登録]{
+package main
+
+import (
+    "context"
+    "time"
+
+    "github.com/olivere/elastic"
+)
+
+type Chat struct {
+    User    string    `json:"user"`
+    Message string    `json:"message"`
+    Created time.Time `json:"created"`
+    Tag     string    `json:"tag"`
+}
+
+const (
+    ChatIndex = "Chat"
+)
+
+func main() {
+    esUrl := "http://localhost:9200"
+    ctx := context.Background()
+
+    client, err := elastic.NewClient(
+        elastic.SetURL(esUrl),
+    )
+    if err != nil {
+        panic(err)
+    }
+
+    chatData01 := Chat{
+        User:    "user01",
+        Message: "明日は期末テストがあるけどなんにも勉強してない....",
+        Created: time.Now(),
+        Tag:     "tag01",
+    }
+    
+    chatData02 := Chat{
+        User:    "user02",
+        Message: "時々だけど勉強のやる気が出るけど長続きしない",
+        Created: time.Now(),
+        Tag:     "tag01",
+    }
+
+    chatData03 := Chat{
+        User:    "user03",
+        Message: "あと十年あれば期末テストもきっと満点がとれたんだろうな",
+        Created: time.Now(),
+        Tag:     "tag01",
+    }
+
+    chatData04 := Chat{
+        User:    "user04",
+        Message: "ドラえもんの映画で一番すきなのは夢幻三剣士だな",
+        Created: time.Now(),
+        Tag:     "tag01",
+    }
+
+    chatData05 := Chat{
+        User:    "user05",
+        Message: "世界記憶の概念、そうアカシックレコードを紐解くことで解は導かれるのかもしれない",
+        Created: time.Now(),
+        Tag:     "tag01",
+    }
+
+    _, err = client.Index().Index("chat").Type("chat").Id("1").BodyJson(&chatData01).Do(ctx)
+    _, err = client.Index().Index("chat").Type("chat").Id("2").BodyJson(&chatData02).Do(ctx)
+    _, err = client.Index().Index("chat").Type("chat").Id("3").BodyJson(&chatData03).Do(ctx)
+    _, err = client.Index().Index("chat").Type("chat").Id("4").BodyJson(&chatData04).Do(ctx)
+    _, err = client.Index().Index("chat").Type("chat").Id("5").BodyJson(&chatData05).Do(ctx)
+    if err != nil {
+        panic(err)
+    }
+}
+//}
+
+
+
 これで準備が整いました！それではここの詳細に移っていきましょう。
 
 
@@ -656,6 +739,7 @@ func main() {
         panic(err)
     }
 
+    //messageフィールドに対して"テスト"という単語を含むドキュメントを検索
     query := elastic.NewMatchQuery("message", "テスト")
     results, err := client.Search().Index("chat").Query(query).Do(ctx)
     if err != nil {
@@ -671,6 +755,99 @@ func main() {
 }
 
 //}
+
+
+実行すると以下の２つのドキュメントがヒットします。(ファイル名をmain.goとして保存しています。)
+
+
+//cmd{
+# go run main.go
+Chat message is: あと十年あれば期末テストもきっと満点がとれたんだろうな
+Chat message is: 明日は期末テストがあるけどなんにも勉強してない....
+//}
+
+
+狙ったとおりのドキュメントを取得できました！では、この検索結果はどのように導かれたのでしょうか。
+AnalyzerこれらのドキュメントがどのようにAnalyzeされインデクシングされているのか確認してみます。
+
+
+
+//list[elasticsearch-list033][analyze api]{
+curl -XPOST "http://localhost:9200/<Index名>/_analyze?pretty" -H "Content-Type: application/json" -d
+  '{
+    "analyzer": "Analyzer名",
+    "text": "Analyzeしたい文字列"
+  }'
+//}
+
+//cmd{
+
+curl -XPOST "http://localhost:9200/chat/_analyze?pretty" -H "Content-Type: application/json" -d '{"analyzer": "kuromoji_analyzer", "text": "あと十年あれば期
+末テストもきっと満点がとれたんだろうな"}'
+{
+  "tokens" : [
+    {
+      "token" : "あと",
+      "start_offset" : 0,
+      "end_offset" : 2,
+      "type" : "word",
+      "position" : 0
+    },
+    {
+      "token" : "10",
+      "start_offset" : 2,
+      "end_offset" : 3,
+      "type" : "word",
+      "position" : 1
+    },
+    {
+      "token" : "年",
+      "start_offset" : 3,
+      "end_offset" : 4,
+      "type" : "word",
+      "position" : 2
+    },
+    {
+      "token" : "期末",
+      "start_offset" : 7,
+      "end_offset" : 9,
+      "type" : "word",
+      "position" : 5
+    },
+    {
+      "token" : "テスト",
+      "start_offset" : 9,
+      "end_offset" : 12,
+      "type" : "word",
+      "position" : 6
+    },
+    {
+      "token" : "きっと",
+      "start_offset" : 13,
+      "end_offset" : 16,
+      "type" : "word",
+      "position" : 8
+    },
+    {
+      "token" : "満点",
+      "start_offset" : 16,
+      "end_offset" : 18,
+      "type" : "word",
+      "position" : 9
+    },
+    {
+      "token" : "とれる",
+      "start_offset" : 19,
+      "end_offset" : 21,
+      "type" : "word",
+      "position" : 11
+    }
+  ]
+}
+
+//}
+
+
 
 ==== Term Query
 
