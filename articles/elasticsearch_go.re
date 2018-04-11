@@ -8,8 +8,7 @@ Elasticsearchの入門の多くはREST APIを使ったものが多いですが�
 そうした際に意外と「あれ、これってどうやるんだ？」となる場合が多いものです。
 
 そこで、本章ではElasticsearchの基本操作をGo言語を利用して体験していきます。Elasticsearchの基本的な操作を中心に、ちょっとしたTipsについても触れていきます。
-Elasticsearchはとても多くの機能を有しています。そのため、全ての機能をカバーすることは難しいです。よって、代表的な機能について本章では記載します。
-また本章ではElasticsearchのAPIを主に扱います。Elasticsearchのクラスタリング機能などについては、最低限の情報しか記載していません	。
+Elasticsearchはとても多くの機能を有しています。そのため、全ての機能をカバーすることは難しいです。よって、代表的な機能について本章では記載します。 また本章ではElasticsearchのAPIを主に扱います。Elasticsearchのクラスタリング機能などについては、最低限の情報しか記載していません	。
 
 
 == Elasticsearch環境の準備
@@ -58,15 +57,17 @@ curl http://localhost:9200
 //cmd{
 # curl http://localhost:9200
 {
-  "name" : "WlZn3XP",
+  "name" : "TiaRqEF",
   "cluster_name" : "docker-cluster",
-  "cluster_uuid" : "7Ltq7Ph_Tv-cLofAglwp_g",
+  "cluster_uuid" : "JMepnQSwQaGmI3fStZ_YTA",
   "version" : {
-    "number" : "5.6.4",
-    "build_hash" : "8bbedf5",
-    "build_date" : "2017-10-31T18:55:38.105Z",
+    "number" : "6.0.0",
+    "build_hash" : "8f0685b",
+    "build_date" : "2017-11-10T18:41:22.859Z",
     "build_snapshot" : false,
-    "lucene_version" : "6.6.1"
+    "lucene_version" : "7.0.1",
+    "minimum_wire_compatibility_version" : "5.6.0",
+    "minimum_index_compatibility_version" : "5.0.0"
   },
   "tagline" : "You Know, for Search"
 }
@@ -167,11 +168,65 @@ Elasticsearchを操作するにあたり利用するMapping定義を@<list>{elas
 
 keyword型とtext型は両者ともString型に相当します。その違いはアナライザを設定できるか否かです。
 後ほど詳細を説明しますが、アナライザを適用することでそのフィールドに対し高度な全文検索を行うことができます。一方でkeyword型はアナライザが適用されないため、完全一致での検索が求めらます。
-
+また、フィールドに対してソートをおこないたい場合はkeyword型を指定する必要があります。
 
 
 Elasticsearch 6系のデータ型の詳細は公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html}）を参照してみてください。
 多くのデータ型が標準でサポートされています。
+
+
+それでは、このMapping定義をElasticsearchへ投入します。先ほどのMapping定義を@<code>{mapping.json}として保存してください。
+本書ではcurlコマンドを利用しElasticsearchのAPIを実行します。
+
+
+//list[elasticsearch-list0][Mappingの作成]{
+curl -XPUT 'http://localhost:9200/<Index名>' -H "Content-Type: application/json" -d @mapping.json
+//}
+
+
+Index名に作成するIndexの名前を指定し、先ほど作成したMapping定義をPUTします。本書ではIndexとTypeの両方をchatとします。
+
+
+//cmd{
+# curl -XPUT http://localhost:9200/chat -H "Content-Type: application/json" -d @mapping.json
+{"acknowledged":true,"shards_acknowledged":true,"index":"chat"}⏎
+//}
+
+
+作成されたIndexを確認してみます。下記のエンドポイントから指定したIndex/TypeのMapping定義を確認できます。
+
+
+//list[elasticsearch-list00][Mappingの確認]{
+curl -XGET 'http://localhost:9200/<Index名>/_mapping/<Type名>?pretty'
+//}
+
+
+//cmd{
+# curl -XGET 'http://localhost:9200/chat/_mapping/chat?pretty'
+{                                                                                                         
+  "chat" : {                                                                                              
+    "mappings" : {                                                                                        
+      "chat" : {                                                                                          
+        "properties" : {                                                                                  
+          "created" : {                                                                                   
+            "type" : "date"                                                                               
+          },                                                                                              
+          "message" : {                                                                                   
+            "type" : "text"                                                                               
+          },                                                                                              
+          "tags" : {                                                                                      
+            "type" : "keyword"                                                                            
+          },                                                                                              
+          "user" : {                                                                                      
+            "type" : "keyword"                                                                            
+          }                                                                                               
+        }                                                                                                 
+      }                                                                                                   
+    }                                                                                                     
+  }                                                                                                       
+}  
+//}
+
 
 === Hello, Elasticsearch with GO
 
@@ -214,6 +269,18 @@ func main() {
 Elasticsearchのバージョン情報といったシステム情報を取得する際は@<code>{Ping}を利用します。
 
 
+では実行してみましょう!
+
+
+//list[elasticsearch-list08][Elasticsearchのバージョン情報を問い合わせる]{
+$ go run hello_elasticsearch.go
+Elasticsearch returned with code 200 and version 6.0.0
+//}
+
+
+ローカル環境で稼働させているElasticsearchのバージョンが表示されれば無事接続成功です。
+
+
 === 単純なCRUD操作
 
 
@@ -240,6 +307,11 @@ type Chat struct {
     Tag     string    `json:"tag"`
 }
 //}
+
+
+GoのクライアントとElasticsearch間はHTTP(S)で通信され、JSONでデータのやり取りがおこなわれます。
+そのため、StructにはMappingで定義したフィールド名をjsonタグで指定することでMapping定義上のフィールド名とマッピングします。
+
 
 ==== ドキュメントの登録
 
