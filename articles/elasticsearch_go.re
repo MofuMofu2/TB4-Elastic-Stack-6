@@ -529,28 +529,27 @@ CONTAINER ID        IMAGE                                                     CO
 
 
 先ほど作成したMapping定義をもとにAnalyzerの設定を加えていきましょう。
-Analyzerの設定は@<code>{settings}内でおこなっていきます。
+Analyzerの設定は@<code>{settings}内でおこなっていきます。Analyzerを適用したいフィールドに@<code>{analyzer}を指定することで適用できます。
 
 
 //list[elasticsearch-list11][Analyzerの設定]{
+
 {
   "settings": {
     "analysis": {
-      "tokenizer": {
-        "kuromoji_tokenizer_search": {
-          "type": "kuromoji_tokenizer",
-          "mode": "search",
-          "discard_punctuation": "true"
-        }
-        },
-      },
       "analyzer": {
         "kuromoji_analyzer": {
           "type": "custom",
-          "tokenizer": "kuromoji_tokenizer_search",
+          "tokenizer": "kuromoji_tokenizer",
+          "char_filter": [
+            "kuromoji_iteration_mark"
+          ],
           "filter": [
             "kuromoji_baseform",
-            "kuromoji_part_of_speech"
+            "kuromoji_part_of_speech",
+            "ja_stop",
+            "kuromoji_number",
+            "kuromoji_stemmer"
           ]
         }
       }
@@ -576,6 +575,7 @@ Analyzerの設定は@<code>{settings}内でおこなっていきます。
     }
   }
 }
+
 //}
 
 
