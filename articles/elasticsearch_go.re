@@ -228,7 +228,7 @@ curl -XGET 'http://localhost:9200/<Index名>/_mapping/<Type名>?pretty'
 //}
 
 
-=== Hello, Elasticsearch with GO
+=== Hello, Elasticsearch with Go
 
 
 それではGoを使ってElasticsearchを触っていきましょう。
@@ -321,7 +321,6 @@ Elasticsearchは登録されたドキュメントに対して、ドキュメン�
 IDの振り方には登録時にクライアント側で設定するか、Elasticsearch側でランダムに振ってもらうかの2通りがあります。
 今回は登録時にクライアント側でドキュメントIDを指定します。
 さきほど作成したクライアントセッションを利用して操作をおこなっていきましょう。
-
 
 //list[elasticesearch-list08][クライアント側でドキュメントIDを付与する]{
 package main
@@ -578,18 +577,22 @@ Analyzerの設定は@<code>{settings}内でおこなっていきます。Analyze
 
 //}
 
-
 Analyzerの設定はMapping定義のanalysisでおこないます。tokenizerでトークン分割の方法を設定し、analyzerで設定したtoknenizerと各filter群を組み合わせて一つのAnalyzerを作ります。
 本書では以下の設定でAnalyzerを設定しました。
 
- * アナライザ名
- ** kuromoji_analyzer
- * 適用Tokenizer
- ** kuromoji_tokenizer: xxxxxxxxxxx
- * 適用Filter
- ** kuromoji_base: xxxxxxxxxxx
- ** kuromoji_part_of_speech: xxxxxxxxxxx
 
+  
+//table[analyzer][本書で利用するAnalyzer]{
+分類  分類  説明
+-------------------------------------------------------------
+Character Filters kuromoji_iteration_mark 踊り字を正規化します。e.g) すゝめ→すすめ
+Tokenizer kuromoji_tokenizer  日本語での形態素解析により文章をトークン化します。
+Token Filters kuromoji_baseform 動詞など活用になりかわる言葉を原形にします。e.g) 読め→読む
+Token Filters kuromoji_part_of_speech 検索時には利用されないような助詞などの品詞を削除します。
+Token Filters ja_stop 文章中に頻出するあるいは検索で利用されることがない言葉を削除します。e.g) あれ、それ
+Token Filters kuromoji_number 漢数字を数字に変更します。e.g) 五->5
+Token Filters kuromoji_stemmer  単語の末尾につく長音を削除します。e.g) サーバー→サーバ
+//}
 
 
 作成したAnalyzerを適用したいMappingフィールドに指定することで、そのフィールドにAnalyzerで指定したインデクシングを施すことができます。
