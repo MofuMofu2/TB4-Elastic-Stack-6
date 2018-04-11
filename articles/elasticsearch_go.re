@@ -848,6 +848,9 @@ curl -XPOST "http://localhost:9200/chat/_analyze?pretty" -H "Content-Type: appli
 //}
 
 
+「あと十年あれば期末テストもきっと満点がとれたんだろうな」は設定したAnalyzerによりこのようにトークン化されインデクシングされています。
+この中に「テスト」というトークンが含まれているために意図通りヒットしたというわけです。
+
 
 ==== Term Query
 
