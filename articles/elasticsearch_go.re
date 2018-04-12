@@ -660,14 +660,14 @@ func main() {
         User:    "user02",
         Message: "時々だけど勉強のやる気が出るけど長続きしない",
         Created: time.Now(),
-        Tag:     "tag01",
+        Tag:     "tag02",
     }
 
     chatData03 := Chat{
         User:    "user03",
         Message: "あと十年あれば期末テストもきっと満点がとれたんだろうな",
         Created: time.Now(),
-        Tag:     "tag01",
+        Tag:     "tag03",
     }
 
     chatData04 := Chat{
@@ -681,7 +681,7 @@ func main() {
         User:    "user05",
         Message: "世界記憶の概念、そうアカシックレコードを紐解くことで解は導かれるのかもしれない",
         Created: time.Now(),
-        Tag:     "tag01",
+        Tag:     "tag02",
     }
 
     _, err = client.Index().Index("chat").Type("chat").Id("1").BodyJson(&chatData01).Do(ctx)
@@ -860,6 +860,8 @@ curl -XPOST "http://localhost:9200/chat/_analyze?pretty" -H "Content-Type: appli
 
 
 TermQueryを利用することで、指定した文字列を完全に含むドキュメントを検索することができます。
+MatchQueryと違い、検索文字列がAnalyzeされないため、指定した文字列と完全に一致する転地インデックスを検索します。
+そのため、例えばタグ情報など指定した検索文字列と完全に一致させて検索をさせたい際に利用します。
 Elastic:An Elasticsearch client for the GoでTermQueryを利用する際はTerm Queryは@<code>{elastic.TermQuery}を利用します。
 elastic.NewTermQueryは検索対象のフィールドと検索文字列を指定します。
 
@@ -898,7 +900,8 @@ func main() {
         panic(err)
     }
 
-    termQuery := elastic.NewTermQuery("User", "山田")
+	//tag01をもつドキュメントを取得
+    termQuery := elastic.NewTermQuery("Tag", "tag01")
     results, err := client.Search().Index("chat").Query(termQuery).Do(ctx)
     if err != nil {
         panic(err)
@@ -907,11 +910,21 @@ func main() {
     var chattype Chat
     for _, chat := range results.Each(reflect.TypeOf(chattype)) {
         if c, ok := chat.(Chat); ok {
-            fmt.Println("Chat message is: %s", c.Message)
+            fmt.Printf("Tag: %s and Chat message is: %s \n", c.Tag, c.Message)
         }
     }
 
 }
+//}
+
+
+実行するとtag01をもつ以下の２つのドキュメントがヒットします。(ファイル名をmain.goとして保存しています。)
+
+
+//cmd{
+# go run main.go
+Tag: tag01 and Chat message is: 明日は期末テストがあるけどなんにも勉強してない....
+Tag: tag01 and Chat message is: ドラえもんの映画で一番すきなのは夢幻三剣士だな
 //}
 
 
