@@ -463,8 +463,8 @@ func main() {
 == 検索の基本
 
 
-さて、基本的なCRUDを通じてElasticsearchの基本をおさえたところで、いよいよ検索処理についてみていきましょう。
-Elasticsearchは多くの検索機能をサポートしていますが、本章ではその中でも代表的な以下についてみていきます。
+さて、基本的なCRUDを通じてElasticsearchの基本をおさえたところで、検索処理について詳しく掘り下げていきます。
+Elasticsearchは多くの検索機能をサポートしています。本章ではその中でも代表的な昨日について取り上げます。
 Elasticsearchの高度な検索を支える仕組みにAnalyzerがあります。これらの検索クエリもAnalyzerの機能を利用することで、より柔軟な検索をおこなうことができます。
 まずはElasticsearchのAnalyzerについてみていきましょう。
 
@@ -483,9 +483,9 @@ Elasticsearchの高度な検索を支える仕組みにAnalyzerがあります�
 この本をきっかけにElasticsearchにもっと興味を持っていただけた方はAnalyzerを深掘ってみてください。
 
 
-Analyzerは以下の要素から構成されています。これらを組み合わせることでより柔軟な検索のためのインデックスを作成できます。
+Analyzerは以下の要素から構成されています。これらを組み合わせることでより柔軟な検索をおこなうためのインデックスを作成することが可能です。
  * Tokenizer
-  ** ドキュメントをどうトークン分割するかを定義します。トークン分割には様々な方法があり、有名なものだと形態素解析やN-Gramなどがあります。Tokenizerにより分割されたトークンをもとに検索文字列との比較がおこなわれます。各Analyzerは1つのTokenizerを持つことができます。
+  ** ドキュメントをどのようにトークン分割するかを定義します。トークン分割には様々な方法があり、有名なものだと形態素解析やN-Gramなどがあります。Tokenizerにより分割されたトークンをもとに検索文字列との比較がおこなわれます。各Analyzerは1つのTokenizerを持つことができます。
  * Character filters
   ** Tokenizerによるトークン分割がされる前に施す処理を定義します。例えば検索文字列のゆらぎを吸収するために、アルファベットの大文字・小文字を全て小文字に変換したり、カタカナの全角・半角を全て半角に統一したりといった処理をトークン分割の前処理として実施します。
  * Token filters
@@ -599,7 +599,7 @@ Token Filters	kuromoji_stemmer	単語の末尾につく長音を削除します�
 
 
 作成したAnalyzerを適用したいMappingフィールドに指定することで、そのフィールドにAnalyzerで指定したインデクシングを施すことができます。
-Chatマッピングの１階層下に存在する、messageフィールドのanalyzerにさきほど作成したAnalyzerを指定することで適用します。
+Chatマッピングの１階層下に存在する、messageフィールドの@<code>{analyzer}にさきほど作成した@<code>{Analyzer}を指定することで適用します。
 
 
 
@@ -703,7 +703,7 @@ func main() {
 
 MatchQueryは全文検索の肝です。MatchQueryでは、指定した検索文字列がAnalyzerにより言語処理がなされ検索がおこなわれます。
 olivere/elasticで検索機能を利用する際は、client経由でSearchメソッドを実行します。
-Searchメソッドはelastic.SearchServiceのQueryメソッドに検索条件を指定したelastic.MatchQueryを渡します。
+Searchメソッドはelastic.SearchServiceのQueryメソッドに、検索条件を指定した@<code>{elastic.MatchQuery}を代入します。
 取得できたドキュメントをStruct経由で操作する際はreflectパッケージを使って操作します。
 
 
@@ -769,7 +769,7 @@ Chat message is: 明日は期末テストがあるけどなんにも勉強して
 //}
 
 
-狙ったとおりのドキュメントを取得できました！では、この検索結果はどのように導かれたのでしょうか。
+意図した通りのドキュメントを取得することができました！では、この検索結果はどのように導かれたのでしょうか。
 AnalyzerこれらのドキュメントがどのようにAnalyzeされインデクシングされているのか確認します。
 
 
@@ -929,8 +929,8 @@ Tag: tag01 and Chat message is: ドラえもんの映画で一番すきなのは
 === Bool Query
 
 
-BoolQueryではさきほどまで紹介したMatchQueryやTermQueryなどを組み合わせたAND/OR/NOTによる検索をおこなえます。検索条件をネストさせることも可能で、より複雑な検索Queryを組み立てることができます。
-実際にはmust/should/must_notといったElasticsearch独自の指定方法を利用します。
+BoolQueryでは、MatchQueryやTermQueryなどを組み合わせたAND/OR/NOTによる検索をおこなうことが可能です。検索条件をネストさせることも可能で、より複雑な検索Queryを組み立てることができます。
+実際にはmust/should/must_notといった、Elasticsearch独自の指定方法を利用します。
 
 
 //table[tbl3][]{
@@ -1011,7 +1011,7 @@ Cnat message is: あと十年あれば期末テストもきっと満点がとれ
 ここでは少し応用的な機能についてみていきます。
 
  * Scroll API
- ** Elasticsearchが提供しているページング機能です。limit&offsetと違い、検索時のスナップショットを保持し、カーソルを利用してページの取得をおこなえます。
+ ** Elasticsearchが提供しているページング機能です。limit&offsetと違い、検索時のスナップショットを保持し、カーソルを利用してページの取得をおこないます。
  * Multi Fields
  ** Multi Fieldsタイプを指定することで1つのフィールドに対してデータ型やAnalyze設定が異なる複数のフィールドを保持することができます。
  * Alias
@@ -1082,7 +1082,7 @@ func main() {
 
 
 Multi Fields機能を利用することで一つのフィールドに対して異なるデータ型やAnalyze設定を指定することができます。
-といってもすぐにピンとこないかもしれませんので、実際にMulti Fieldsの設定をしているMapping定義をみてみましょう。
+といってもすぐにピンとこないかもしれませんので、実際にMulti Fieldsの設定をしているMapping定義をみていきましょう。
 
 
 //list[elasticsearch-list17][Multi Fieldsの設定がされているMapping定義の参照]{
@@ -1162,7 +1162,7 @@ func main() {
 === エラーハンドリング
 
 
-最後にエラーハンドリングについて記載します。
+最後に、エラーハンドリングについて記載します。
 @<code>{Elastic:An Elasticsearch client for the Go}では@<code>{elastic.Error}経由で詳細なエラー情報を取得できます。これをもとにしてエラーハンドリングを実装することができます。
 
 
