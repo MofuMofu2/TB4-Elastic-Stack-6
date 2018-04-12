@@ -937,9 +937,9 @@ BoolQueryではAND/OR/NOTによる検索がおこなえます。検索条件を�
 //table[tbl3][]{
 Query	説明	oliver/elasticでの指定方法
 -----------------
-must	ANDに相当	boolQuery := elastic.NewBoolQuery() <br> boolQuery.Must(elastic.NewTermQuery("field", "value")
-should	ORに相当	boolQuery := elastic.NewBoolQuery() <br> boolQuery.Should(elastic.NewTermQuery("field", "value")
-must_not	NOT	boolQuery := elastic.NewBoolQuery() <br> boolQuery.MustNot(elastic.NewTermQuery("field", "value")
+must	ANDに相当	boolQuery := elastic.NewBoolQuery() @<br> boolQuery.Must(elastic.NewTermQuery("field", "value")
+should	ORに相当	boolQuery := elastic.NewBoolQuery() @<br> boolQuery.Should(elastic.NewTermQuery("field", "value")
+must_not	NOT	boolQuery := elastic.NewBoolQuery() @<br> boolQuery.MustNot(elastic.NewTermQuery("field", "value")
 //}
 
 
