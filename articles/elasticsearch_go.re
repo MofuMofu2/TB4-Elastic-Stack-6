@@ -4,11 +4,11 @@
 == はじめに
 
 
-Elasticsearchの入門の多くはREST APIを使ったものが多いですが、実際にアプリケーション作成する際は何らかの言語のSDKを利用するかと思います。
+Elasticsearchの入門の多くはREST APIを使ったものが多いのですが、実際にアプリケーションを作成する際は何らかの言語のSDKを利用するかと思います。
 そうした際に意外と「あれ、これってどうやるんだ？」となる場合が多いものです。
 
-そこで、本章ではElasticsearchの基本操作をGo言語を利用して体験していきます。Elasticsearchの基本的な操作を中心に、ちょっとしたTipsについても触れていきます。
-Elasticsearchはとても多くの機能を有しています。そのため、全ての機能をカバーすることは難しいです。よって、代表的な機能について本章では記載します。 また本章ではElasticsearchのAPIを主に扱います。Elasticsearchのクラスタリング機能などについては、最低限の情報しか記載していません	。
+そこで、本章ではElasticsearchの基本操作を、Go言語を利用して体験していきます。Elasticsearchの基本的な操作を中心に、ちょっとしたTipsについても触れていきます。
+Elasticsearchはとても多くの機能を有しています。そのため、全ての機能をカバーすることは難しいです。よって、代表的な機能について本章では記載します。 また本章ではElasticsearchのAPIを主に扱います。Elasticsearchのクラスタリング機能などについては、最低限の情報しか記載していません。
 
 
 == Elasticsearch環境の準備
@@ -112,7 +112,7 @@ RDBMSで例えると以下に相当します。
 
 
 
-と、このようにRDBMSで例えられることが多いのですが、ここで注意が必要なのがTypeはElasticsearch 7系より廃止が予定されています。
+と、このようにRDBMSで例えられることが多いのですが、TypeはElasticsearch 7系より廃止が予定されています。
 また5系までは1つのIndexに複数のTypeを作成できたのですが、6系では1つのIndexに1つのTypeのみ作成できる仕様へ変わっています
 （参考：@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/master/removal-of-types.html}）。
 
@@ -129,7 +129,7 @@ RDBMSで例えると以下に相当します。
 
 本章ではChatアプリケーションを想定したIndex/Typeをもとに操作をおこなっていきます。
 
-Elasticsearchを操作するにあたり利用するMapping定義を@<list>{elasticsearch-list05}に記述しました。
+Elasticsearchの操作に必要なMapping定義を@<list>{elasticsearch-list05}に記述しました。
 
 
 //list[elasticsearch-list05][Mapping定義]{
@@ -167,11 +167,11 @@ Elasticsearchを操作するにあたり利用するMapping定義を@<list>{elas
 
 
 keyword型とtext型は両者ともString型に相当します。その違いはアナライザを設定できるか否かです。
-後ほど詳細を説明しますが、アナライザを適用することでそのフィールドに対し高度な全文検索を行うことができます。一方でkeyword型はアナライザが適用されないため、完全一致での検索が求めらます。
-また、フィールドに対してソートをおこないたい場合はkeyword型を指定する必要があります。
+後ほど詳細を説明しますが、アナライザを適用することでそのフィールドに対し高度な全文検索を行うことができます。一方でkeyword型はアナライザが適用されないため、完全一致での検索が求められます。
+また、フィールドに対してソートをおこなう場合、keyword型を指定する必要があります。
 
 
-Elasticsearch 6系のデータ型の詳細は公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html}）を参照してみてください。
+Elasticsearch 6系のデータ型の詳細は公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html}）を参照してください。
 多くのデータ型が標準でサポートされています。
 
 
@@ -203,28 +203,28 @@ curl -XGET 'http://localhost:9200/<Index名>/_mapping/<Type名>?pretty'
 
 //cmd{
 # curl -XGET 'http://localhost:9200/chat/_mapping/chat?pretty'
-{                                                                                                         
-  "chat" : {                                                                                              
-    "mappings" : {                                                                                        
-      "chat" : {                                                                                          
-        "properties" : {                                                                                  
-          "created" : {                                                                                   
-            "type" : "date"                                                                               
-          },                                                                                              
-          "message" : {                                                                                   
-            "type" : "text"                                                                               
-          },                                                                                              
-          "tags" : {                                                                                      
-            "type" : "keyword"                                                                            
-          },                                                                                              
-          "user" : {                                                                                      
-            "type" : "keyword"                                                                            
-          }                                                                                               
-        }                                                                                                 
-      }                                                                                                   
-    }                                                                                                     
-  }                                                                                                       
-}  
+{
+  "chat" : {
+    "mappings" : {
+      "chat" : {
+        "properties" : {
+          "created" : {
+            "type" : "date"
+          },
+          "message" : {
+            "type" : "text"
+          },
+          "tags" : {
+            "type" : "keyword"
+          },
+          "user" : {
+            "type" : "keyword"
+          }
+        }
+      }
+    }
+  }
+}
 //}
 
 
@@ -584,7 +584,7 @@ Analyzerの設定はMapping定義のanalysisでおこないます。tokenizerで
 本書では以下の設定でAnalyzerを設定しました。
 
 
-  
+
 //table[analyzer][本書で利用するAnalyzer]{
 分類	分類	説明
 -------------------------------------------------------------
@@ -653,7 +653,7 @@ func main() {
         Created: time.Now(),
         Tag:     "tag01",
     }
-    
+
     chatData02 := Chat{
         User:    "user02",
         Message: "時々だけど勉強のやる気が出るけど長続きしない",
