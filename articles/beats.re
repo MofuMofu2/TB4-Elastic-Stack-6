@@ -2,11 +2,11 @@
 = Beats
 
 
-Beatsは、Elastic Stakcのファミリーで様々な用途に対応可能なデータ取り込みツールです。
-Logstashと機能が被っているのでは？とお気付きになられた方もいるかと思います。
+Beatsは、シンプルなデータ取り込みツールです。
+あれ？Logstashは？と思う方もいると思いますが、Logstashは、豊富な機能を持ってます。
 改めてLogstashの役割を説明すると、様々なデータソースからデータを取得し、意味のあるフィールドに変換し、指定のOutput先にストリーミング処理をします。
 このことからETLとしてLogstashが必要な機能を持っているということがわかるかと思います。
-ではなぜ、Logstashだけでなく、Beatsが登場したかというと、パフォーマンス問題を抱えていたためです。
+ではなぜ、LogstashだけでなくBeatsが登場したかというと、パフォーマンス問題を抱えていたためです。
 Logstashは、複数のパイプラインや高度なフィルタリングを施すことができますが、その分メモリを多く消費します。
 そこで軽量で手軽に導入できるBeatsが登場しました。
 何が手軽かというと、設定ファイルがYAMLで全て完結するのです。
@@ -46,11 +46,11 @@ Logstashに転送することでログを集約することができます。
 また、Filebeatから転送されたデータを分析しやすい構造に変換する処理を行い、Elasticsearchに保存します。
 
 
-この他にもFilebeatは、Modulesを利用することで一部のデータを分析しやすい構造に変換することもできます。
-Modulesについては、後ほど説明します。
+この他にもFilebeatは、Moduleを利用することで一部のデータを分析しやすいフィールド構造に変換することもできます。
+Moduleについては、後ほど説明します。
 
 
-それでは、Filebeatでデータを取得し、Logstashに転送し、Elasticsaerchに格納するところまでをみていきたいと思います。
+それでは、Filebeatでデータを取得し、Logstashに転送し、Elasticsaerchに保存するところまでをみていきたいと思います。
 
 
 === Filebeatの構成について
@@ -60,7 +60,7 @@ Filebeatを試す環境は、@<chapref>{logstash}を元として構成します�
 
 
 今回想定するケースは、NginxのアクセスログををFilebeatが取得し、Logstashに転送します。
-Logstashは、Filebeatから転送されたログをElasticsearchに格納するところまでを行います。
+Logstashは、Filebeatから転送されたログをElasticsearchに保存するところまでを行います。
 
 
 //image[filebeat02][サーバの構成について]{
@@ -148,8 +148,8 @@ output.logstash:
 次にFilebeatの転送先であるLogstashの設定を行います。
 新しくパイプラインファイルとパターンファイルを作成します。
 
-Filebeatで取得したNginxのアクセスログは、フィールド分割されていないため分析できない状態です。
-そのため、意味のあるフィールドに変換するためにパターンファイルを作成します。
+Filebeatで取得したNginxのアクセスログは、フィールド分割されていないため分析できない構造です。
+そのため、分析しやすい構造にするためパターンファイルを作成します。
 
 //list[beats-06][パターンファイルの作成]{
 vim /etc/logstash/patterns/nginx_patterns
@@ -222,7 +222,7 @@ filter {
 Outputは、@<chapref>{logstash}の設定と同様です。
 
 
-最後に、作成したパイプラインファイルを読み込むため、piplines.ymlの設定をします。
+最後に、作成したパイプラインファイルを読み込むため、pipelines.ymlの設定をします。
 @<code>{logstash_pipelines}の設定が残っている場合、削除してください。
 
 //list[beats-10][logstash_pipelinesの編集]{
@@ -255,31 +255,34 @@ logstash start/running, process 3845
 Elasticsearchにインデクシングされているかを確認します。
 想定通り取り込まれていることがわかります。
 
+Elasticsearchにデータが転送されているか、curlを発行して確認します。
+以下のように@<code>{logstash-YYYY.MM.dd}で出力されていれば正常に保存されています。
+
 //list[beats-13][Filebeatの起動]{
 curl -XGET localhost:9200/_cat/indices/logstash*
 yellow open logstash-2018.04.10 fzIOfXzOQK-p0_mmvO7wrw 5 1 8 0 93.2kb 93.2kb
 //}
 
 補足ですが、ステータスが"yellow"になっているのは、ノードが冗長化されていないため表示されています。
-今回は、1ノード構成としているため、必然的に"yellow"になってしまうので、無視してください。
+今回は、1ノード構成のため"yellow"になってしまうので、無視してください。
 
 
-=== Filbeat Module
+=== Filbeat Modules
 
 ここまででFilebeatの使い方がわかったと思います。
 しかし、これではどこが手軽なの？むしろ重厚感が増したのでは？と思われる方もいると思います。
-ここからは、もっと手軽に導入するためのFilbeat Modulesについて触れていきたいと思います。
+ここからは、もっと手軽に導入するためのFilbeat Moduleについて触れていきたいと思います。
 
 
-Filebeat Modulesは、あらかじめデータソースに対応した Modulesが用意されています。
-このModulesを使用することで、Logstashで複雑なフィルタなどを書かずに、意味のあるフィールドに変換し、Elasticsearchにインデクシングできます。
+Filebeat Modulesは、あらかじめデータソースに対応した Moduleが用意されています。
+このModuleを使用することで、Logstashで複雑なフィルタなどを書かずに、意味のあるフィールドに変換し、Elasticsearchにインデクシングできます。
 また、Kibanaのダッシュボードも用意されているため、インデクシングされたデータを即時でビジュアライズすることができます。
 
 
-==== Filebeat Moduleの構成
+==== Filebeat Modulesの構成
 
 Filebeatのデータソースは、Nginxのアクセスログとします。
-先ほどの構成は、Logstashに転送していましたが、Elasticsaerchに直接格納する構成とします。
+先ほどの構成は、Logstashに転送していましたが、Elasticsaerchに直接保存する構成とします。
 
 //image[filebeat03][Filebeatの構成]{
 //}
@@ -307,13 +310,13 @@ Filebeat Modulesは、パイプラインを自動で作成します。
 sudo service elasticsearch restart
 //}
 
-今回は@<code>{Nginx Modules}を例にModulesを利用すると、どのくらい構築コストが減少するのかを検証します。
+今回は@<code>{Nginx Module}を例にModuleを利用すると、どのくらい構築コストが減少するのかを検証します。
 @<chapref>{logstash}でKibanaをインストールしている環境を引き続き利用することを前提として
 話を進めますが、もし新しい環境で始める場合は@<chapref>{logstash}や@<chapref>{Kibana-visualize}を参考に
 環境構築を行ってください。
 
 
-==== Filebeat Moduleの設定
+==== Filebeat Modulesの設定
 
 Filebeatの設定ファイルを編集しますので、以下の設定ファイル@<code>{filebeat.yml}を使用します。
 既存で設定してある内容は全て上書きしてください。
@@ -435,8 +438,8 @@ Logstashなどでログを取り込んだ場合は、Dashboardを一から作成
 //}
 
 いかがでしたか？
-他にも取り込みたいログがあれば、@<code>{filebeat.yml}のModuleを有効化するだけで容易にモニタリングができるようになります。
-
+他にも取り込みたいログがあれば、@<code>{filebeat.yml}のModuleを追加するだけで容易にモニタリングができるようになります。
+追加する場合は、@<code>{filebeat.reference.yml}にModulesが記載されているので、コピー&ペーストして有効化してください。
 
 
 次は、サーバのリソースを容易にモニタリングすることを可能とするMetricbeatについてです。
