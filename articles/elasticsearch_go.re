@@ -1010,7 +1010,7 @@ Cnat message is: あと十年あれば期末テストもきっと満点がとれ
 == ちょっと応用
 
 
-ここでは少し応用的な機能についてみていきましょう。
+ここでは少し応用的な機能についてみていきます。
 
  * Scroll API
  ** Elasticsearchが提供しているページング機能です。limit&offsetと違い、検索時のスナップショットを保持し、カーソルを利用してページの取得をおこなえます。
@@ -1019,6 +1019,8 @@ Cnat message is: あと十年あれば期末テストもきっと満点がとれ
  * Alias
  ** インデックスに別名をつけてアクセスすることができる機能です。任意の検索条件を指定したエイリアスも作成することが可能で、RDBのビューのような機能も利用できます。
 
+
+利用するIndexは「検索の基本」で作成したものを引き続き利用します。
 
 === Scroll API
 
@@ -1061,18 +1063,21 @@ func main() {
         panic(err)
     }
 
-    termQuery := elastic.NewTermQuery("user", "山田")
-    results, err := client.Scroll("chat").Query(termQuery).Size(10).Do(ctx)
+	//messageに「テスト」が含まれるドキュメントを検索
+    matchQuery := elastic.NewMatchQuery("message", "テスト")
+    results, err := client.Scroll("chat").Query(matchQuery).Size(1).Do(ctx)
     if err != nil {
         panic(err)
     }
 
-    results, err = client.Scroll("chat").Query(termQuery).Size(10).ScrollId(results.ScrollId).Do(ctx)
+	//先ほどの取得結果resutlsからスクロールIDを取得し、検索時に渡すことで前回検索結果の続きから取得が可能
+    nextResults, err := client.Scroll("chat").Query(matchQuery).Size(1).ScrollId(results.ScrollId).Do(ctx)
     if err != nil {
         panic(err)
     }
 }
 //}
+
 
 === Multi Fields
 
@@ -1108,11 +1113,10 @@ userフィールドのtypeにmulti_fieldを指定しています。以下のよ�
  * user.analyzed：Analyzeされている
 
 
-
 インデクシングする際はuserフィールドにのみ投入すればOKです。
 
 
-==== Alias
+=== Alias
 
 
 AliasはIndexに別名をつけてアクセスすることができる機能です。任意の検索条件を指定したエイリアスも作成することが可能で、RDBのビューのような機能も利用できます。
