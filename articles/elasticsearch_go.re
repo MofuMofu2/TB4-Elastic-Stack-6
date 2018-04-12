@@ -496,7 +496,7 @@ Analyzerは以下の要素から構成されています。これらを組み合
 //}
 
 
-Tokenizerで形態素解析を用いた場合の例は以下のようになります。
+Tokenizerで形態素解析を用いた場合の例を@<img>{analyzer_sample}に示します。
 
 
 //image[analyzer_sample][Analyzerの仕組み]{
