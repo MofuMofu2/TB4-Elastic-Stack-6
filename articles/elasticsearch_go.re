@@ -193,7 +193,7 @@ Index名に作成するIndexの名前を指定し、先ほど作成したMapping
 //}
 
 
-作成されたIndexを確認してみます。下記のエンドポイントから指定したIndex/TypeのMapping定義を確認できます。
+作成されたIndexを確認します。下記のエンドポイントから指定したIndex/TypeのMapping定義を確認できます。
 
 
 //list[elasticsearch-list00][Mappingの確認]{
@@ -234,8 +234,8 @@ curl -XGET 'http://localhost:9200/<Index名>/_mapping/<Type名>?pretty'
 === Elasticsearchにつないでみよう
 
 
-それではGoを使ってElasticsearchを触っていきましょう。
-まずはさきほどDockerで起動したElasticsearchへの接続確認も兼ねて、Elasticsearchのバージョン情報などを取得してみましょう。
+それではGoを使ってElasticsearchを操作していきましょう。
+まず始めに、さきほどDockerで起動したElasticsearchへの接続確認をおこなうため、Elasticsearchのバージョン情報などを取得します。
 
 
 //list[elasticsearch-list07][Go言語を用いてElasticsearchに接続する]{
@@ -281,7 +281,7 @@ Elasticsearch returned with code 200 and version 6.0.0
 //}
 
 
-ローカル環境で稼働させているElasticsearchのバージョンが表示されれば無事接続成功です。
+ローカル環境で稼働させているElasticsearchのバージョンが表示されれば、Elasticsearchに接続できています。
 
 
 === 単純なCRUD操作
@@ -415,7 +415,7 @@ func main() {
 ==== ドキュメントの削除
 
 
-ドキュメントIDをもとに登録したドキュメントを削除してみます。
+ドキュメントIDをもとに登録したドキュメントを削除します。
 登録したドキュメントを、@<code>{ドキュメントID}を指定して取得します。
 
 
@@ -770,7 +770,7 @@ Chat message is: 明日は期末テストがあるけどなんにも勉強して
 
 
 狙ったとおりのドキュメントを取得できました！では、この検索結果はどのように導かれたのでしょうか。
-AnalyzerこれらのドキュメントがどのようにAnalyzeされインデクシングされているのか確認してみます。
+AnalyzerこれらのドキュメントがどのようにAnalyzeされインデクシングされているのか確認します。
 
 
 
