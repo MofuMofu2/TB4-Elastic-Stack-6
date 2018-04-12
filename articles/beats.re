@@ -2,10 +2,10 @@
 = Beats
 
 
-Beatsは、Elastic Stakcのファミリーでさまざまな用途に対応可能なデータ取り込みツールです。
+Beatsは、Elastic Stakcのファミリーで様々な用途に対応可能なデータ取り込みツールです。
 Logstashと機能が被っているのでは？とお気付きになられた方もいるかと思います。
-改めてLogstashの役割を説明すると、さまざまなデータソースからデータを取得し、意味のあるフィールドに変換し、指定のOutput先にストリーミング処理をします。
-このことからETLとしてLogstashが必要な機能を持っているということが分かるかと思います。
+改めてLogstashの役割を説明すると、様々なデータソースからデータを取得し、意味のあるフィールドに変換し、指定のOutput先にストリーミング処理をします。
+このことからETLとしてLogstashが必要な機能を持っているということがわかるかと思います。
 ではなぜ、Logstashだけでなく、Beatsが登場したかというと、パフォーマンス問題を抱えていたためです。
 Logstashは、複数のパイプラインや高度なフィルタリングを施すことができますが、その分メモリを多く消費します。
 そこで軽量で手軽に導入できるBeatsが登場しました。
@@ -15,7 +15,7 @@ Logstashは、複数のパイプラインや高度なフィルタリングを施
 
 == Beats Family
 
-Beatsにはどんな種類があるのかを改めて記載します。
+Beatsはどんな種類があるのかを改めて記載します。
 
  * Filebeat
  * Metricbeat
@@ -36,18 +36,18 @@ Beatsにはどんな種類があるのかを改めて記載します。
 
 Filebeatは、ログを一箇所に転送する用途で使用します。
 また、TLS暗号化をサポートしているため、セキュアに転送することができます。
-たとえば、次の構成図がFilebeatのよくある構成です。
+たとえば、以下の構成図がFilebeatのよくある構成です。
 
 //image[filebeat01][Filebeatの構成]{
 //}
 
 Filebeatをデータソースであるサーバに導入し、Logstashへ転送する構成です。
 Logstashに転送することでログを集約することができます。
-また、Filebeatから転送されたデータを分析しやすい構造に変換する処理を行い、Elasticsearchにストアします。
+また、Filebeatから転送されたデータを分析しやすい構造に変換する処理を行い、Elasticsearchに保存します。
 
 
-この他にもFilebeatには、モジュールを利用することで一部のデータを分析しやすい構造に変換することもできます。
-モジュールについては、後ほど説明します。
+この他にもFilebeatは、Modulesを利用することで一部のデータを分析しやすい構造に変換することもできます。
+Modulesについては、後ほど説明します。
 
 
 それでは、Filebeatでデータを取得し、Logstashに転送し、Elasticsaerchに格納するところまでをみていきたいと思います。
@@ -59,7 +59,7 @@ Filebeatを試す環境は、@<chapref>{logstash}を元として構成します�
 新たにFilebeatとNginxを追加します。
 
 
-今回想定するケースは、Nginxにアクセスした時に出力されるアクセスログをデータソースとし、そのデータをFilebeatが取得し、Logstashに転送します。
+今回想定するケースは、NginxのアクセスログををFilebeatが取得し、Logstashに転送します。
 Logstashは、Filebeatから転送されたログをElasticsearchに格納するところまでを行います。
 
 
@@ -148,14 +148,15 @@ output.logstash:
 次にFilebeatの転送先であるLogstashの設定を行います。
 新しくパイプラインファイルとパターンファイルを作成します。
 
-Nginxのアクセスログを意味のある形に変換するためのパターンファイルを作成します。
+Filebeatで取得したNginxのアクセスログは、フィールド分割されていないため分析できない状態です。
+そのため、意味のあるフィールドに変換するためにパターンファイルを作成します。
 
 //list[beats-06][パターンファイルの作成]{
 vim /etc/logstash/patterns/nginx_patterns
 NGINX_ACCESS_LOG %{IPORHOST:client_ip} (?:-|(%{WORD}.%{WORD})) %{USER:ident} \[%{HTTPDATE:date}\] "(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:ver})?|%{DATA:rawrequest})" %{NUMBER:response} (?:%{NUMBER:bytes}|-) %{QS:referrer} %{QS:agent} %{QS:forwarder}
 //}
 
-パターンファイルを作成します。
+パイプラインファイルを作成します。
 
 //list[beats-07][パイプラインファイルの作成]{
 input {
@@ -221,11 +222,10 @@ filter {
 Outputは、@<chapref>{logstash}の設定と同様です。
 
 
-最後に作成したパイプラインファイルを読み込むため、piplines.ymlの設定をします。
-@<chapref>{logstash_pipelines}の設定が残っている場合は、削除してください。
+最後に、作成したパイプラインファイルを読み込むため、piplines.ymlの設定をします。
+@<code>{logstash_pipelines}の設定が残っている場合、削除してください。
 
-//list[beats-10][Logstashの起動]{
-vim pipelines.yml
+//list[beats-10][logstash_pipelinesの編集]{
 - pipeline.id: filebeat
   pipeline.batch.size: 125
   path.config: "/etc/logstash/conf.d/filebeat.cfg"
@@ -241,7 +241,7 @@ sudo initctl start logstash
 logstash start/running, process 3845
 //}
 
-次にFilebeatを起動します。
+Filebeatを起動します。
 "config OK"と標準出力されれば問題なく起動しています。
 
 //list[beats-12][Filebeatの起動]{
@@ -268,11 +268,11 @@ yellow open logstash-2018.04.10 fzIOfXzOQK-p0_mmvO7wrw 5 1 8 0 93.2kb 93.2kb
 
 ここまででFilebeatの使い方がわかったと思います。
 しかし、これではどこが手軽なの？むしろ重厚感が増したのでは？と思われる方もいると思います。
-ここからは、もっと手軽に導入するためのFilbeatモジュールについて触れていきたいと思います。
+ここからは、もっと手軽に導入するためのFilbeat Modulesについて触れていきたいと思います。
 
 
-Filebeatモジュールは、あらかじめデータソースに対応したモジュールが用意されています。
-このモジュールを使用することで、Logstashで複雑なフィルタなどを書かずに、意味のあるフィールドに変換し、Elasticsearchにインデクシングできます。
+Filebeat Modulesは、あらかじめデータソースに対応した Modulesが用意されています。
+このModulesを使用することで、Logstashで複雑なフィルタなどを書かずに、意味のあるフィールドに変換し、Elasticsearchにインデクシングできます。
 また、Kibanaのダッシュボードも用意されているため、インデクシングされたデータを即時でビジュアライズすることができます。
 
 
@@ -287,7 +287,7 @@ Filebeatのデータソースは、Nginxのアクセスログとします。
 
 ==== Ingest Node Pluginをインストール
 
-Filebeatモジュールは、パイプラインを自動で作成します。
+Filebeat Modulesは、パイプラインを自動で作成します。
 その際にUserAgent、GeoIPの解析をするため、@<code>{Ingest Node Plugin}と@<code>{Ingest GeoIP plugin}をインストールします。
 
 
@@ -315,7 +315,7 @@ sudo service elasticsearch restart
 
 ==== Filebeat Moduleの設定
 
-Filebeatの設定ファイルを編集しますので、次の設定ファイル@<code>{filebeat.yml}を使用します。
+Filebeatの設定ファイルを編集しますので、以下の設定ファイル@<code>{filebeat.yml}を使用します。
 既存で設定してある内容は全て上書きしてください。
 
 //list[beats-17][filebeat.ymlのNginx Module編集]{
@@ -385,7 +385,7 @@ setup.dashboards.enabled: true
 
 
 今回の設定では、アウトプット先を複数にする設定は発生しないと思いますが、
-もし既存の設定が残っていた場合は、再起動時に次のエラーが発生します。
+もし既存の設定が残っていた場合は、再起動時に以下のエラーが発生します。
 このエラーが発生した場合は、アウトプット先が複数の可能性があるので確認してください。
 
 
@@ -457,7 +457,7 @@ sudo yum install metricbeat
 
 
 MetricbeatもFilebeat同様にベースの設定ファイル@<code>{metricbeat.reference.yml}があるのですが、
-デフォルト有効化されているModuleが多いため、次の設定ファイルを使用します。
+デフォルト有効化されているModuleが多いため、以下の設定ファイルを使用します。
 既存で設定してある内容は全て上書きしてください。
 
 
@@ -548,8 +548,8 @@ CPUやメモリ、プロセスの状態をニアリアルタイムにモニタ�
 サーバの監査としてauditdが出力する@<code>{audit.log}をモニタリングしている方は多くいるのではないでしょうか。
 @<code>{audit.log}を保管するだけでなく、ニアリアルタイムにモニタリングするためにLogstashなどのツールを利用している方もいると思います。
 ただ、これから@<code>{audit.log}をモニタリングしたいという人からしたらハードルが高く、モニタリングするまでに時間を要してしまいます。
-そこで、Beatsには、Auditbeatというデータシッパーがあるので容易に導入することができます。
-ここまでFilbeatやMetricbeatを触ってきたら分かるとおり、学習コストはほぼかからないでDashboardで閲覧するところまでできてしまいます。
+そこで、Beatsは、Auditbeatというデータシッパーがあるので容易に導入することができます。
+ここまでFilbeatやMetricbeatを触ってきたらわかるとおり、学習コストはほぼかからないでDashboardで閲覧するところまでできてしまいます。
 
 それでは、ここからAuditbeatをインストールします。
 
@@ -617,7 +617,7 @@ sudo service auditbeat start
 //}
 
 左ペインにあるDashboardをクリックします。
-検索ウィンドウから@<code>{Auditbeat}と入力するとさまざまなDashboardがヒットします。
+検索ウィンドウから@<code>{Auditbeat}と入力すると様々なDashboardがヒットします。
 
 //image[auditbeat02][AuditbeatのDashboardを確認]{
 //}
