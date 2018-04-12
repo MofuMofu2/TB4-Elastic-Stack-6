@@ -94,7 +94,7 @@ Elastic社の公式クライアント@<href>{https://github.com/elastic/go-elast
 go get "github.com/olivere/elastic"
 //}
 
-== Goで始めるElasticsearch
+== Elasticsearchでの準備
 
 
 さて、いよいよGoでElasticsearchを操作していきましょう。
@@ -124,7 +124,7 @@ RDBMSで例えると以下に相当します。
 また、Mapping定義を作成することにより、各フィールド単位でより細かな検索設定をおこなうことが可能です。本章では動的Mappingは利用せず、Mapping定義を1から作成し利用します。
 
 
-=== 本章で利用するMapping定義
+=== Mapping
 
 
 本章ではChatアプリケーションを想定したIndex/Typeをもとに操作をおこなっていきます。
@@ -228,7 +228,10 @@ curl -XGET 'http://localhost:9200/<Index名>/_mapping/<Type名>?pretty'
 //}
 
 
-=== Hello, Elasticsearch with Go
+== Hello, Elasticsearch with Go
+
+
+=== Elasticsearchにつないでみよう
 
 
 それではGoを使ってElasticsearchを触っていきましょう。
@@ -368,6 +371,7 @@ func main() {
 }
 //}
 
+
 ==== ドキュメントIDによる取得
 
 
@@ -389,19 +393,30 @@ func main() {
   ctx := context.Background()
 
   client, err := elastic.NewClient(
-    elastic.SetURL(esEndpoint),
-    elastic.SetSniff(false),
+    elastic.SetURL(esUrl),
   )
   if err != nil {
     panic(err)
   }
 
+  document, err := client.Get().Index("chat").Type("chat").Id("1").Do(ctx)
+  if err != nil {
+    panic(err)
+  }
+
+  if document.Found {
+  	fmt.Printf("Document ID is %s", document.Id)
+  }
+}
+
 //}
+
 
 ==== ドキュメントの削除
 
 
 ドキュメントIDをもとに登録したドキュメントを削除してみます。
+登録したドキュメントを、@<code>{ドキュメントID}を指定して取得します。
 
 
 //list[elasticsearch-list10][ドキュメントの削除]{
@@ -436,21 +451,7 @@ func main() {
         panic(err)
     }
 
-    chatData := Chat{
-        User:    "user01",
-        Message: "test message",
-        Created: time.Now(),
-        Tag:     "tag01",
-    }
-
-  //登録
-  //省略
-
-
-  //参照
-  //省略
-
-  //削除
+    //削除
     _, err = client.Delete().Index("chat").Type("chat").Id("1").Do(ctx)
     if err != nil {
         panic(err)
@@ -458,7 +459,8 @@ func main() {
 }
 //}
 
-=== 検索の基本操作
+
+== 検索の基本
 
 
 さて、基本的なCRUDを通じてElasticsearchの基本をおさえたところで、いよいよ検索処理についてみていきましょう。
@@ -474,7 +476,7 @@ Elasticsearchの高度な検索を支える仕組みにAnalyzerがあります�
  ** AND/OR/NOTによる検索がおこなえます。実際にはmust/should/must_notといったElasticsearch独自の指定方法を利用します。検索条件をネストさせることも可能で、より複雑な検索Queryを組み立てることができます。
 
 
-==== Analyzerの基本
+=== Analyzerの基本
 
 
 ここでAnalyzerについて簡単に説明します。Analyzerの設定は全文検索処理の要です。そのため、設定内容も盛り沢山ですし、自然言語処理の知識も必要となってくるため、ここではあくまで触りだけを説明します。
@@ -584,15 +586,15 @@ Analyzerの設定はMapping定義のanalysisでおこないます。tokenizerで
 
   
 //table[analyzer][本書で利用するAnalyzer]{
-分類  分類  説明
+分類	分類	説明
 -------------------------------------------------------------
-Character Filters kuromoji_iteration_mark 踊り字を正規化します。e.g) すゝめ→すすめ
-Tokenizer kuromoji_tokenizer  日本語での形態素解析により文章をトークン化します。
-Token Filters kuromoji_baseform 動詞など活用になりかわる言葉を原形にします。e.g) 読め→読む
-Token Filters kuromoji_part_of_speech 検索時には利用されないような助詞などの品詞を削除します。
-Token Filters ja_stop 文章中に頻出するあるいは検索で利用されることがない言葉を削除します。e.g) あれ、それ
-Token Filters kuromoji_number 漢数字を数字に変更します。e.g) 五->5
-Token Filters kuromoji_stemmer  単語の末尾につく長音を削除します。e.g) サーバー→サーバ
+Character Filters	kuromoji_iteration_mark	踊り字を正規化します。e.g) すゝめ→すすめ
+Tokenizer	kuromoji_tokenizer	日本語での形態素解析により文章をトークン化します。
+Token Filters	kuromoji_baseform	動詞など活用になりかわる言葉を原形にします。e.g) 読め→読む
+Token Filters	kuromoji_part_of_speech	検索時には利用されないような助詞などの品詞を削除します。
+Token Filters	ja_stop	文章中に頻出するあるいは検索で利用されることがない言葉を削除します。e.g) あれ、それ
+Token Filters	kuromoji_number	漢数字を数字に変更します。e.g) 五->5
+Token Filters	kuromoji_stemmer	単語の末尾につく長音を削除します。e.g) サーバー→サーバ
 //}
 
 
@@ -656,14 +658,14 @@ func main() {
         User:    "user02",
         Message: "時々だけど勉強のやる気が出るけど長続きしない",
         Created: time.Now(),
-        Tag:     "tag01",
+        Tag:     "tag02",
     }
 
     chatData03 := Chat{
         User:    "user03",
         Message: "あと十年あれば期末テストもきっと満点がとれたんだろうな",
         Created: time.Now(),
-        Tag:     "tag01",
+        Tag:     "tag03",
     }
 
     chatData04 := Chat{
@@ -677,7 +679,7 @@ func main() {
         User:    "user05",
         Message: "世界記憶の概念、そうアカシックレコードを紐解くことで解は導かれるのかもしれない",
         Created: time.Now(),
-        Tag:     "tag01",
+        Tag:     "tag02",
     }
 
     _, err = client.Index().Index("chat").Type("chat").Id("1").BodyJson(&chatData01).Do(ctx)
@@ -696,7 +698,7 @@ func main() {
 これで準備が整いました！それではここの詳細に移っていきましょう。
 
 
-==== Match Query
+=== Match Query
 
 
 MatchQueryは全文検索の肝です。MatchQueryでは、指定した検索文字列がAnalyzerにより言語処理がなされ検索がおこなわれます。
@@ -852,10 +854,12 @@ curl -XPOST "http://localhost:9200/chat/_analyze?pretty" -H "Content-Type: appli
 この中に「テスト」というトークンが含まれているために意図通りヒットしたというわけです。
 
 
-==== Term Query
+=== Term Query
 
 
 TermQueryを利用することで、指定した文字列を完全に含むドキュメントを検索することができます。
+MatchQueryと違い、検索文字列がAnalyzeされないため、指定した文字列と完全に一致する転地インデックスを検索します。
+そのため、例えばタグ情報など指定した検索文字列と完全に一致させて検索をさせたい際に利用します。
 Elastic:An Elasticsearch client for the GoでTermQueryを利用する際はTerm Queryは@<code>{elastic.TermQuery}を利用します。
 elastic.NewTermQueryは検索対象のフィールドと検索文字列を指定します。
 
@@ -894,7 +898,8 @@ func main() {
         panic(err)
     }
 
-    termQuery := elastic.NewTermQuery("User", "山田")
+	//tag01をもつドキュメントを取得
+    termQuery := elastic.NewTermQuery("Tag", "tag01")
     results, err := client.Search().Index("chat").Query(termQuery).Do(ctx)
     if err != nil {
         panic(err)
@@ -903,29 +908,38 @@ func main() {
     var chattype Chat
     for _, chat := range results.Each(reflect.TypeOf(chattype)) {
         if c, ok := chat.(Chat); ok {
-            fmt.Println("Chat message is: %s", c.Message)
+            fmt.Printf("Tag: %s and Chat message is: %s \n", c.Tag, c.Message)
         }
     }
 
 }
 //}
 
-==== Bool Query
+
+実行するとtag01をもつ以下の２つのドキュメントがヒットします。(ファイル名をmain.goとして保存しています。)
 
 
-BoolQueryではAND/OR/NOTによる検索がおこなえます。検索条件をネストさせることも可能で、より複雑な検索Queryを組み立てることができます。
+//cmd{
+# go run main.go
+Tag: tag01 and Chat message is: 明日は期末テストがあるけどなんにも勉強してない....
+Tag: tag01 and Chat message is: ドラえもんの映画で一番すきなのは夢幻三剣士だな
+//}
+
+
+=== Bool Query
+
+
+BoolQueryではさきほどまで紹介したMatchQueryやTermQueryなどを組み合わせたAND/OR/NOTによる検索をおこなえます。検索条件をネストさせることも可能で、より複雑な検索Queryを組み立てることができます。
 実際にはmust/should/must_notといったElasticsearch独自の指定方法を利用します。
+
 
 //table[tbl3][]{
 Query	説明	oliver/elasticでの指定方法
 -----------------
-must	ANDに相当	boolQuery := elastic.NewBoolQuery() <br> boolQuery.Must(elastic.NewTermQuery("field", "value")
-should	ORに相当	boolQuery := elastic.NewBoolQuery() <br> boolQuery.Should(elastic.NewTermQuery("field", "value")
-must_not	NOT	boolQuery := elastic.NewBoolQuery() <br> boolQuery.MustNot(elastic.NewTermQuery("field", "value")
+must	ANDに相当	boolQuery := elastic.NewBoolQuery()@<br>{}boolQuery.Must(elastic.NewTermQuery("field", "value")
+should	ORに相当	boolQuery := elastic.NewBoolQuery()@<br>{}boolQuery.Should(elastic.NewTermQuery("field", "value")
+must_not	NOT	boolQuery := elastic.NewBoolQuery()@<br>{}boolQuery.MustNot(elastic.NewTermQuery("field", "value")
 //}
-
-
-userが「佐藤」で、messageに「Elasticsearch」が含まれるが「Solor」が含まれないドキュメントを検索するクエリは以下の通りです。
 
 
 //list[elasticsearch-list15][Analyzerの設定]{
@@ -963,9 +977,9 @@ func main() {
     }
 
     boolQuery := elastic.NewBoolQuery()
-    boolQuery.Must(elastic.NewTermQuery("user", "佐藤")
-    boolQuery.Should(elastic.NewTermQuery("message", "Elasticsearch")
-    boolQuery.MustNot(elastic.NewTermQuery("message", "Solor")
+	//messageに「テスト」もしくは「勉強」を含み、tag01以外をもつドキュメントを検索
+    boolQuery.Sould(elastic.NewMatchQuery("message", "テスト"), elastic.NewMatchQuery("message", "勉強"))
+    boolQuery.MustNot(elastic.NewTermQuery("tag", "tag01")
     results, err := client.Search().Index("chat").Query(termQuery).Do(ctx)
     if err != nil {
         panic(err)
@@ -974,7 +988,7 @@ func main() {
     var chattype Chat
     for _, chat := range results.Each(reflect.TypeOf(chattype)) {
         if c, ok := chat.(Chat); ok {
-            fmt.Println("Chat message is: %s", c.Message)
+            fmt.Printf("Chat message is: %s \n", c.Message)
         }
     }
 
@@ -982,13 +996,19 @@ func main() {
 //}
 
 
-#@#//TODO:ネストがふかいもの
+実行するとtag01をもつ以下のドキュメントがヒットします。(ファイル名をmain.goとして保存しています。)
 
 
-=== ちょっと応用
+//cmd{
+# go run main.go
+Cnat message is: あと十年あれば期末テストもきっと満点がとれたんだろうな
+//}
 
 
-ここでは少し応用的な機能についてみていきましょう。
+== ちょっと応用
+
+
+ここでは少し応用的な機能についてみていきます。
 
  * Scroll API
  ** Elasticsearchが提供しているページング機能です。limit&offsetと違い、検索時のスナップショットを保持し、カーソルを利用してページの取得をおこなえます。
@@ -996,9 +1016,12 @@ func main() {
  ** Multi Fieldsタイプを指定することで1つのフィールドに対してデータ型やAnalyze設定が異なる複数のフィールドを保持することができます。
  * Alias
  ** インデックスに別名をつけてアクセスすることができる機能です。任意の検索条件を指定したエイリアスも作成することが可能で、RDBのビューのような機能も利用できます。
+ * エラーハンドリング
 
 
-==== Scroll API
+利用するIndexは「検索の基本」で作成したものを引き続き利用します。
+
+=== Scroll API
 
 
 Scroll APIを利用することで、スクロールタイプのページング機能を手軽に利用することができます。Elasticsearchでは@<code>{limit&offset}を用いた値の取得もできます。
@@ -1039,20 +1062,23 @@ func main() {
         panic(err)
     }
 
-    termQuery := elastic.NewTermQuery("user", "山田")
-    results, err := client.Scroll("chat").Query(termQuery).Size(10).Do(ctx)
+	//messageに「テスト」が含まれるドキュメントを検索
+    matchQuery := elastic.NewMatchQuery("message", "テスト")
+    results, err := client.Scroll("chat").Query(matchQuery).Size(1).Do(ctx)
     if err != nil {
         panic(err)
     }
 
-    results, err = client.Scroll("chat").Query(termQuery).Size(10).ScrollId(results.ScrollId).Do(ctx)
+	//先ほどの取得結果resutlsからスクロールIDを取得し、検索時に渡すことで前回検索結果の続きから取得が可能
+    nextResults, err := client.Scroll("chat").Query(matchQuery).Size(1).ScrollId(results.ScrollId).Do(ctx)
     if err != nil {
         panic(err)
     }
 }
 //}
 
-==== Multi Fields
+
+=== Multi Fields
 
 
 Multi Fields機能を利用することで一つのフィールドに対して異なるデータ型やAnalyze設定を指定することができます。
@@ -1086,11 +1112,10 @@ userフィールドのtypeにmulti_fieldを指定しています。以下のよ�
  * user.analyzed：Analyzeされている
 
 
-
 インデクシングする際はuserフィールドにのみ投入すればOKです。
 
 
-==== Alias
+=== Alias
 
 
 AliasはIndexに別名をつけてアクセスすることができる機能です。任意の検索条件を指定したエイリアスも作成することが可能で、RDBのビューのような機能も利用できます。
@@ -1133,7 +1158,8 @@ func main() {
 }
 //}
 
-== エラーハンドリング
+
+=== エラーハンドリング
 
 
 最後にエラーハンドリングについて記載します。
