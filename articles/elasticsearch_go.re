@@ -588,7 +588,7 @@ Analyzerの設定はMapping定義のanalysisでおこないます。tokenizerで
 
   
 //table[analyzer][本書で利用するAnalyzer]{
-分類  分類  説明
+分類	分類	説明
 -------------------------------------------------------------
 Character Filters	kuromoji_iteration_mark	踊り字を正規化します。e.g) すゝめ→すすめ
 Tokenizer	kuromoji_tokenizer	日本語での形態素解析により文章をトークン化します。
@@ -937,9 +937,9 @@ BoolQueryではAND/OR/NOTによる検索がおこなえます。検索条件を�
 //table[tbl3][]{
 Query	説明	oliver/elasticでの指定方法
 -----------------
-must	ANDに相当	boolQuery := elastic.NewBoolQuery() @<br> boolQuery.Must(elastic.NewTermQuery("field", "value")
-should	ORに相当	boolQuery := elastic.NewBoolQuery() @<br> boolQuery.Should(elastic.NewTermQuery("field", "value")
-must_not	NOT	boolQuery := elastic.NewBoolQuery() @<br> boolQuery.MustNot(elastic.NewTermQuery("field", "value")
+must	ANDに相当	boolQuery := elastic.NewBoolQuery()@<br>{}boolQuery.Must(elastic.NewTermQuery("field", "value")
+should	ORに相当	boolQuery := elastic.NewBoolQuery()@<br>{}boolQuery.Should(elastic.NewTermQuery("field", "value")
+must_not	NOT	boolQuery := elastic.NewBoolQuery()@<br>{}boolQuery.MustNot(elastic.NewTermQuery("field", "value")
 //}
 
 
