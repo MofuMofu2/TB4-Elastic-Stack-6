@@ -371,6 +371,7 @@ func main() {
 }
 //}
 
+
 ==== ドキュメントIDによる取得
 
 
@@ -392,19 +393,30 @@ func main() {
   ctx := context.Background()
 
   client, err := elastic.NewClient(
-    elastic.SetURL(esEndpoint),
-    elastic.SetSniff(false),
+    elastic.SetURL(esUrl),
   )
   if err != nil {
     panic(err)
   }
 
+  document, err := client.Get().Index("chat").Type("chat").Id("1").Do(ctx)
+  if err != nil {
+    panic(err)
+  }
+
+  if document.Found {
+  	fmt.Printf("Document ID is %s", document.Id)
+  }
+}
+
 //}
+
 
 ==== ドキュメントの削除
 
 
 ドキュメントIDをもとに登録したドキュメントを削除してみます。
+登録したドキュメントを、@<code>{ドキュメントID}を指定して取得します。
 
 
 //list[elasticsearch-list10][ドキュメントの削除]{
@@ -439,21 +451,7 @@ func main() {
         panic(err)
     }
 
-    chatData := Chat{
-        User:    "user01",
-        Message: "test message",
-        Created: time.Now(),
-        Tag:     "tag01",
-    }
-
-  //登録
-  //省略
-
-
-  //参照
-  //省略
-
-  //削除
+    //削除
     _, err = client.Delete().Index("chat").Type("chat").Id("1").Do(ctx)
     if err != nil {
         panic(err)
@@ -1018,6 +1016,7 @@ Cnat message is: あと十年あれば期末テストもきっと満点がとれ
  ** Multi Fieldsタイプを指定することで1つのフィールドに対してデータ型やAnalyze設定が異なる複数のフィールドを保持することができます。
  * Alias
  ** インデックスに別名をつけてアクセスすることができる機能です。任意の検索条件を指定したエイリアスも作成することが可能で、RDBのビューのような機能も利用できます。
+ * エラーハンドリング
 
 
 利用するIndexは「検索の基本」で作成したものを引き続き利用します。
@@ -1158,9 +1157,6 @@ func main() {
     client.Alias().Remove("chat", "chat-alias").Do(ctx)
 }
 //}
-
-
-=== Synonym
 
 
 === エラーハンドリング
