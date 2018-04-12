@@ -94,7 +94,7 @@ Elastic社の公式クライアント@<href>{https://github.com/elastic/go-elast
 go get "github.com/olivere/elastic"
 //}
 
-== Goで始めるElasticsearch
+== Elasticsearchでの準備
 
 
 さて、いよいよGoでElasticsearchを操作していきましょう。
@@ -124,7 +124,7 @@ RDBMSで例えると以下に相当します。
 また、Mapping定義を作成することにより、各フィールド単位でより細かな検索設定をおこなうことが可能です。本章では動的Mappingは利用せず、Mapping定義を1から作成し利用します。
 
 
-=== 本章で利用するMapping定義
+=== Mapping
 
 
 本章ではChatアプリケーションを想定したIndex/Typeをもとに操作をおこなっていきます。
@@ -228,7 +228,10 @@ curl -XGET 'http://localhost:9200/<Index名>/_mapping/<Type名>?pretty'
 //}
 
 
-=== Hello, Elasticsearch with Go
+== Hello, Elasticsearch with Go
+
+
+=== Elasticsearchにつないでみよう
 
 
 それではGoを使ってElasticsearchを触っていきましょう。
@@ -458,7 +461,8 @@ func main() {
 }
 //}
 
-=== 検索の基本操作
+
+== 検索の基本
 
 
 さて、基本的なCRUDを通じてElasticsearchの基本をおさえたところで、いよいよ検索処理についてみていきましょう。
@@ -474,7 +478,7 @@ Elasticsearchの高度な検索を支える仕組みにAnalyzerがあります�
  ** AND/OR/NOTによる検索がおこなえます。実際にはmust/should/must_notといったElasticsearch独自の指定方法を利用します。検索条件をネストさせることも可能で、より複雑な検索Queryを組み立てることができます。
 
 
-==== Analyzerの基本
+=== Analyzerの基本
 
 
 ここでAnalyzerについて簡単に説明します。Analyzerの設定は全文検索処理の要です。そのため、設定内容も盛り沢山ですし、自然言語処理の知識も必要となってくるため、ここではあくまで触りだけを説明します。
@@ -696,7 +700,7 @@ func main() {
 これで準備が整いました！それではここの詳細に移っていきましょう。
 
 
-==== Match Query
+=== Match Query
 
 
 MatchQueryは全文検索の肝です。MatchQueryでは、指定した検索文字列がAnalyzerにより言語処理がなされ検索がおこなわれます。
@@ -852,7 +856,7 @@ curl -XPOST "http://localhost:9200/chat/_analyze?pretty" -H "Content-Type: appli
 この中に「テスト」というトークンが含まれているために意図通りヒットしたというわけです。
 
 
-==== Term Query
+=== Term Query
 
 
 TermQueryを利用することで、指定した文字列を完全に含むドキュメントを検索することができます。
@@ -910,7 +914,8 @@ func main() {
 }
 //}
 
-==== Bool Query
+
+=== Bool Query
 
 
 BoolQueryではAND/OR/NOTによる検索がおこなえます。検索条件をネストさせることも可能で、より複雑な検索Queryを組み立てることができます。
@@ -985,7 +990,7 @@ func main() {
 #@#//TODO:ネストがふかいもの
 
 
-=== ちょっと応用
+== ちょっと応用
 
 
 ここでは少し応用的な機能についてみていきましょう。
@@ -998,7 +1003,7 @@ func main() {
  ** インデックスに別名をつけてアクセスすることができる機能です。任意の検索条件を指定したエイリアスも作成することが可能で、RDBのビューのような機能も利用できます。
 
 
-==== Scroll API
+=== Scroll API
 
 
 Scroll APIを利用することで、スクロールタイプのページング機能を手軽に利用することができます。Elasticsearchでは@<code>{limit&offset}を用いた値の取得もできます。
@@ -1052,7 +1057,7 @@ func main() {
 }
 //}
 
-==== Multi Fields
+=== Multi Fields
 
 
 Multi Fields機能を利用することで一つのフィールドに対して異なるデータ型やAnalyze設定を指定することができます。
@@ -1133,7 +1138,11 @@ func main() {
 }
 //}
 
-== エラーハンドリング
+
+=== Synonym
+
+
+=== エラーハンドリング
 
 
 最後にエラーハンドリングについて記載します。
