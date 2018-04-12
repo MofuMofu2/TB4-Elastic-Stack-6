@@ -931,8 +931,9 @@ Tag: tag01 and Chat message is: ドラえもんの映画で一番すきなのは
 === Bool Query
 
 
-BoolQueryではAND/OR/NOTによる検索がおこなえます。検索条件をネストさせることも可能で、より複雑な検索Queryを組み立てることができます。
+BoolQueryではさきほどまで紹介したMatchQueryやTermQueryなどを組み合わせたAND/OR/NOTによる検索をおこなえます。検索条件をネストさせることも可能で、より複雑な検索Queryを組み立てることができます。
 実際にはmust/should/must_notといったElasticsearch独自の指定方法を利用します。
+
 
 //table[tbl3][]{
 Query	説明	oliver/elasticでの指定方法
@@ -941,9 +942,6 @@ must	ANDに相当	boolQuery := elastic.NewBoolQuery()@<br>{}boolQuery.Must(elast
 should	ORに相当	boolQuery := elastic.NewBoolQuery()@<br>{}boolQuery.Should(elastic.NewTermQuery("field", "value")
 must_not	NOT	boolQuery := elastic.NewBoolQuery()@<br>{}boolQuery.MustNot(elastic.NewTermQuery("field", "value")
 //}
-
-
-userが「佐藤」で、messageに「Elasticsearch」が含まれるが「Solor」が含まれないドキュメントを検索するクエリは以下の通りです。
 
 
 //list[elasticsearch-list15][Analyzerの設定]{
@@ -981,9 +979,9 @@ func main() {
     }
 
     boolQuery := elastic.NewBoolQuery()
-    boolQuery.Must(elastic.NewTermQuery("user", "佐藤")
-    boolQuery.Should(elastic.NewTermQuery("message", "Elasticsearch")
-    boolQuery.MustNot(elastic.NewTermQuery("message", "Solor")
+	//messageに「テスト」もしくは「勉強」を含み、tag01以外をもつドキュメントを検索
+    boolQuery.Sould(elastic.NewMatchQuery("message", "テスト"), elastic.NewMatchQuery("message", "勉強"))
+    boolQuery.MustNot(elastic.NewTermQuery("tag", "tag01")
     results, err := client.Search().Index("chat").Query(termQuery).Do(ctx)
     if err != nil {
         panic(err)
@@ -992,7 +990,7 @@ func main() {
     var chattype Chat
     for _, chat := range results.Each(reflect.TypeOf(chattype)) {
         if c, ok := chat.(Chat); ok {
-            fmt.Println("Chat message is: %s", c.Message)
+            fmt.Printf("Chat message is: %s \n", c.Message)
         }
     }
 
@@ -1000,7 +998,13 @@ func main() {
 //}
 
 
-#@#//TODO:ネストがふかいもの
+実行するとtag01をもつ以下のドキュメントがヒットします。(ファイル名をmain.goとして保存しています。)
+
+
+//cmd{
+# go run main.go
+Cnat message is: あと十年あれば期末テストもきっと満点がとれたんだろうな
+//}
 
 
 == ちょっと応用
