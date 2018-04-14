@@ -592,9 +592,11 @@ drwxr-xr-x 2 root root 4096 xxx xx xx:xx patterns
 ALB_ACCESS_LOG %{NOTSPACE:class} %{TIMESTAMP_ISO8601:date} %{NOTSPACE:elb}
 (?:%{IP:client_ip}:%{INT:client_port:int}) (?:%{IP:backend_ip}:%{INT:backend_port:int}|-)
 (:?%{NUMBER:request_processing_time:float}|-1) (?:%{NUMBER:target_processing_time:float}|-1)
-(?:%{NUMBER:response_processing_time:float}|-1) (?:%{INT:elb_status_code}|-) (?:%{INT:target_status_code:int}|-)
+(?:%{NUMBER:response_processing_time:float}|-1) （紙面の都合により改行）
+(?:%{INT:elb_status_code}|-) (?:%{INT:target_status_code:int}|-)
  %{INT:received_bytes:int} %{INT:sent_bytes:int} \"%{ELB_REQUEST_LINE}\" \"(?:%{DATA:user_agent}|-)\"
- (?:%{NOTSPACE:ssl_cipher}|-) (?:%{NOTSPACE:ssl_protocol}|-)  %{NOTSPACE:target_group_arn} \"%{NOTSPACE:trace_id}\"
+ (?:%{NOTSPACE:ssl_cipher}|-) (?:%{NOTSPACE:ssl_protocol}|-) （紙面の都合により改行）
+  %{NOTSPACE:target_group_arn} \"%{NOTSPACE:trace_id}\"
 //}
 
 
@@ -630,7 +632,7 @@ output {
 
 
 編集が完了したら、@<code>{/usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf}でLogstashを実行します。
-最初に実行した時と違って、いい感じにkey-valueの形になっていることがわかります。
+最初に実行した時と違い、key-valueの形になっていることがわかります。
 
 
 //cmd{
@@ -679,7 +681,7 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 
 
 それでは、Filterで記載している内容について説明します。
-今回使用しているフィルタは、以下の3つです。
+今回使用しているフィルタは次の通りです。
 
  1. grok
  1. date
