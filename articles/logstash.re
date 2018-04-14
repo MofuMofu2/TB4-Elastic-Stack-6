@@ -583,9 +583,9 @@ drwxr-xr-x 2 root root 4096 xxx xx xx:xx patterns
 また、Typeは、インデックステンプレートで作成するのが一般的かと思いますが、今回は、パターンファイルの中で指定します（いろんなやり方があるんだよという意味で）
 
 
-あ、このパターンファイルを呼び出す時は、ファイル名の指定だけでなく@<code>{Grok-Patterns}の指定も必要です。
+このパターンファイルを呼び出す時は、ファイル名の指定だけでなく@<code>{Grok-Patterns}の指定も必要です。
 ここでいう@<code>{Grok-Patterns}は、@<code>{ALB ACCESS LOG}に該当します。
-この@<code>{ALB ACCESS LOG}は、任意の名前を指定できます。
+この@<code>{ALB ACCESS LOG}は、任意の名前を指定することができます。
 
 
 //list[logstash-29][/etc/logstash/patterns/alb_patternsを次の通り編集]{
