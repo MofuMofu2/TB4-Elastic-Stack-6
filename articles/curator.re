@@ -1,18 +1,18 @@
 = Curator
 
+== この章でやること
+
 Curatorは、Elasticsearchに保存したログのインデックス操作や、スナップショットの取得などを行う運用支援ツールです。
-この章は、以下の操作を行います。
-
- * インデックスの削除
- * インデックスのCloseとOpen
-
+この章では、Elasticsearchに保存したインデックスの削除や、検索対象から外す方法について触れていきます。
+Curatorの詳細は、こちらのリンク@<href>{https://www.elastic.co/guide/en/elasticsearch/client/curator/current/index.html}を参照してください。
 
 Curatorの実行環境を構築します。
 
 
 === Curatorのインストール
 
-Curatorのパッケージを取得するため、リポジトリの登録をします。
+まず始めに、Curatorのパッケージを取得するため、リポジトリの登録をします。
+ここで登録するリポジトリは、@<chapref>{logstash}とは別のため登録が必要です。
 
 //list[curator-01][curator.repoの追加]{
 sudo vim /etc/yum.repos.d/curator.repo
@@ -37,9 +37,10 @@ yum install elasticsearch-curator
 
 == インデックスの削除
 
-ログ分析などの運用を行うと、大量のログデータが溜まっていきます。その結果、ディスクを圧迫したり、パフォーマンス低下などが発生する可能性があります。
+ログ分析などの運用を行うと、大量のログデータが溜まっていきます。
+ログを保存しているサーバのディスク容量を圧迫するので、結果としてパフォーマンス低下が発生する可能性があります。
 そこでCuratorの登場です。
-Curatorを使用することで、任意の期間でインデックスを削除することが可能です。
+Curatorを使用すると、任意の期間を指定してインデックスを削除することが可能です。
 
 
 補足ですが、@<chapref>{logstash}や@<chapref>{beats}でElasticsearchに保存したログは、日ごとにインデックスが作成されていきます。
@@ -52,7 +53,7 @@ Curatorを使用することで、任意の期間でインデックスを削除�
 === インデックスの削除操作
 
 インデックスが2018年4月1日〜4月5日まであるとします。
-Curlでインデックスを確認します。
+curコマンドを利用して、インデックスが存在することを確認します。
 
 //list[curator-03][インデックスの確認]{
 curl -XGET localhost:9200/_cat/indices/logstash* | sort
@@ -63,7 +64,7 @@ yellow open logstash-2018.04.04 5 1 4 0  14.5kb  14.5kb
 yellow open logstash-2018.04.05 5 1 4 0  14.5kb 104.5kb
 //}
 
-Curatorは、設定ファイルとアクションファイルの二つのファイルで構成されています。
+Curatorは、設定ファイルとアクションファイルの2つのファイルで構成されています。
 
 
 設定ファイルの@<code>{curator.yml}を作成します。
@@ -72,7 +73,7 @@ Curatorは、設定ファイルとアクションファイルの二つのファ�
 vim ~/.curator/curator.yml
 //}
 
-//cmd{
+//list[curator-05][curator.yml]{
 ---
 client:
   hosts:
@@ -97,7 +98,7 @@ logging:
 
 主な設定項目について表で説明します。
 
-//table[curator-05][curator.ymlの設定項目]{
+//table[curator-06][curator.ymlの設定項目]{
 No.	Item	Content
 -----------------
 1	hosts	ElasticsearchのIPアドレスを指定
@@ -108,7 +109,7 @@ No.	Item	Content
 次にインデックス削除を定義したアクションファイルの@<code>{delete_indices.yml}を作成します。
 今回は、1日分のインデックス保持させるため、unit_countを1に指定します。
 
-//list[curator-06][delete_indices.ymlの作成]{
+//list[curator-07][delete_indices.ymlの作成]{
 vim ~/.curator/delete_indices.yml
 //}
 
@@ -135,7 +136,7 @@ actions:
 
 主な設定項目について表で説明します。
 
-//table[curator-07][delete_indices.ymlの設定項目]{
+//table[curator-08][delete_indices.ymlの設定項目]{
 No.	Item	Content
 -----------------
 1	action	アクションを指定します（今回は、削除を指定）
@@ -147,12 +148,12 @@ No.	Item	Content
 //}
 
 
-インデックス削除の環境が整ったので実行します。
-Curatorのコマンドラインで実行する際の引数は以下です。
+インデックス削除の環境が整ったので、Curatorを実行します。
+Curatorのコマンドラインの引数について説明します。
 オプションの--configは、@<code>{curator.yml}を@<code>{~/.curator/curator.yml}以外に配置した場合に使用します。
 今回は、@<code>{~/.curator/curator.yml}に配置しているため、--configオプションは使用しません
 
-//list[curator-08][Curatorの実行引数]{
+//list[curator-09][Curatorの実行引数]{
 curator [--config CONFIG.YML] [--dry-run] delete_indices.yml
 //}
 
@@ -160,56 +161,57 @@ curator [--config CONFIG.YML] [--dry-run] delete_indices.yml
 DRY-RUNを使用することで、設定ファイルに不備がないかを確認することができます。
 
 
-//list[curator-09][CuratorをDRY-RUNで削除実行]{
+//list[curator-10][CuratorをDRY-RUNで削除実行]{
 curator --dry-run ~/.curator/delete_indices.yml
 //}
 
 ログで実行結果を確認します。
-DRY-RUNで実行した場合は、ログにDRY-RUNと表記されます。
+設定ファイルで指定した@<code>{/var/log/curator}に出力されているので確認します。
+DRY-RUNで実行した場合、ログにDRY-RUNと表記されます。
 最新のインデックス以外は削除対象という結果がログからわかります。
 
-//list[curator-10][ログの確認]{
+//list[curator-11][ログの確認]{
 cat /var/log/curator
 //}
 
 //cmd{
-2018-xx-xx xx:xx:xx,xxx INFO      Preparing Action ID: 1, "delete_indices"
-2018-xx-xx xx:xx:xx,xxx INFO      Trying Action ID: 1, "delete_indices": delete logstash index
-2018-xx-xx xx:xx:xx,xxx INFO      DRY-RUN MODE.  No changes will be made.
-2018-xx-xx xx:xx:xx,xxx INFO      (CLOSED) indices may be shown that may not be acted on by action "delete_indices".
-2018-xx-xx xx:xx:xx,xxx INFO      DRY-RUN: delete_indices: logstash-2018.04.01 with arguments: {}
-2018-xx-xx xx:xx:xx,xxx INFO      DRY-RUN: delete_indices: logstash-2018.04.02 with arguments: {}
-2018-xx-xx xx:xx:xx,xxx INFO      DRY-RUN: delete_indices: logstash-2018.04.03 with arguments: {}
-2018-xx-xx xx:xx:xx,xxx INFO      DRY-RUN: delete_indices: logstash-2018.04.04 with arguments: {}
-2018-xx-xx xx:xx:xx,xxx INFO      Action ID: 1, "delete_indices" completed.
-2018-xx-xx xx:xx:xx,xxx INFO      Job completed.
+INFO      Preparing Action ID: 1, "delete_indices"
+INFO      Trying Action ID: 1, "delete_indices": delete logstash index
+INFO      DRY-RUN MODE.  No changes will be made.
+INFO      (CLOSED) indices may be shown that may not be acted on by action "delete_indices".
+INFO      DRY-RUN: delete_indices: logstash-2018.04.01 with arguments: {}
+INFO      DRY-RUN: delete_indices: logstash-2018.04.02 with arguments: {}
+INFO      DRY-RUN: delete_indices: logstash-2018.04.03 with arguments: {}
+INFO      DRY-RUN: delete_indices: logstash-2018.04.04 with arguments: {}
+INFO      Action ID: 1, "delete_indices" completed.
+INFO      Job completed.
 //}
 
 
 次にDRY-RUNを外して実行します。
 
-//list[curator-11][Curatorで削除実行]{
+//list[curator-12][Curatorで削除実行]{
 curator ~/.curator/delete_indices.yml
 //}
 
 DRY-RUNで実行した時と同様にログを確認します。
 
-//list[curator-12][ログの確認]{
-2018-xx-xx xx:xx:xx,xxx INFO      Preparing Action ID: 1, "delete_indices"
-2018-xx-xx xx:xx:xx,xxx INFO      Trying Action ID: 1, "delete_indices": delete logstash index
-2018-xx-xx xx:xx:xx,xxx INFO      Deleting selected indices: ['logstash-2018.04.10', 'logstash-2018.04.11']
-2018-xx-xx xx:xx:xx,xxx INFO      DRY-RUN: delete_indices: logstash-2018.04.01 with arguments: {}
-2018-xx-xx xx:xx:xx,xxx INFO      DRY-RUN: delete_indices: logstash-2018.04.02 with arguments: {}
-2018-xx-xx xx:xx:xx,xxx INFO      DRY-RUN: delete_indices: logstash-2018.04.03 with arguments: {}
-2018-xx-xx xx:xx:xx,xxx INFO      DRY-RUN: delete_indices: logstash-2018.04.04 with arguments: {}
-2018-xx-xx xx:xx:xx,xxx INFO      Action ID: 1, "delete_indices" completed.
-2018-xx-xx xx:xx:xx,xxx INFO      Job completed.
+//list[curator-13][ログの確認]{
+INFO      Preparing Action ID: 1, "delete_indices"
+INFO      Trying Action ID: 1, "delete_indices": delete logstash index
+INFO      Deleting selected indices: ['logstash-2018.04.10', 'logstash-2018.04.11']
+INFO      DRY-RUN: delete_indices: logstash-2018.04.01 with arguments: {}
+INFO      DRY-RUN: delete_indices: logstash-2018.04.02 with arguments: {}
+INFO      DRY-RUN: delete_indices: logstash-2018.04.03 with arguments: {}
+INFO      DRY-RUN: delete_indices: logstash-2018.04.04 with arguments: {}
+INFO      Action ID: 1, "delete_indices" completed.
+INFO      Job completed.
 //}
 
-最後に、curlでインデックスが削除されているか確認します。
+最後に、curlコマンドでインデックスが削除されているか確認します。
 2018年4月5日のインデックスのみが保存されていることがわかります。
 
-//list[curator-13][インデックスの確認]{
+//list[curator-14][インデックスの確認]{
 curl -XGET localhost:9200/_cat/indices/logstash* | sort
 yellow open logstash-2018.04.05 5 1 4 0  14.5kb 104.5kb
 //}
@@ -236,7 +238,7 @@ actionは、closeを指定します。
 vim ~/.curator/close_indices.yml
 //}
 
-//cmd{
+//list[curator-16][close_indices.yml]{
 ---
 actions:
   1:
@@ -260,7 +262,7 @@ actions:
 
 それではDRY-RUNで実行します。
 
-//list[curator-16][CuratorをDRY-RUNでClose実行]{
+//list[curator-17][CuratorをDRY-RUNでClose実行]{
 curator --dry-run ~/.curator/close_indices.yml
 //}
 
@@ -268,45 +270,45 @@ DRY-RUNでログの実行結果を確認します。
 close対象のインデックスがログの結果からわかります。
 
 
-//list[curator-17][ログの確認]{
+//list[curator-18][ログの確認]{
 cat /var/log/curator
 //}
 
 //cmd{
-2018-xx-xx xx:xx:xx,xxx INFO      Preparing Action ID: 1, "close"
-2018-xx-xx xx:xx:xx,xxx INFO      Trying Action ID: 1, "close": close logstash index
-2018-xx-xx xx:xx:xx,xxx INFO      DRY-RUN MODE.  No changes will be made.
-2018-xx-xx xx:xx:xx,xxx INFO      (CLOSED) indices may be shown that may not be acted on by action "close".
-2018-xx-xx xx:xx:xx,xxx INFO      DRY-RUN: close: logstash-2018.04.01 with arguments: {'delete_aliases': False}
-2018-xx-xx xx:xx:xx,xxx INFO      DRY-RUN: close: logstash-2018.04.02 with arguments: {'delete_aliases': False}
-2018-xx-xx xx:xx:xx,xxx INFO      DRY-RUN: close: logstash-2018.04.03 with arguments: {'delete_aliases': False}
-2018-xx-xx xx:xx:xx,xxx INFO      DRY-RUN: close: logstash-2018.04.04 with arguments: {'delete_aliases': False}
-2018-xx-xx xx:xx:xx,xxx INFO      Action ID: 1, "close" completed.
-2018-xx-xx xx:xx:xx,xxx INFO      Job completed.
+INFO      Preparing Action ID: 1, "close"
+INFO      Trying Action ID: 1, "close": close logstash index
+INFO      DRY-RUN MODE.  No changes will be made.
+INFO      (CLOSED) indices may be shown that may not be acted on by action "close".
+INFO      DRY-RUN: close: logstash-2018.04.01 with arguments: {'delete_aliases': False}
+INFO      DRY-RUN: close: logstash-2018.04.02 with arguments: {'delete_aliases': False}
+INFO      DRY-RUN: close: logstash-2018.04.03 with arguments: {'delete_aliases': False}
+INFO      DRY-RUN: close: logstash-2018.04.04 with arguments: {'delete_aliases': False}
+INFO      Action ID: 1, "close" completed.
+INFO      Job completed.
 //}
 
 次にDRY-RUNを外して実行します。
 
 
-//list[curator-18][Curatorでclose実行]{
+//list[curator-19][Curatorでclose実行]{
 curator ~/.curator/close_indices.yml
 //}
 
 DRY-RUNで実行した時と同様にログを確認します。
 
 
-//list[curator-19][ログの確認]{
-2018-xx-xx xx:xx:xx,xxx INFO      Preparing Action ID: 1, "close"
-2018-xx-xx xx:xx:xx,xxx INFO      Trying Action ID: 1, "close": close logstash index
-2018-xx-xx xx:xx:xx,xxx INFO      Closing selected indices: ['logstash-2018.04.01', 'logstash-2018.04.02', 'logstash-2018.04.03', 'logstash-2018.04.04']
-2018-xx-xx xx:xx:xx,xxx INFO      Action ID: 1, "close" completed.
-2018-xx-xx xx:xx:xx,xxx INFO      Job completed.
+//list[curator-20][ログの確認]{
+INFO      Preparing Action ID: 1, "close"
+INFO      Trying Action ID: 1, "close": close logstash index
+INFO      Closing selected indices: ['logstash-2018.04.01', 'logstash-2018.04.02', 'logstash-2018.04.03', 'logstash-2018.04.04']
+INFO      Action ID: 1, "close" completed.
+INFO      Job completed.
 //}
 
-curlでインデックスを確認します。
+curコマンドを利用して、インデックスが存在することを確認します。
 2018年4月5日以外のインデックスがcloseに変更されていることがわかります。
 
-//list[curator-20][インデックスの確認]{
+//list[curator-21][インデックスの確認]{
 curl -XGET localhost:9200/_cat/indices/logstash* | sort
 yellow close logstash-2018.04.01 5 1 8 0  93.2kb  93.2kb
 yellow close logstash-2018.04.02 5 1 9 0 102.8kb 102.8kb
@@ -326,11 +328,11 @@ yellow open logstash-2018.04.05 5 1 4 0  14.5kb 104.5kb
 directionで新しい方から数えるのか、古い方から数えるのかを指定できます。
 今回は、新しい方から数えるため、youngerを指定します（古い方からの場合は、olderです）
 
-//list[curator-21][open_indices.ymlの作成]{
+//list[curator-22][open_indices.ymlの作成]{
 vim ~/.curator/open_indices.yml
 //}
 
-//cmd{
+//list[curator-23][open_indices.yml]{
 ---
 actions:
   1:
@@ -354,7 +356,7 @@ actions:
 DRY-RUNで実行します。
 
 
-//list[curator-22][CuratorをDRY-RUNでOpen実行]{
+//list[curator-24][CuratorをDRY-RUNでOpen実行]{
 curator --dry-run ~/.curator/open_indices.yml
 //}
 
@@ -362,7 +364,7 @@ DRY-RUNでログの実行結果を確認します。
 open対象のインデックスが、ログの結果からわかります。
 
 
-//list[curator-23][ログの確認]{
+//list[curator-25][ログの確認]{
 cat /var/log/curator
 //}
 
@@ -383,25 +385,25 @@ cat /var/log/curator
 次にDRY-RUNを外して実行します。
 
 
-//list[curator-24][Curatorでclose実行]{
+//list[curator-26][Curatorでclose実行]{
 curator ~/.curator/open_indices.yml
 //}
 
 DRY-RUNで実行した時と同様にログを確認します。
 
-//list[curator-25][ログの確認]{
-2018-xx-xx xx:xx:xx,xxx INFO      Preparing Action ID: 1, "open"
-2018-xx-xx xx:xx:xx,xxx INFO      Trying Action ID: 1, "open": open logstash index
-2018-xx-xx xx:xx:xx,xxx INFO      Opening selected indices: ['logstash-2018.04.05', 'logstash-2018.04.04', 'logstash-2018.04.03', 'logstash-2018.04.02', 'logstash-2018.04.01']
-2018-xx-xx xx:xx:xx,xxx INFO      Action ID: 1, "open" completed.
-2018-xx-xx xx:xx:xx,xxx INFO      Job completed.
+//list[curator-27][ログの確認]{
+INFO      Preparing Action ID: 1, "open"
+INFO      Trying Action ID: 1, "open": open logstash index
+INFO      Opening selected indices: ['logstash-2018.04.05', 'logstash-2018.04.04', 'logstash-2018.04.03', 'logstash-2018.04.02', 'logstash-2018.04.01']
+INFO      Action ID: 1, "open" completed.
+INFO      Job completed.
 //}
 
 
-curlでインデックスを確認します。
+curコマンドを利用して、インデックスが存在することを確認します。
 インデックスがopenされていることがわかります。
 
-//list[curator-26][インデックスの確認]{
+//list[curator-28][インデックスの確認]{
 curl -XGET localhost:9200/_cat/indices/logstash* | sort
 yellow open logstash-2018.04.01 5 1 8 0  93.2kb  93.2kb
 yellow open logstash-2018.04.02 5 1 9 0 102.8kb 102.8kb
@@ -411,5 +413,5 @@ yellow open logstash-2018.04.05 5 1 4 0  14.5kb 104.5kb
 //}
 
 
-Curatorは、ここでは紹介できていない便利な機能がまだまだあります。
-ぜひ色々と試してください。
+今回は、Curatorの全機能を紹介することができません。
+ご自分のユースケースに合わせて機能を試していただけると幸いです。
