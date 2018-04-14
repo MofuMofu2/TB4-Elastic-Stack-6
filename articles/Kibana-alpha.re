@@ -74,7 +74,7 @@ Visualizeを利用すると、自分でグラフを作成できるというの�
 @<code>{Vega}（@<href>{https://vega.github.io/vega/}）は、The UW Interactive Data Lab（@<href>{http://idl.cs.washington.edu/about}）が作成・開発している、データを
 グラフに描画するためのツールです。
 
-Kibanaと同じなのでは？と思う方もいるかもしれませんが、Vegaはグラフを描画するためのデータ・グラフを描画するための設定をjsonで管理します。一方、Kibanaはグラフ描画に利用するデータは
+Kibanaと同じなのでは？と思う方もいるかもしれませんが、Vegaはデータ・グラフを描画するための設定をjsonで管理します。一方、Kibanaはグラフ描画に利用するデータは
 Elasticsearchから取得しますし、グラフの描画はGUIを用いて行います。
 
 また、Vegaで描画できるグラフの種類（@<href>{https://vega.github.io/vega/examples/}）はKibanaよりも多いです。特にデータ分析を行う場合に利用することが多い
