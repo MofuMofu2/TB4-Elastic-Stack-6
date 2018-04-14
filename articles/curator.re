@@ -106,7 +106,7 @@ No.	Item	Content
 //}
 
 次にインデックス削除を定義したアクションファイルの@<code>{delete_indices.yml}を作成します。
-今回は、1日分のインデックス保持させるためunit_countを1を指定します。
+今回は、1日分のインデックス保持させるため、unit_countを1に指定します。
 
 //list[curator-06][delete_indices.ymlの作成]{
 vim ~/.curator/delete_indices.yml
@@ -217,7 +217,6 @@ yellow open logstash-2018.04.05 5 1 4 0  14.5kb 104.5kb
 
 == インデックスのCloseとOpen
 
-インデックスの削除を先ほど行いました。
 次は、インデックスのCloseです。
 ログをElasticsearchに保存し続けたいが、パフォーマンスは低下させたくないといった時にCloseを利用します。
 インデックスをCloseすることでメモリを解放します。
@@ -227,21 +226,11 @@ Closeしたインデックスは、再度利用する場合にopenを使用し�
 
 
 インデックス削除を実施した時と同様に2018年4月1日〜4月5日までのインデックスがあるとします。
-Curlでインデックスを確認します。
-
-//list[curator-14][インデックスの確認]{
-curl -XGET localhost:9200/_cat/indices/logstash* | sort
-yellow open logstash-2018.04.01 5 1 8 0  93.2kb  93.2kb
-yellow open logstash-2018.04.02 5 1 9 0 102.8kb 102.8kb
-yellow open logstash-2018.04.03 5 1 9 0 102.8kb  72.8kb
-yellow open logstash-2018.04.04 5 1 4 0  14.5kb  14.5kb
-yellow open logstash-2018.04.05 5 1 4 0  14.5kb 104.5kb
-//}
 
 
 すでに@<code>{curator.yml}は、作成してあるので、@<code>{close_indices.yml}を作成します。
 対象は、最新のインデックス以外をclose設定とします。
-また、actionは、closeを指定します。
+actionは、closeを指定します。
 
 //list[curator-15][close_indices.ymlの作成]{
 vim ~/.curator/close_indices.yml
@@ -314,7 +303,7 @@ DRY-RUNで実行した時と同様にログを確認します。
 2018-xx-xx xx:xx:xx,xxx INFO      Job completed.
 //}
 
-最後に、curlでインデックスがcloseされているか確認します。
+curlでインデックスを確認します。
 2018年4月5日以外のインデックスがcloseに変更されていることがわかります。
 
 //list[curator-20][インデックスの確認]{
@@ -369,8 +358,8 @@ DRY-RUNで実行します。
 curator --dry-run ~/.curator/open_indices.yml
 //}
 
-DRY-RUNでログで実行結果を確認します。
-open対象のインデックスがログの結果からわかります。
+DRY-RUNでログの実行結果を確認します。
+open対象のインデックスが、ログの結果からわかります。
 
 
 //list[curator-23][ログの確認]{
@@ -409,7 +398,7 @@ DRY-RUNで実行した時と同様にログを確認します。
 //}
 
 
-最後に、curlでインデックスがopenされているか確認します。
+curlでインデックスを確認します。
 インデックスがopenされていることがわかります。
 
 //list[curator-26][インデックスの確認]{
@@ -423,4 +412,4 @@ yellow open logstash-2018.04.05 5 1 4 0  14.5kb 104.5kb
 
 
 Curatorは、ここでは紹介できていない便利な機能がまだまだあります。
-ぜひ色々と試して運用を効率的にしていってもらえればと思います。
+ぜひ色々と試してください。
