@@ -55,6 +55,7 @@ curl http://localhost:9200
 //}
 
 //cmd{
+
 # curl http://localhost:9200
 {                                      
   "name" : "7JNxM8W",                  
@@ -71,6 +72,7 @@ curl http://localhost:9200
   },                                   
   "tagline" : "You Know, for Search"   
 }       
+
 //}
 
 
@@ -1130,7 +1132,7 @@ Multi Fields機能を利用することで一つのフィールドに対して�
           "type": "text",
           "fields": {
             "raw": {
-              "type":  "keyword"
+              "type": "keyword"
             }
           }
         }
@@ -1144,9 +1146,27 @@ Multi Fields機能を利用することで一つのフィールドに対して�
 
 userフィールドのtypeにmulti_fieldを指定しています。以下のようにフィールドを指定して操作することができます。
  * user： type textが適用されているuserフィールドにアクセスします
- * user.analyzed：type keywordが適用されちえるフィールドにアクセスします
+ * user.keyword：type keywordが適用されちえるフィールドにアクセスします
 
 ドキュメントを登録する際にはこれまで通りuserフィールドを明示して登録するだけでよいです。
+
+例えばMatchQueryの場合だと以下のようになります。
+
+
+//list[elasticsearch-list177][user(type text)に対する検索]{
+/* 省略 */
+
+//「テスト」が含まれるドキュメントがヒット
+query := elastic.NewMatchQuery("message", "テスト")
+//}
+
+
+//list[elasticsearch-list177][user(type keyword)に対する検索]{
+/* 省略 */
+
+//「テスト」に完全一致するドキュメントがヒット
+query := elastic.NewMatchQuery("message.keyword", "テスト")
+//}
 
 
 === エラーハンドリング
@@ -1162,8 +1182,8 @@ if err != nil {
     // Get *elastic.Error which contains additional information
     e, ok := err.(*elastic.Error)
     if !ok {
-        //...
+        //エラーハンドリングを記載
     }
-    log.Printf("Elastic failed with status %d and error %s.", e.Status, e.Details)
+    log.Printf("status %d ,error %s.", e.Status, e.Details)
 }
 //}
