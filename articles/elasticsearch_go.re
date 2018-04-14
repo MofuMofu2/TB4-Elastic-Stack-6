@@ -369,7 +369,8 @@ func main() {
         }
 
         //ドキュメントIDを1として登録
-        indexedDoc, err := client.Index().Index("chat").Type("chat").Id("1").BodyJson(&chatData).Do(ctx)
+        indexedDoc, err := client.Index().Index("chat").（紙面の都合により改行）
+				Type("chat").Id("1").BodyJson(&chatData).Do(ctx)
         if err != nil {
                 panic(err)
         }
@@ -549,17 +550,23 @@ Tokenizerで形態素解析を用いた場合の例を@<img>{analyzer_sample}に
 ==== Kuromojiプラグインの導入
 
 
-Kuromojiプラグインは標準ではElasticsearchに内蔵されていないため追加でプラグインをインストールする必要があります。
+Kuromojiプラグインは標準ではElasticsearchに内蔵されていないため、追加でプラグインをインストールする必要があります。
 稼働しているDockerのコンテナのコンテナIDを調べbashからプラグインのインストールをおこなっていきましょう。
 Elasticsearchではプラグインをインストールする際には@<code>{elasticsearch-plugin}を利用します。
-またプラグインを有効にするためにプラグインインストール後にコンテナの再起動をおこなってください。
+またプラグインを有効にするためにプラグインインストール後にコンテナの再起動を実施してください。
 
 
 //cmd{
 # docker ps
 
-CONTAINER ID        IMAGE                                                     COMMAND                  CREATED             STATUS              PORTS                                            NAMES
-9a96bafde5bd        docker.elastic.co/elasticsearch/elasticsearch-oss:6.0.0   "/usr/local/bin/dock…"   2 hours ago         Up 2 hours          0.0.0.0:9200->9200/tcp, 0.0.0.0:9300->9300/tcp   agitated_haibt
+CONTAINER ID        IMAGE
+9a96bafde5bd        docker.elastic.co/elasticsearch/elasticsearch-oss:6.0.0
+
+COMMAND                  CREATED             STATUS
+"/usr/local/bin/dock…"   2 hours ago         Up 2 hours
+
+PORTS                                            NAMES
+0.0.0.0:9200->9200/tcp, 0.0.0.0:9300->9300/tcp   agitated_haibt
 
 # docker exec -it 66cec7c14657 bash
 [root@9a96bafde5bd elasticsearch]# bin/elasticsearch-plugin install analysis-kuromoji
