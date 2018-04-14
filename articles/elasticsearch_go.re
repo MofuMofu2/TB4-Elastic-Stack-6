@@ -301,7 +301,7 @@ Elasticsearch returned with code 200 and version 6.2.2
 
 このクライアントオブジェクトを通じてElasticsearchを操作していきます。
 クライアントの作成時に以下の2つのオプションを指定しています。
-特にSetSniffはElasticsearchのコンテナへ接続する際に必要となる設定です。
+特にSetSniffはElasticsearchのDockerコンテナへ接続する際に必要となる設定です。
 
 
 
