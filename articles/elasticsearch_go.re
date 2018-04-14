@@ -654,7 +654,8 @@ Chatマッピングの１階層下に存在する、messageフィールドの@<c
 
 //list[elasticsearch-list12][Mapping定義の再作成]{
 # curl -XDELETE 'http://localhost:9200/chat'
-# curl -XPUT 'http://localhost:9200/chat' -H "Content-Type: application/json" -d @analyzed_mapping.json
+# curl -XPUT 'http://localhost:9200/chat' （紙面の都合により改行）
+-H "Content-Type: application/json" -d @analyzed_mapping.json
 //}
 
 
