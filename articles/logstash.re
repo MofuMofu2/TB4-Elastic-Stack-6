@@ -413,9 +413,9 @@ pipeline.batch.delay: 50
 
 Logstashは@<code>{Input}、@<code>{Filter}、@<code>{Output}の3つで構成されています。
 
- * Input: データソースを指定し、アクセスし、ログを取得します
- * Filter: 取得したログを構造化するため、Grokでキーバリューに分割したり、地理情報などを付与したり様々なフィルタを施します
- * Output: データの取り込み先を指定します（今回はElasticsearchを指定しています）
+ * Input: データの取得元を設定します。
+ * Filter: データを構造化するための処理内容を設定します。データの追加・削除も可能です。
+ * Output: データの送信先を指定します。（今回はElasticsearchを指定しています）
 
 この一連の流れのことを@<b>{パイプライン（pipeline）}といいます。
 
