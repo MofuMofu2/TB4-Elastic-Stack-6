@@ -268,7 +268,7 @@ func main() {
         }
 
         info, code, err := client.Ping(esURL).Do(ctx)
-        fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)
+        fmt.Printf("Elasticsearch version %s\n", info.Version.Number)
 }
 //}
 
@@ -284,7 +284,7 @@ Elasticsearchのバージョン情報といったシステム情報を取得す�
 
 //list[elasticsearch-list08][Elasticsearchのバージョン情報を問い合わせる]{
 $ go run hello_elasticsearch.go
-Elasticsearch returned with code 200 and version 6.2.2
+Elasticsearch version 6.2.2
 //}
 
 
