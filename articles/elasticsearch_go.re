@@ -1054,7 +1054,7 @@ Cnat message is: あと十年あれば期末テストもきっと満点がとれ
 Scroll APIを利用することで、スクロールタイプのページング機能を手軽に利用することができます。Elasticsearchでは@<code>{limit&offset}を用いた値の取得もできます。
 ただし、@<code>{limit&offset}を利用した場合、検索がおこなわれる度に指定したoffsetからlimit数分のドキュメントを取得します。そのため、取得結果に抜け漏れや重複が生じる可能性があります。
 一方でScroll APIを利用した場合、初回検索時にスナップショットが生成されます。そのため、Scroll APIが返すスクロールIDを利用することで、初回検索時のスナップショットに対して任意の箇所からページングをおこなうことができます。
-使い方はとても簡単で、@<code>{elastic.ScrollService}を介して操作することができます。
+使い方はとても簡単で、@<code>{elastic.ScrollService}を介して操作することが可能です。
 
 
 //list[elasticsearch-list16][Scroll APIを利用した検索(scroll_api.go)]{
