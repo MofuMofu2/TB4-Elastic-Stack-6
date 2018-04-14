@@ -844,7 +844,7 @@ No.	Item	Content
 
 今回は、AWSのアクセスキーとシークレットキーを指定せず、IAM Role
 （@<href>{https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html}）をインスタンスに割り当てています。
-オプションで指定することも可能ですが、セキュリティ面からIAM Roleで制御してます。
+オプションで指定することも可能ですが、セキュリティ面からIAM Roleで制御しています。
 
 ===== Outputの編集
 
@@ -861,7 +861,7 @@ output {
 
 
 以下に各オプションについて説明します。
-インデックスを任意の形で指定することも可能ですが、デフォルトのままとするため、指定はしてません。
+インデックスを任意の形で指定することも可能ですが、デフォルトのままとするため、指定はしていません。
 デフォルトだと@<code>{logstash-logs-%{+YYYYMMdd}で作成されます。
 
 //table[logstash-35][Elasticsearch-output-pluginの解説]{
