@@ -4,18 +4,18 @@
 
 Beatsは、シンプルなデータ取り込みツールです。
 あれ？Logstashは？と思う方もいると思いますが、Logstashは、豊富な機能を持ってます。
-@<chapref>{logstash_pipelines}で説明したGrokフィルタで複雑なログを取り込むことも可能ですし、Inputのデータソースを多種多様に選択することが可能です。
-そのためLogstashを利用するには、学習コストもそれなりに発生します。手軽に利用しよう！という方には難しいツールです。
-
-そこで活躍するのがBeatsです。
+改めてLogstashの役割を説明すると、様々なデータソースからデータを取得し、意味のあるフィールドに変換し、指定のOutput先にストリーミング処理をします。
+このことからETLとしてLogstashが必要な機能を持っているということがわかるかと思います。
+ではなぜ、LogstashだけでなくBeatsが登場したかというと、パフォーマンス問題を抱えていたためです。
+Logstashは、複数のパイプラインや高度なフィルタリングを施すことができますが、その分メモリを多く消費します。
+そこで軽量で手軽に導入できるBeatsが登場しました。
 何が手軽かというと、設定ファイルがYAMLで全て完結するのです。
 しかも、設定箇所も複数存在するわけではなく、最低限の設定で十分な機能を提供します。
 
 
-
 == Beats Family
 
-Beatsにはどんな種類があるのかを改めて記載します。
+Beatsはどんな種類があるのかを改めて記載します。
 
  * Filebeat
  * Metricbeat
@@ -34,8 +34,40 @@ Beatsにはどんな種類があるのかを改めて記載します。
 == Filebeat
 
 
-Filebeatを使用することで、Apache、Nginx、MySQLなどのログ収集・パースをすることが可能です。
-また、Modules機能を利用するととで、データの収集からKibanaを用いたデータの可視化までを一貫で行うことが可能です。
+Filebeatは、ログを一箇所に転送する用途で使用します。
+また、TLS暗号化をサポートしているため、セキュアに転送することができます。
+たとえば、以下の構成図がFilebeatのよくある構成です。
+
+//image[filebeat01][Filebeatの構成]{
+//}
+
+Filebeatをデータソースであるサーバに導入し、Logstashへ転送する構成です。
+Logstashに転送することでログを集約することができます。
+また、Filebeatから転送されたデータを分析しやすい構造に変換する処理を行い、Elasticsearchに保存します。
+
+
+この他にもFilebeatは、Moduleを利用することで一部のデータを分析しやすいフィールド構造に変換することもできます。
+Moduleについては、後ほど説明します。
+
+
+それでは、Filebeatでデータを取得し、Logstashに転送し、Elasticsaerchに保存するところまでをみていきたいと思います。
+
+
+=== Filebeatの構成について
+
+Filebeatを試す環境は、@<chapref>{logstash}を元として構成します。
+新たにFilebeatとNginxを追加します。
+
+
+今回想定するケースは、NginxのアクセスログををFilebeatが取得し、Logstashに転送します。
+Logstashは、Filebeatから転送されたログをElasticsearchに保存するところまでを行います。
+
+
+//image[filebeat02][サーバの構成について]{
+//}
+
+それでは、FilebeatとNginxのインストールを実施していきます。
+
 
 === Filebeatをインストール
 
@@ -47,45 +79,18 @@ Filebeatをインストールします。@<chapref>{logstash}でyumリポジト�
 sudo yum install filebeat
 //}
 
-=== Ingest Node Pluginをインストール
 
+=== Nginxの環境を構築する
 
-UserAgent、GeoIPの解析をするため、@<code>{Ingest Node Plugin}と@<code>{Ingest GeoIP plugin}をインストールします。
+Nginxをインストールします。
 
-
-//list[beats-02][Ingest Node Pluginのインストール]{
-/usr/share/elasticsearch/bin/elasticsearch-plugin install ingest-user-agent
-//}
-
-//list[beats-03][Ingest GeoIP pluginのインストール]{
-/usr/share/elasticsearch/bin/elasticsearch-plugin install ingest-geoip
-//}
-
-
-インストールが完了したらElasticsearchを再起動します。
-
-
-//list[beats-04][Elasticsaerchの再起動]{
-sudo service elasticsearch restart
-//}
-
-今回は@<code>{Nginx Modules}を例にModulesを利用すると、どの位構築コストが減少するのかを
-検証します。@<chapref>{logstash}でKibanaをインストールしている環境を引き続き利用することを前提として
-話を進めますが、もし新しい環境で始める場合は@<chapref>{logstash}や@<chapref>{Kibana-visualize}を参考に
-環境構築を行ってください。
-
-
-=== Nginx環境を整える
-
-まず、Nginxをインストールします。
-
-//list[beats-05][Nginxのインストール]{
+//list[beats-02][Nginxのインストール]{
 sudo yum install nginx
 //}
 
 インストールが完了したら、Nginxを起動します。
 
-//list[beats-06][Nginxの起動]{
+//list[beats-03][Nginxの起動]{
 sudo service nginx start
 //}
 
@@ -93,69 +98,282 @@ sudo service nginx start
 Nginxに対してcurlを実行し、アクセスログが出力されているかを確認します。
 また、ステータスコード200が返ってきていることも合わせて確認します。
 
-//cmd{
-$ tail -f /var/log/nginx/access.log
+//list[beats-04][Nginxの動作確認]{
+curl localhost
+tail -f /var/log/nginx/access.log
 127.0.0.1 - - [xx/xxx/2018:xx:xx:xx +0000] "GET / HTTP/1.1" 200 3770 "-" "curl/7.53.1" "-"
 //}
 
-=== Filebeat Module
 
-Filebeatの設定ファイルを編集する前に、@<code>{filebeat.yml}を@<code>{filebeat.reference.yml}に置き換えます。
-このとき@<code>{filebeat.reference.yml}という名前から@<code>{filebeat.yml}に名前を合わせて変更します。
-@<code>{filebeat.reference.yml}にModulesの設定が記載されているため、これを利用するとより簡単にBeatsのセットアップを行うことができるからです。
+これでFilebeatとNginxの環境が構築できました。
 
-//cmd{
-### Change file name
-mv /etc/filebeat/filebeat..yml /etc/filebeat/filebeat.yml_origin
-mv /etc/filebeat/filebeat.reference.yml /etc/filebeat/filebeat.yml
+=== FilebeatからLogstashへ転送
+
+ここからはFilebeatがNginxのアクセスログを取得し、Logstashに転送し、LogstashがElasticsearchに取り込む設定を行なっていきます。
+
+
+==== FilebeatとLogstashの設定
+
+filebeat.ymlを編集します。
+filebeat.prospectorsを有効化し、Nginxのアクセスログのパスを指定します。
+output.logstashで転送先のLogstashを指定します。
+今回は、ローカルホストですが、ネットワーク越しの場合は、IPアドレスやホスト名を指定してください。
+
+
+設定を反映させるにはFilebeatの再起動が必要ですが、Logstashの設定を実施後に行います。
+
+//list[beats-05][filebeat.ymlの編集]{
+######################## Filebeat Configuration ############################
+
+#=========================== Filebeat prospectors =============================
+filebeat.prospectors:
+
+#------------------------------ Log prospector --------------------------------
+- type: log
+  enabled: true
+  paths:
+    - /var/log/nginx/access.log
+
+#================================ Outputs ======================================
+
+#----------------------------- Logstash output ---------------------------------
+output.logstash:
+  hosts: ["localhost:5044"]
+
+#================================ Logging ======================================
+#logging.level: info
 //}
 
 
-@<code>{filebeat.yml}の編集を行い、Nginxの有効化を行います。Nginxのパス設定ですが、インストールした状態（デフォルト）のまま
-利用するのであればパスの変更は不要です。今回はデフォルト設定のまま利用しています。
+次にFilebeatの転送先であるLogstashの設定を行います。
+新しくパイプラインファイルとパターンファイルを作成します。
 
-//list[beats-07][filebeat.ymlの編集]{
+Filebeatで取得したNginxのアクセスログは、フィールド分割されていないため分析できない構造です。
+そのため、分析しやすい構造にするためパターンファイルを作成します。
+
+//list[beats-06][パターンファイルの作成]{
+vim /etc/logstash/patterns/nginx_patterns
+NGINX_ACCESS_LOG %{IPORHOST:client_ip} (?:-|(%{WORD}.%{WORD})) %{USER:ident} \[%{HTTPDATE:date}\] "(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:ver})?|%{DATA:rawrequest})" %{NUMBER:response} (?:%{NUMBER:bytes}|-) %{QS:referrer} %{QS:agent} %{QS:forwarder}
+//}
+
+パイプラインファイルを作成します。
+
+//list[beats-07][パイプラインファイルの作成]{
+input {
+  beats {
+    port => "5044"
+  }
+}
+filter {
+  grok {
+    patterns_dir => ["/etc/logstash/patterns/nginx_patterns"]
+    match => { "message" => "%{NGINX_ACCESS_LOG}" }
+  }
+  date {
+    match => ["date", "dd/MMM/YYYY:HH:mm:ss Z"]
+    timezone => "Asia/Tokyo"
+    target => "@timestamp"
+  }
+  geoip {
+    source => "client_ip"
+  }
+}
+output {
+  elasticsearch {
+    hosts => [ "localhost:9200" ]
+  }
+}
+//}
+
+
+パターンファイルのInputにFilebeatからデータを受信するためBeatsブラグインを使用します。
+Beatsプラグインは、デフォルトでインストールされています。
+ポートは、先ほどfilebeat.ymlのoutput.logstashで指定したポートを指定します。
+今回は、デフォルトの5044とします。
+
+//list[beats-08][パイプラインファイルのInputについて]{
+input {
+  beats {
+    port => "5044"
+  }
+}
+//}
+
+パターンファイルを指定します。
+dateオプションでNginxの日付パターンを指定します。
+
+//list[beats-09][パイプラインファイルのOutputについて]{
+filter {
+  grok {
+    patterns_dir => ["/etc/logstash/patterns/nginx_patterns"]
+    match => { "message" => "%{NGINX_ACCESS_LOG}" }
+  }
+  date {
+    match => ["date", "dd/MMM/YYYY:HH:mm:ss Z"]
+    timezone => "Asia/Tokyo"
+    target => "@timestamp"
+  }
+  geoip {
+    source => "client_ip"
+  }
+}
+//}
+
+Outputは、@<chapref>{logstash}の設定と同様です。
+
+
+最後に、作成したパイプラインファイルを読み込むため、pipelines.ymlの設定をします。
+@<code>{logstash_pipelines}の設定が残っている場合、削除してください。
+
+//list[beats-10][logstash_pipelinesの編集]{
+- pipeline.id: filebeat
+  pipeline.batch.size: 125
+  path.config: "/etc/logstash/conf.d/filebeat.cfg"
+  pipeline.workers: 1
+//}  
+
+これでFilebeatとLogstashの環境が整いました。
+Filebeatから起動してしまうと転送先のLogstashにBeats設定が反映されていないため、エラーになります。
+そのため、Logstashから起動します。
+
+//list[beats-11][Logstashの起動]{
+sudo initctl start logstash
+logstash start/running, process 3845
+//}
+
+Filebeatを起動します。
+"config OK"と標準出力されれば問題なく起動しています。
+
+//list[beats-12][Filebeatの起動]{
+sudo initctl start logstash
+logstash start/running, process 3845
+//}
+
+
+=== 動作確認
+
+Elasticsearchにインデクシングされているかを確認します。
+想定通り取り込まれていることがわかります。
+
+Elasticsearchにデータが転送されているか、curlを発行して確認します。
+以下のように@<code>{logstash-YYYY.MM.dd}で出力されていれば正常に保存されています。
+
+//list[beats-13][Filebeatの起動]{
+curl -XGET localhost:9200/_cat/indices/logstash*
+yellow open logstash-2018.04.10 fzIOfXzOQK-p0_mmvO7wrw 5 1 8 0 93.2kb 93.2kb
+//}
+
+補足ですが、ステータスが"yellow"になっているのは、ノードが冗長化されていないため表示されています。
+今回は、1ノード構成のため"yellow"になってしまうので、無視してください。
+
+
+=== Filbeat Modules
+
+ここまででFilebeatの使い方がわかったと思います。
+しかし、これではどこが手軽なの？むしろ重厚感が増したのでは？と思われる方もいると思います。
+ここからは、もっと手軽に導入するためのFilbeat Moduleについて触れていきたいと思います。
+
+
+Filebeat Modulesは、あらかじめデータソースに対応した Moduleが用意されています。
+このModuleを使用することで、Logstashで複雑なフィルタなどを書かずに、意味のあるフィールドに変換し、Elasticsearchにインデクシングできます。
+また、Kibanaのダッシュボードも用意されているため、インデクシングされたデータを即時でビジュアライズすることができます。
+
+
+==== Filebeat Modulesの構成
+
+Filebeatのデータソースは、Nginxのアクセスログとします。
+先ほどの構成は、Logstashに転送していましたが、Elasticsaerchに直接保存する構成とします。
+
+//image[filebeat03][Filebeatの構成]{
+//}
+
+
+==== Ingest Node Pluginをインストール
+
+Filebeat Modulesは、パイプラインを自動で作成します。
+その際にUserAgent、GeoIPの解析をするため、@<code>{Ingest Node Plugin}と@<code>{Ingest GeoIP plugin}をインストールします。
+
+
+//list[beats-14][Ingest Node Pluginのインストール]{
+/usr/share/elasticsearch/bin/elasticsearch-plugin install ingest-user-agent
+//}
+
+//list[beats-15][Ingest GeoIP pluginのインストール]{
+/usr/share/elasticsearch/bin/elasticsearch-plugin install ingest-geoip
+//}
+
+
+インストールが完了したらElasticsearchを再起動します。
+
+
+//list[beats-16][Elasticsaerchの再起動]{
+sudo service elasticsearch restart
+//}
+
+今回は@<code>{Nginx Module}を例にModuleを利用すると、どのくらい構築コストが減少するのかを検証します。
+@<chapref>{logstash}でKibanaをインストールしている環境を引き続き利用することを前提として
+話を進めますが、もし新しい環境で始める場合は@<chapref>{logstash}や@<chapref>{Kibana-visualize}を参考に
+環境構築を行ってください。
+
+
+==== Filebeat Modulesの設定
+
+Filebeatの設定ファイルを編集しますので、以下の設定ファイル@<code>{filebeat.yml}を使用します。
+既存で設定してある内容は全て上書きしてください。
+
+//list[beats-17][filebeat.ymlのNginx Module編集]{
+######################## Filebeat Configuration ############################
+
+#==========================  Modules configuration ============================
+filebeat.modules:
+
 #-------------------------------- Nginx Module -------------------------------
 - module: nginx
-  # Access logs
   access:
     enabled: true
-
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
-
-    # Prospector configuration (advanced). Any prospector configuration option
-    # can be added under this section.
-    #prospector:
-
-  # Error logs
   error:
     enabled: true
 
-    # Set custom paths for the log files. If left empty,
-    # Filebeat will choose the paths depending on your OS.
-    #var.paths:
+#================================ Outputs ======================================
 
-    # Prospector configuration (advanced). Any prospector configuration option
-    # can be added under this section.
-    #prospector:
+#-------------------------- Elasticsearch output -------------------------------
+output.elasticsearch:
+  enabled: true
+
+  hosts: ["localhost:9200"]
+
+#============================== Dashboards =====================================
+setup.dashboards.enabled: true
+
+#============================== Kibana =====================================
+setup.kibana:
+  #host: "localhost:5601"
+
+#================================ Logging ======================================
+#logging.level: info
+//}
+
+@<code>{filebeat.yml}の編集内容について説明します。
+Nginxの有効化を行います。Nginxのアクセスログのパス設定ですが、インストールした状態（デフォルト）のまま利用するのであればパスの変更は不要です。
+今回はデフォルト設定のまま利用しています。
+
+
+//list[beats-17][filebeat.ymlのNginx Module編集]{
+#-------------------------------- Nginx Module -------------------------------
+- module: nginx
+  access:
+    enabled: true
 //}
 
 
-合わせて、OutputをElasticsearchに変更します。
+Output先をElasticsearchに変更しています。
 
 
-//list[beats-08][Elasticsearchをデータ転送先にする]{
+//list[beats-18][filebeat.ymlのElasticsearch output編集]{
 #-------------------------- Elasticsearch output -------------------------------
 output.elasticsearch:
-  # Boolean flag to enable or disable the output module.
   enabled: true
-
-  # Array of hosts to connect to.
-  # Scheme and port can be left out and will be set to the default (http and 9200)
-  # In case you specify and additional path, the scheme is required: http://localhost:9200/path
-  # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
+  
   hosts: ["localhost:9200"]
 //}
 
@@ -163,34 +381,25 @@ output.elasticsearch:
 最後にKibanaのDashboardを起動時にセットアップする設定を有効化します。
 
 
-//list[beats-09x][KibanaのDashboardを自動で作成する]{
-### Activate Dashboards
+//list[beats-22][KibanaのDashboardを自動で作成する]{
 #============================== Dashboards =====================================
-# These settings control loading the sample dashboards to the Kibana index. Loading
-# the dashboards are disabled by default and can be enabled either by setting the
-# options here, or by using the `-setup` CLI flag or the `setup` command.
 setup.dashboards.enabled: true
 //}
 
 
-@<code>{filebeat.reference.yml}をベースに@<code>{filebeat.yml}を作成しているため、
-デフォルトでkafkaが@<code>{enabled: true}になっています。
-このまま起動するとエラーが発生するためコメントアウトします。
+今回の設定では、アウトプット先を複数にする設定は発生しないと思いますが、
+もし既存の設定が残っていた場合は、再起動時に以下のエラーが発生します。
+このエラーが発生した場合は、アウトプット先が複数の可能性があるので確認してください。
 
 
-//list[beats-10][kafkaのmodulesを利用しない]{
-#-------------------------------- Kafka Module -------------------------------
-#- module: kafka
-  # All logs
-  #log:
-    #enabled: true
+//list[beats-21][複数アウトプット指定した際のエラー]{
+error unpacking config data: more than one namespace configured accessing 'output' (source:'/etc/filebeat/filebeat.yml')
 //}
-
 
 では、いよいよFilebeatを起動します。
 
 
-//list[beats-11][Filebeatの起動]{
+//list[beats-23][Filebeatの起動]{
 sudo service filebeat start
 //}
 
@@ -198,40 +407,39 @@ sudo service filebeat start
 あとは、データが取り込まれているかをKibana@<href>{http://{Global_IP\}:5601}を開いて確認します。
 
 
-
-以下のトップページが開きます。
+トップページが開きます。
 左ペインにあるManagementをクリックします。
 
 
-//image[filebeat01][Managementをクリック]{
+//image[filebeat04][Managementをクリック]{
 //}
 
 Index Patternsをクリックします。
 
-//image[filebeat02][Indexを選択]{
+//image[filebeat05][Indexを選択]{
 //}
 
 Filebeatのインデックスパターンが登録されていることがわかります。
 
-//image[filebeat03][Filebeatのインデックスパターンを確認]{
+//image[filebeat06][Filebeatのインデックスパターンを確認]{
 //}
 
 左ペインにある@<code>{Dashboard}をクリックします。
 様々なDashboardが登録されていることがわかります。
 Logstashなどでログを取り込んだ場合は、Dashboardを一から作成する必要がありますが、Beatsの場合は、あらかじめ用意されています。
 
-//image[filebeat04][Dashboardの確認]{
+//image[filebeat07][Dashboardの確認]{
 //}
 
 今回は、Nginxの@<code>{Filebeat Nginx Overview}というDashboardをクリックします。
 取り込んだログがDashboardに表示されていることがわかります。
 
-//image[filebeat05][Filebeat Nginx Overview]{
+//image[filebeat08][Filebeat Nginx Overview]{
 //}
 
 いかがでしたか？
-他にも取り込みたいログがあれば、@<code>{filebeat.yml}のModuleを有効化するだけで容易にモニタリングができるようになります。
-
+他にも取り込みたいログがあれば、@<code>{filebeat.yml}のModuleを追加するだけで容易にモニタリングができるようになります。
+追加する場合は、@<code>{filebeat.reference.yml}にModulesが記載されているので、コピー&ペーストして有効化してください。
 
 
 次は、サーバのリソースを容易にモニタリングすることを可能とするMetricbeatについてです。
@@ -246,7 +454,7 @@ Metricbeatは、サーバのリソース(CPU/Mem/process..など)を容易にモ
 今回は、サーバのメトリックをモニタリングできるところまで見たいと思います。それでは、早速インストールしていきます。
 
 
-//list[filebeat06][Metricbeatのインストール]{
+//list[beats-24][Metricbeatのインストール]{
 sudo yum install metricbeat
 //}
 
@@ -256,29 +464,14 @@ MetricbeatもFilebeat同様にベースの設定ファイル@<code>{metricbeat.r
 既存で設定してある内容は全て上書きしてください。
 
 
-//list[filebeat07][/etc/metricbeat/metricbeat.ymlの編集]{
-##################### Metricbeat Configuration Example #######################
-
-# This file is an example configuration file highlighting only the most common
-# options. The metricbeat.reference.yml file from the same directory contains all the
-# supported options with more comments. You can use it as a reference.
-#
-# You can find the full configuration reference here:
-# https://www.elastic.co/guide/en/beats/metricbeat/index.html
-
+//list[beats-25][/etc/metricbeat/metricbeat.ymlの編集]{
 #==========================  Modules configuration ============================
-metricbeat.modules:
 metricbeat.config.modules:
-  # Glob pattern for configuration loading
   path: ${path.config}/modules.d/*.yml
-
-  # Set to true to enable config reloading
   reload.enabled: false
 
-  # Period on which files under path should be checked for changes
-  #reload.period: 10s
-
 #------------------------------- System Module -------------------------------
+metricbeat.modules:
 - module: system
   metricsets:
     - cpu             # CPU usage
@@ -297,101 +490,35 @@ metricbeat.config.modules:
   period: 10s
   processes: ['.*']
 
-  # Configure the metric types that are included by these metricsets.
   cpu.metrics:  ["percentages"]  # The other available options are normalized_percentages and ticks.
   core.metrics: ["percentages"]  # The other available option is ticks.
 
-  # A list of filesystem types to ignore. The filesystem metricset will not
-  # collect data from filesystems matching any of the specified types, and
-  # fsstats will not include data from these filesystems in its summary stats.
-  #filesystem.ignore_types: []
-
-  # These options allow you to filter out all processes that are not
-  # in the top N by CPU or memory, in order to reduce the number of documents created.
-  # If both the `by_cpu` and `by_memory` options are used, the union of the two sets
-  # is included.
-  #process.include_top_n:
-    #
-    # Set to false to disable this feature and include all processes
-    #enabled: true
-
 #==================== Elasticsearch template setting ==========================
-
 setup.template.settings:
   index.number_of_shards: 1
   index.codec: best_compression
-  #_source.enabled: false
-
-#================================ General =====================================
-
-# The name of the shipper that publishes the network data. It can be used to group
-# all the transactions sent by a single shipper in the web interface.
-#name:
-
-# The tags of the shipper are included in their own field with each
-# transaction published.
-#tags: ["service-X", "web-tier"]
-
-# Optional fields that you can specify to add additional information to the
-# output.
-#fields:
-#  env: staging
-
 
 #============================== Dashboards =====================================
-# These settings control loading the sample dashboards to the Kibana index. Loading
-# the dashboards is disabled by default and can be enabled either by setting the
-# options here, or by using the `-setup` CLI flag or the `setup` command.
 setup.dashboards.enabled: true
 
-# The URL from where to download the dashboards archive. By default this URL
-# has a value which is computed based on the Beat name and version. For released
-# versions, this URL points to the dashboard archive on the artifacts.elastic.co
-# website.
-#setup.dashboards.url:
-
 #============================== Kibana =====================================
-
-# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
-# This requires a Kibana endpoint configuration.
 setup.kibana:
-
-  # Kibana Host
-  # Scheme and port can be left out and will be set to the default (http and 5601)
-  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
-  # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
   #host: "localhost:5601"
 
 #================================ Outputs =====================================
 
-# Configure what output to use when sending the data collected by the beat.
-
 #-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
-  # Array of hosts to connect to.
   hosts: ["localhost:9200"]
 
-  # Optional protocol and basic auth credentials.
-  #protocol: "https"
-  #username: "elastic"
-  #password: "changeme"
-
 #================================ Logging =====================================
-
-# Sets log level. The default log level is info.
-# Available log levels are: error, warning, info, debug
 #logging.level: debug
-
-# At debug level, you can selectively enable logging only for some components.
-# To enable all selectors use ["*"]. Examples of other selectors are "beat",
-# "publish", "service".
-#logging.selectors: ["*"]
 //}
 
 設定が完了したのでMetricbeatを起動します。
 
 
-//list[filebeat08][Metricbeatの起動]{
+//list[beats-26][Metricbeatの起動]{
 sudo service metricbeat start
 //}
 
@@ -424,59 +551,25 @@ CPUやメモリ、プロセスの状態をニアリアルタイムにモニタ�
 サーバの監査としてauditdが出力する@<code>{audit.log}をモニタリングしている方は多くいるのではないでしょうか。
 @<code>{audit.log}を保管するだけでなく、ニアリアルタイムにモニタリングするためにLogstashなどのツールを利用している方もいると思います。
 ただ、これから@<code>{audit.log}をモニタリングしたいという人からしたらハードルが高く、モニタリングするまでに時間を要してしまいます。
-そこで、Beatsには、Auditbeatというデータシッパーがあるので容易に導入することができます。
-ここまでFilbeatやMetricbeatを触ってきたらわかる通り、学習コストはほぼかからないでDashboardで閲覧するところまでできてしまいます。
+そこで、Beatsは、Auditbeatというデータシッパーがあるので容易に導入することができます。
+ここまでFilbeatやMetricbeatを触ってきたらわかるとおり、学習コストはほぼかからないでDashboardで閲覧するところまでできてしまいます。
 
 それでは、ここからAuditbeatをインストールします。
 
 
-//list[beats-09][Auditbeatのインストール]{
+//list[beats-27][Auditbeatのインストール]{
 sudo yum install auditbeat
 //}
 
-@<list>{beats-10}の@<code>{auditbeat.yml}を既存で設定してある内容は全て上書きしてください。
+@<list>{beats-28}の@<code>{auditbeat.yml}を既存で設定してある内容は全て上書きしてください。
 
 
-//list[beats-10x][/etc/auditbeat/auditbeat.ymlの編集]{
-
-###################### Auditbeat Configuration Example #########################
-
-# This is an example configuration file highlighting only the most common
-# options. The auditbeat.reference.yml file from the same directory contains all
-# the supported options with more comments. You can use it as a reference.
-#
-# You can find the full configuration reference here:
-# https://www.elastic.co/guide/en/beats/auditbeat/index.html
-
+//list[beats-28][/etc/auditbeat/auditbeat.ymlの編集]{
 #==========================  Modules configuration =============================
 auditbeat.modules:
 
 - module: auditd
   audit_rules: |
-    ## Define audit rules here.
-    ## Create file watches (-w) or syscall audits (-a or -A). Uncomment these
-    ## examples or add your own rules.
-
-    ## If you are on a 64 bit platform, everything should be running
-    ## in 64 bit mode. This rule will detect any use of the 32 bit syscalls
-    ## because this might be a sign of someone exploiting a hole in the 32
-    ## bit API.
-    #-a always,exit -F arch=b32 -S all -F key=32bit-abi
-
-    ## Executions.
-    #-a always,exit -F arch=b64 -S execve,execveat -k exec
-
-    ## External access (warning: these can be expensive to audit).
-    #-a always,exit -F arch=b64 -S accept,bind,connect -F key=external-access
-
-    ## Identity changes.
-    #-w /etc/group -p wa -k identity
-    #-w /etc/passwd -p wa -k identity
-    #-w /etc/gshadow -p wa -k identity
-
-    ## Unauthorized access attempts.
-    #-a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EACCES -k access
-    #-a always,exit -F arch=b64 -S open,creat,truncate,ftruncate,openat,open_by_handle_at -F exit=-EPERM -k access
 
 - module: file_integrity
   paths:
@@ -486,87 +579,34 @@ auditbeat.modules:
   - /usr/sbin
   - /etc
 
-
-
 #==================== Elasticsearch template setting ==========================
 setup.template.settings:
   index.number_of_shards: 3
-  #index.codec: best_compression
-  #_source.enabled: false
-
-#================================ General =====================================
-
-# The name of the shipper that publishes the network data. It can be used to group
-# all the transactions sent by a single shipper in the web interface.
-#name:
-
-# The tags of the shipper are included in their own field with each
-# transaction published.
-#tags: ["service-X", "web-tier"]
-
-# Optional fields that you can specify to add additional information to the
-# output.
-#fields:
-#  env: staging
-
 
 #============================== Dashboards =====================================
-# These settings control loading the sample dashboards to the Kibana index. Loading
-# the dashboards is disabled by default and can be enabled either by setting the
-# options here, or by using the `-setup` CLI flag or the `setup` command.
 setup.dashboards.enabled: true
-
-# The URL from where to download the dashboards archive. By default this URL
-# has a value which is computed based on the Beat name and version. For released
-# versions, this URL points to the dashboard archive on the artifacts.elastic.co
-# website.
 #setup.dashboards.url:
 
 #============================== Kibana =====================================
-
-# Starting with Beats version 6.0.0, the dashboards are loaded via the Kibana API.
-# This requires a Kibana endpoint configuration.
 setup.kibana:
-
-  # Kibana Host
-  # Scheme and port can be left out and will be set to the default (http and 5601)
-  # In case you specify and additional path, the scheme is required: http://localhost:5601/path
-  # IPv6 addresses should always be defined as: https://[2001:db8::1]:5601
   #host: "localhost:5601"
 
 #================================ Outputs =====================================
 
-# Configure what output to use when sending the data collected by the beat.
-
 #-------------------------- Elasticsearch output ------------------------------
 output.elasticsearch:
-  # Boolean flag to enable or disable the output module.
   enabled: true
-  # Array of hosts to connect to.
   hosts: ["localhost:9200"]
 
-  # Optional protocol and basic auth credentials.
-  #protocol: "https"
-  #username: "elastic"
-  #password: "changeme"
-
 #================================ Logging =====================================
-
-# Sets log level. The default log level is info.
-# Available log levels are: error, warning, info, debug
 #logging.level: debug
-
-# At debug level, you can selectively enable logging only for some components.
-# To enable all selectors use ["*"]. Examples of other selectors are "beat",
-# "publish", "service".
-#logging.selectors: ["*"]
 //}
 
 
 設定が完了したので、Auditbeatを起動します。
 
 
-//list[beats-11x][Auditbeatの起動]{
+//list[beats-29][Auditbeatの起動]{
 sudo service auditbeat start
 //}
 
@@ -586,6 +626,7 @@ sudo service auditbeat start
 //}
 
 @<code>{Auditbeat File Integrity Overview}や@<code>{Auditbeat Auditd Overview}からモニタリングが可能です。
+
 
 //image[auditbeat03][Auditbeatを用いたモニタリング]{
 //}
