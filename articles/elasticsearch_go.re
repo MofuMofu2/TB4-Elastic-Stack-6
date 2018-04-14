@@ -294,7 +294,7 @@ Elasticsearch returned with code 200 and version 6.2.2
 === 単純なCRUD操作
 
 
-それでは先ほど作成したIndexを対象に基本的なCRUD操作をおこなってみましょう。
+それでは@<list>{elasticsearch-list0}で作成したIndexを対象に基本的なCRUD操作をおこなってみましょう。
 操作を始めるために、まずはクライアントのオブジェクトを作成します。
 
 
