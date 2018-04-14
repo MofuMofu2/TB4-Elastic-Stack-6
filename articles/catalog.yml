@@ -14,7 +14,7 @@ CHAPS:
   # Beatsを体験する
   - beats.re
   # Curatorを用いてIndexを操作する  
-  - curator.re
+  #- curator.re
   # GitとKibanaで同人誌の進捗を可視化するぞ！
   - Kibana-visualize.re
   # Kibana6の見所

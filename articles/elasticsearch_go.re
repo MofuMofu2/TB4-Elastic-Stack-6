@@ -140,7 +140,7 @@ RDBMSで例えると以下に相当します。
 Elasticsearchの操作に必要なMapping定義を@<list>{elasticsearch-list05}に記述しました。
 
 
-//list[elasticsearch-list05][Mapping定義]{
+//list[elasticsearch-list05][利用するMapping定義]{
 {
   "mappings": {
     "chat": {
@@ -268,7 +268,7 @@ func main() {
         }
 
         info, code, err := client.Ping(esURL).Do(ctx)
-        fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)
+        fmt.Printf("Elasticsearch version %s\n", info.Version.Number)
 }
 //}
 
@@ -284,7 +284,7 @@ Elasticsearchのバージョン情報といったシステム情報を取得す�
 
 //list[elasticsearch-list08][Elasticsearchのバージョン情報を問い合わせる]{
 $ go run hello_elasticsearch.go
-Elasticsearch returned with code 200 and version 6.2.2
+Elasticsearch version 6.2.2
 //}
 
 
@@ -332,7 +332,7 @@ IDの振り方には登録時にクライアント側で設定するか、Elasti
 今回は登録時にクライアント側でドキュメントIDを指定します。
 さきほど作成したクライアントセッションを利用して操作をおこなっていきましょう。
 
-//list[elasticesearch-list08][クライアント側でドキュメントIDを付与する(index.go)]{
+//list[elasticesearch-list08][ドキュメントの登録(index.go)]{
 package main
 
 import (
@@ -745,7 +745,7 @@ Searchメソッドはelastic.SearchServiceのQueryメソッドに、検索条件
 取得できたドキュメントをStruct経由で操作する際はreflectパッケージを使って操作します。
 
 
-//list[elasticsearch-list13][Searchメソッドの実行(match_query.go)]{
+//list[elasticsearch-list13][Match Queryによる検索(match_query.go)]{
 package main
 
 import (
@@ -808,7 +808,7 @@ AnalyzerこれらのドキュメントがどのようにAnalyzeされインデ�
 
 
 //list[elasticsearch-list033][analyze api]{
-curl -XPOST "http://localhost:9200/<Index名>/_analyze?pretty" -H "Content-Type: application/json" -d
+# curl -XPOST "http://localhost:9200/<Index名>/_analyze?pretty" -H "Content-Type: application/json" -d
   '{
     "analyzer": "Analyzer名",
     "text": "Analyzeしたい文字列"
@@ -817,7 +817,7 @@ curl -XPOST "http://localhost:9200/<Index名>/_analyze?pretty" -H "Content-Type:
 
 //cmd{
 
-curl -XPOST "http://localhost:9200/chat/_analyze?pretty" -H "Content-Type: application/json" -d '{"analyzer": "kuromoji_analyzer", "text": "あと十年あれば期
+# curl -XPOST "http://localhost:9200/chat/_analyze?pretty" -H "Content-Type: application/json" -d '{"analyzer": "kuromoji_analyzer", "text": "あと十年あれば期
 末テストもきっと満点がとれたんだろうな"}'
 {
   "tokens" : [
@@ -897,7 +897,7 @@ Elastic:An Elasticsearch client for the GoでTermQueryを利用する際はTerm 
 elastic.NewTermQueryは検索対象のフィールドと検索文字列を指定します。
 
 
-//list[elasticsearch-list14][Term Queryを用いたドキュメント検索(term_query.go)]{
+//list[elasticsearch-list14][Term Queryによる検索(term_query.go)]{
 package main
 
 import (
@@ -969,7 +969,7 @@ must_not	NOT	boolQuery := elastic.NewBoolQuery()@<br>{}boolQuery.MustNot(elastic
 //}
 
 
-//list[elasticsearch-list15][Bool Query(bool_query.go)]{
+//list[elasticsearch-list15][Bool Queryによる検索(bool_query.go)]{
 
 package main
 
@@ -1134,7 +1134,7 @@ Multi Fields機能を利用することで一つのフィールドに対して�
 といってもすぐにピンとこないかもしれませんので、実際にMulti Fieldsの設定をしているMapping定義をみていきましょう。
 
 
-//list[elasticsearch-list17][Multi Fieldsの設定がされているMapping定義の参照]{
+//list[elasticsearch-list17][Multi Fieldsの設定がされているMapping定義例]{
 
 {
   "mappings": {
