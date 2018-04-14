@@ -148,7 +148,7 @@ Elasticsearchの操作に必要なMapping定義を@<list>{elasticsearch-list05}�
         "created": {
           "type": "date"
         },
-        "tag": {
+        "tags": {
           "type": "keyword"
         }
       }
@@ -216,7 +216,7 @@ curl -XGET 'http://localhost:9200/<Index名>/_mapping/<Type名>?pretty'
           "message" : {
             "type" : "text"
           },
-          "tag" : {
+          "tags" : {
             "type" : "keyword"
           },
           "user" : {
@@ -436,7 +436,7 @@ func main() {
 
 //cmd{
 $ go run get.go
-essage:<test message> created by user01
+Message:<test message> created by user01
 //}
 
 
@@ -603,7 +603,7 @@ Analyzerの設定は@<code>{settings}内でおこなっていきます。Analyze
         "created": {
           "type": "date"
         },
-        "tag": {
+        "tags": {
           "type": "keyword"
         }
       }
@@ -649,72 +649,81 @@ Chatマッピングの１階層下に存在する、messageフィールドの@<c
 
 
 //list[elasticesearch-list112][テストデータの登録]{
-
 package main
 
 import (
-	"context"
-	"time"
+    "context"
+    "time"
 
-	"github.com/olivere/elastic"
+    "github.com/olivere/elastic"
 )
 
 type Chat struct {
-	User    string    `json:"user"`
-	Message string    `json:"message"`
-	Created time.Time `json:"created"`
-	Tag     string    `json:"tag"`
+    User    string    `json:"user"`
+    Message string    `json:"message"`
+    Created time.Time `json:"created"`
+    Tag     string    `json:"tag"`
 }
+
+const (
+    ChatIndex = "Chat"
+)
 
 func main() {
-	esURL := "http://localhost:9200"
-	ctx := context.Background()
-	client, err := elastic.NewClient(
-		elastic.SetURL(esURL),
-	)
-	if err != nil {
-		panic(err)
-	}
-	chatData01 := Chat{
-		User:    "user01",
-		Message: "明日は期末テストがあるけどなんにも勉強してない....",
-		Created: time.Now(),
-		Tag:     "試験",
-	}
-	chatData02 := Chat{
-		User:    "user02",
-		Message: "時々だけど勉強のやる気が出るけど長続きしない",
-		Created: time.Now(),
-		Tag:     "学習",
-	}
-	chatData03 := Chat{
-		User:    "user03",
-		Message: "あと十年あれば期末テストもきっと満点がとれたんだろうな",
-		Created: time.Now(),
-		Tag:     "試験",
-	}
-	chatData04 := Chat{
-		User:    "user04",
-		Message: "ドラえもんの映画で一番すきなのは夢幻三剣士だな",
-		Created: time.Now(),
-		Tag:     "ドラえもん",
-	}
-	chatData05 := Chat{
-		User:    "user05",
-		Message: "世界記憶の概念、そうアカシックレコードを紐解くことで解は導かれるのかもしれない",
-		Created: time.Now(),
-		Tag:     "ファンタジー",
-	}
-	_, err = client.Index().Index("chat").Type("chat").Id("1").BodyJson(&chatData01).Do(ctx)
-	_, err = client.Index().Index("chat").Type("chat").Id("2").BodyJson(&chatData02).Do(ctx)
-	_, err = client.Index().Index("chat").Type("chat").Id("3").BodyJson(&chatData03).Do(ctx)
-	_, err = client.Index().Index("chat").Type("chat").Id("4").BodyJson(&chatData04).Do(ctx)
-	_, err = client.Index().Index("chat").Type("chat").Id("5").BodyJson(&chatData05).Do(ctx)
-	if err != nil {
-		panic(err)
-	}
-}
+    esUrl := "http://localhost:9200"
+    ctx := context.Background()
 
+    client, err := elastic.NewClient(
+        elastic.SetURL(esUrl),
+    )
+    if err != nil {
+        panic(err)
+    }
+
+    chatData01 := Chat{
+        User:    "user01",
+        Message: "明日は期末テストがあるけどなんにも勉強してない....",
+        Created: time.Now(),
+        Tag:     "tag01",
+    }
+
+    chatData02 := Chat{
+        User:    "user02",
+        Message: "時々だけど勉強のやる気が出るけど長続きしない",
+        Created: time.Now(),
+        Tag:     "tag02",
+    }
+
+    chatData03 := Chat{
+        User:    "user03",
+        Message: "あと十年あれば期末テストもきっと満点がとれたんだろうな",
+        Created: time.Now(),
+        Tag:     "tag03",
+    }
+
+    chatData04 := Chat{
+        User:    "user04",
+        Message: "ドラえもんの映画で一番すきなのは夢幻三剣士だな",
+        Created: time.Now(),
+        Tag:     "tag01",
+    }
+
+    chatData05 := Chat{
+        User:    "user05",
+        Message: "世界記憶の概念、そうアカシックレコードを紐解くことで解は導かれるのかもしれない",
+        Created: time.Now(),
+        Tag:     "tag02",
+    }
+
+    _, err = client.Index().Index("chat").Type("chat").Id("1").BodyJson(&chatData01).Do(ctx)
+    _, err = client.Index().Index("chat").Type("chat").Id("2").BodyJson(&chatData02).Do(ctx)
+    _, err = client.Index().Index("chat").Type("chat").Id("3").BodyJson(&chatData03).Do(ctx)
+    _, err = client.Index().Index("chat").Type("chat").Id("4").BodyJson(&chatData04).Do(ctx)
+    _, err = client.Index().Index("chat").Type("chat").Id("5").BodyJson(&chatData05).Do(ctx)
+    if err != nil {
+        panic(err)
+    }
+}
 //}
 
 
@@ -725,64 +734,69 @@ func main() {
 === Match Query
 
 
-atchQueryは全文検索の肝です。MatchQueryでは、指定した検索文字列がAnalyzerにより言語処理がなされ検索がおこなわれます。
+MatchQueryは全文検索の肝です。MatchQueryでは、指定した検索文字列がAnalyzerにより言語処理がなされ検索がおこなわれます。
 olivere/elasticで検索機能を利用する際は、client経由でSearchメソッドを実行します。
 Searchメソッドはelastic.SearchServiceのQueryメソッドに、検索条件を指定した@<code>{elastic.MatchQuery}を代入します。
 取得できたドキュメントをStruct経由で操作する際はreflectパッケージを使って操作します。
 
 
-//list[elasticsearch-list13][Searchメソッドの実行(match_query.go)]{
+//list[elasticsearch-list13][Searchメソッドの実行]{
 package main
 
 import (
-	"context"
-	"fmt"
-	"reflect"
-	"time"
+    "context"
+    "fmt"
+    "reflect"
+    "time"
 
-	"github.com/olivere/elastic"
+    "github.com/olivere/elastic"
 )
 
 type Chat struct {
-	User    string    `json:"user"`
-	Message string    `json:"message"`
-	Created time.Time `json:"created"`
-	Tag     string    `json:"tag"`
+    User    string    `json:"user"`
+    Message string    `json:"message"`
+    Created time.Time `json:"created"`
+    Tag     string    `json:"tag"`
 }
+
+const (
+    ChatIndex = "Chat"
+)
 
 func main() {
-	esURL := "http://localhost:9200"
-	ctx := context.Background()
-	client, err := elastic.NewClient(
-		elastic.SetURL(esURL),
-		elastic.SetSniff(false),
-	)
-	if err != nil {
-		panic(err)
-	}
+    esUrl := "http://localhost:9200"
+    ctx := context.Background()
 
-	//messageフィールドに対して"テスト"という単語を含むドキュメントを検索
-	query := elastic.NewMatchQuery("message", "テスト")
-	results, err := client.Search().Index("chat").Query(query).Do(ctx)
-	if err != nil {
-		panic(err)
-	}
+    client, err := elastic.NewClient(
+        elastic.SetURL(esUrl),
+    )
+    if err != nil {
+        panic(err)
+    }
 
-	var chattype Chat
-	for _, chat := range results.Each(reflect.TypeOf(chattype)) {
-		if c, ok := chat.(Chat); ok {
-			fmt.Printf("Chat message is: %s \n", c.Message)
-		}
-	}
+    //messageフィールドに対して"テスト"という単語を含むドキュメントを検索
+    query := elastic.NewMatchQuery("message", "テスト")
+    results, err := client.Search().Index("chat").Query(query).Do(ctx)
+    if err != nil {
+        panic(err)
+    }
+
+    var chattype Chat
+    for _, chat := range results.Each(reflect.TypeOf(chattype)) {
+        if c, ok := chat.(Chat); ok {
+            fmt.Println("Chat message is: %s", c.Message)
+        }
+    }
 }
+
 //}
 
 
-実行すると以下の２つのドキュメントがヒットします。
+実行すると以下の２つのドキュメントがヒットします。(ファイル名をmain.goとして保存しています。)
 
 
 //cmd{
-# go run match_query.go
+# go run main.go
 Chat message is: あと十年あれば期末テストもきっと満点がとれたんだろうな
 Chat message is: 明日は期末テストがあるけどなんにも勉強してない....
 //}
@@ -877,64 +891,70 @@ curl -XPOST "http://localhost:9200/chat/_analyze?pretty" -H "Content-Type: appli
 
 
 TermQueryを利用することで、指定した文字列を完全に含むドキュメントを検索することができます。
-atchQueryと違い、検索文字列がAnalyzeされないため、指定した文字列と完全に一致する転地インデックスを検索します。
+MatchQueryと違い、検索文字列がAnalyzeされないため、指定した文字列と完全に一致する転地インデックスを検索します。
 そのため、例えばタグ情報など指定した検索文字列と完全に一致させて検索をさせたい際に利用します。
 Elastic:An Elasticsearch client for the GoでTermQueryを利用する際はTerm Queryは@<code>{elastic.TermQuery}を利用します。
 elastic.NewTermQueryは検索対象のフィールドと検索文字列を指定します。
 
 
-//list[elasticsearch-list14][Term Queryを用いたドキュメント検索(term_query.go)]{
+//list[elasticsearch-list14][Term Queryを用いたドキュメント検索]{
 package main
 
 import (
-	"context"
-	"fmt"
-	"reflect"
-	"time"
+    "context"
+    "fmt"
+    "reflect"
+    "time"
 
-	"github.com/olivere/elastic"
+    "github.com/olivere/elastic"
 )
 
 type Chat struct {
-	User    string    `json:"user"`
-	Message string    `json:"message"`
-	Created time.Time `json:"created"`
-	Tag     string    `json:"tag"`
+    User    string    `json:"user"`
+    Message string    `json:"message"`
+    Created time.Time `json:"created"`
+    Tag     string    `json:"tag"`
 }
 
+const (
+    ChatIndex = "Chat"
+)
+
 func main() {
-	esURL := "http://localhost:9200"
-	ctx := context.Background()
-	client, err := elastic.NewClient(
-		elastic.SetURL(esURL),
-		elastic.SetSniff(false),
-	)
-	if err != nil {
-		panic(err)
-	}
+    esUrl := "http://localhost:9200"
+    ctx := context.Background()
 
-	//タグに「ドラえもん」をもつドキュメントを取得
-	termQuery := elastic.NewTermQuery("tag", "ドラえもん")
-	results, err := client.Search().Index("chat").Type("chat").Query(termQuery).Do(ctx)
-	if err != nil {
-		panic(err)
-	}
+    client, err := elastic.NewClient(
+        elastic.SetURL(esUrl),
+    )
+    if err != nil {
+        panic(err)
+    }
 
-	var chattype Chat
-	for _, chat := range results.Each(reflect.TypeOf(chattype)) {
-		if c, ok := chat.(Chat); ok {
-			fmt.Printf("Tag: %s and Chat message is: %s \n", c.Tag, c.Message)
-		}
-	}
+	//tag01をもつドキュメントを取得
+    termQuery := elastic.NewTermQuery("Tag", "tag01")
+    results, err := client.Search().Index("chat").Query(termQuery).Do(ctx)
+    if err != nil {
+        panic(err)
+    }
+
+    var chattype Chat
+    for _, chat := range results.Each(reflect.TypeOf(chattype)) {
+        if c, ok := chat.(Chat); ok {
+            fmt.Printf("Tag: %s and Chat message is: %s \n", c.Tag, c.Message)
+        }
+    }
+
 }
 //}
 
 
-実行すると以下のドキュメントがヒットします。
+実行するとtag01をもつ以下の２つのドキュメントがヒットします。(ファイル名をmain.goとして保存しています。)
 
 
 //cmd{
-# go run term_query.go
+# go run main.go
+Tag: tag01 and Chat message is: 明日は期末テストがあるけどなんにも勉強してない....
 Tag: tag01 and Chat message is: ドラえもんの映画で一番すきなのは夢幻三剣士だな
 //}
 
@@ -955,65 +975,65 @@ must_not	NOT	boolQuery := elastic.NewBoolQuery()@<br>{}boolQuery.MustNot(elastic
 //}
 
 
-//list[elasticsearch-list15][Bool Query(bool_query.go)]{
-
+//list[elasticsearch-list15][Analyzerの設定]{
 package main
 
 import (
-	"context"
-	"fmt"
-	"reflect"
-	"time"
+    "context"
+    "fmt"
+    "reflect"
+    "time"
 
-	"github.com/olivere/elastic"
+    "github.com/olivere/elastic"
 )
 
 type Chat struct {
-	User    string    `json:"user"`
-	Message string    `json:"message"`
-	Created time.Time `json:"created"`
-	Tag     string    `json:"tag"`
+    User    string    `json:"user"`
+    Message string    `json:"message"`
+    Created time.Time `json:"created"`
+    Tag     string    `json:"tag"`
 }
+
+const (
+    ChatIndex = "Chat"
+)
 
 func main() {
-	esURL := "http://localhost:9200"
-	ctx := context.Background()
-	client, err := elastic.NewClient(
-		elastic.SetURL(esURL),
-		elastic.SetSniff(false),
-	)
-	if err != nil {
-		panic(err)
-	}
+    esUrl := "http://localhost:9200"
+    ctx := context.Background()
 
-	boolQuery := elastic.NewBoolQuery()
-	//messageに「テスト」もしくは「勉強」を含み、user01のメッセージ以外を検索
-	boolQuery.Should(
-		elastic.NewMatchQuery("message", "テスト"),
-		elastic.NewMatchQuery("message", "試験"),
-	)
-	boolQuery.MustNot(elastic.NewTermQuery("user", "user01"))
-	results, err := client.Search().Index("chat").Query(boolQuery).Do(ctx)
-	if err != nil {
-		panic(err)
-	}
+    client, err := elastic.NewClient(
+        elastic.SetURL(esUrl),
+    )
+    if err != nil {
+        panic(err)
+    }
 
-	var chattype Chat
-	for _, chat := range results.Each(reflect.TypeOf(chattype)) {
-		if c, ok := chat.(Chat); ok {
-			fmt.Printf("Chat message is: %s \n", c.Message)
-		}
-	}
+    boolQuery := elastic.NewBoolQuery()
+	//messageに「テスト」もしくは「勉強」を含み、tag01以外をもつドキュメントを検索
+    boolQuery.Sould(elastic.NewMatchQuery("message", "テスト"), elastic.NewMatchQuery("message", "勉強"))
+    boolQuery.MustNot(elastic.NewTermQuery("tag", "tag01")
+    results, err := client.Search().Index("chat").Query(termQuery).Do(ctx)
+    if err != nil {
+        panic(err)
+    }
+
+    var chattype Chat
+    for _, chat := range results.Each(reflect.TypeOf(chattype)) {
+        if c, ok := chat.(Chat); ok {
+            fmt.Printf("Chat message is: %s \n", c.Message)
+        }
+    }
+
 }
-
 //}
 
 
-実行すると以下のドキュメントがヒットします。
+実行するとtag01をもつ以下のドキュメントがヒットします。(ファイル名をmain.goとして保存しています。)
 
 
 //cmd{
-# go run bool_query.go
+# go run main.go
 Cnat message is: あと十年あれば期末テストもきっと満点がとれたんだろうな
 //}
 
@@ -1094,7 +1114,7 @@ func main() {
 === Multi Fields
 
 
-ulti Fields機能を利用することで一つのフィールドに対して異なるデータ型やAnalyze設定を指定することができます。
+Multi Fields機能を利用することで一つのフィールドに対して異なるデータ型やAnalyze設定を指定することができます。
 といってもすぐにピンとこないかもしれませんので、実際にMulti Fieldsの設定をしているMapping定義をみていきましょう。
 
 
