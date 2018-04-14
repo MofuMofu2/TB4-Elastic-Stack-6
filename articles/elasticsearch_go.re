@@ -1027,12 +1027,12 @@ Cnat message is: あと十年あれば期末テストもきっと満点がとれ
  ** Elasticsearchが提供しているページング機能です。limit&offsetと違い、検索時のスナップショットを保持し、カーソルを利用してページの取得をおこないます。
  * Multi Fields
  ** Multi Fieldsタイプを指定することで1つのフィールドに対してデータ型やAnalyze設定が異なる複数のフィールドを保持することができます。
- * Alias
- ** インデックスに別名をつけてアクセスすることができる機能です。任意の検索条件を指定したエイリアスも作成することが可能で、RDBのビューのような機能も利用できます。
  * エラーハンドリング
+ ** olivere/elasticを使った際のエラーハンドリングの方法について説明します。
 
 
 利用するIndexは「検索の基本」で作成したものを引き続き利用します。
+
 
 === Scroll API
 
@@ -1043,51 +1043,73 @@ Scroll APIを利用することで、スクロールタイプのページング�
 使い方はとても簡単で、@<code>{elastic.ScrollService}を介して操作することができます。
 
 
-//list[elasticsearch-list16][Scroll APIを利用した検索]{
+//list[elasticsearch-list16][Scroll APIを利用した検索(scroll_api.go)]{
+
 package main
 
 import (
-    "context"
-    "time"
+	"context"
+	"fmt"
+	"reflect"
+	"time"
 
-    "github.com/olivere/elastic"
+	"github.com/olivere/elastic"
 )
 
 type Chat struct {
-    User    string    `json:"user"`
-    Message string    `json:"message"`
-    Created time.Time `json:"created"`
-    Tag     string    `json:"tag"`
+	User    string    `json:"user"`
+	Message string    `json:"message"`
+	Created time.Time `json:"created"`
+	Tag     string    `json:"tag"`
 }
-
-const (
-    ChatIndex = "Chat"
-)
 
 func main() {
-    esUrl := "http://localhost:9200"
-    ctx := context.Background()
-
-    client, err := elastic.NewClient(
-        elastic.SetURL(esUrl),
-    )
-    if err != nil {
-        panic(err)
-    }
+	esURL := "http://localhost:9200"
+	ctx := context.Background()
+	client, err := elastic.NewClient(
+		elastic.SetURL(esURL),
+		elastic.SetSniff(false),
+	)
+	if err != nil {
+		panic(err)
+	}
 
 	//messageに「テスト」が含まれるドキュメントを検索
-    matchQuery := elastic.NewMatchQuery("message", "テスト")
-    results, err := client.Scroll("chat").Query(matchQuery).Size(1).Do(ctx)
-    if err != nil {
-        panic(err)
-    }
+	matchQuery := elastic.NewMatchQuery("message", "テスト")
+	results, err := client.Scroll("chat").Query(matchQuery).Size(1).Do(ctx)
+	if err != nil {
+		panic(err)
+	}
 
-	//先ほどの取得結果resutlsからスクロールIDを取得し、検索時に渡すことで前回検索結果の続きから取得が可能
-    nextResults, err := client.Scroll("chat").Query(matchQuery).Size(1).ScrollId(results.ScrollId).Do(ctx)
-    if err != nil {
-        panic(err)
-    }
+	var chatType Chat
+	for _, chat := range results.Each(reflect.TypeOf(chatType)) {
+		if c, ok := chat.(Chat); ok {
+			fmt.Printf("Chat message is: %s \n", c.Message)
+		}
+	}
+
+	//さきほどの検索結果からスクロールIDを取得し、前回検索結果の続きからを取得
+	nextResults, err := client.Scroll("chat").Query(matchQuery).Size(1).ScrollId(results.ScrollId).Do(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, chat := range nextResults.Each(reflect.TypeOf(chatType)) {
+		if c, ok := chat.(Chat); ok {
+			fmt.Printf("Scrolled message is: %s \n", c.Message)
+		}
+	}
 }
+
+//}
+
+
+実行してみるとmessageに「テスト」を含む2つのドキュメントがヒットしますが、スクロールAPIを利用しSize(1)で取得しているため、次のように出力されます。
+
+//cmd{
+# go run term_query.go
+Chat message is: 明日は期末テストがあるけどなんにも勉強してない.... 
+Scrolled message is: あと十年あれば期末テストもきっと満点がとれたんだろうな 
 //}
 
 
@@ -1126,50 +1148,6 @@ userフィールドのtypeにmulti_fieldを指定しています。以下のよ�
 
 
 インデクシングする際はuserフィールドにのみ投入すればOKです。
-
-
-=== Alias
-
-
-AliasはIndexに別名をつけてアクセスすることができる機能です。任意の検索条件を指定したエイリアスも作成することが可能で、RDBのビューのような機能も利用できます。
-@<code>{Elastic:An Elasticsearch client for the Go}ではAliasServiceを経由して操作することができます。
-
-
-//list[elasticsearch-list18][AliasServiceを利用してIndexを操作]{
-package main
-
-import (
-    "context"
-    "time"
-
-    "github.com/olivere/elastic"
-)
-
-const (
-    ChatIndex = "Chat"
-)
-
-func main() {
-    esUrl := "http://localhost:9200"
-    ctx := context.Background()
-
-    client, err := elastic.NewClient(
-        elastic.SetURL(esUrl),
-    )
-    if err != nil {
-        panic(err)
-    }
-
-    termQuery := elastic.NewTermQuery("user", "山田")
-
-  //chatインデックスに対してchat-aliasインデックスを作成
-    client.Alias().Add("chat", "chat-alias").Do(ctx)
-  //chatインデックスのmessageに山田だけが含まれるcaht-yamada-message-onlyエイリアスを作成
-    client.Alias().AddWithFilter("chat", "chat-yamada-message-only", termQuery).Do(ctx)
-  //chat-aliasエイリアスを削除
-    client.Alias().Remove("chat", "chat-alias").Do(ctx)
-}
-//}
 
 
 === エラーハンドリング
