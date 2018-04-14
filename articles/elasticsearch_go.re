@@ -1157,8 +1157,9 @@ Multi Fields機能を利用することで一つのフィールドに対して�
 
 
 userフィールドのtypeにmulti_fieldを指定しています。以下のようにフィールドを指定して操作することができます。
+
  * user： type textが適用されているuserフィールドにアクセスします
- * user.keyword：type keywordが適用されちえるフィールドにアクセスします
+ * user.keyword：type keywordが適用されうるフィールドにアクセスします
 
 ドキュメントを登録する際にはこれまで通りuserフィールドを明示して登録するだけでよいです。
 
