@@ -23,13 +23,15 @@ docker pull docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 //}
 
 
-Dockerイメージが起動できるかを確認します。本書では後半でElasticsearchの外部プラグインをインストールします。
+Dockerイメージが起動できるかを確認します。この章の後半でElasticsearchの外部プラグインをインストールします。
 Dockerイメージは停止するとイメージ内のデータは消えてしまいます。そのため本書ではインストールしたプラグインを保存する先としてpluginsディレクトリを作成し、
 Dockerイメージの起動時にマウントさせて利用します。ローカルPC上に作成したpluginsディレクトリが存在する場所でDockerイメージの起動をおこなってください。
 
 
 //list[elasticsearch-list02][Dockerイメージの起動]{
-docker run -p 9200:9200  -e "discovery.type=single-node" -e "network.publish_host=localhost" -v plugins:/usr/share/elasticsearch/plugins
+docker run -p 9200:9200  -e "discovery.type=single-node" -e （紙面の都合で改行）
+"network.publish_host=localhost"（紙面の都合で改行）
+-v plugins:/usr/share/elasticsearch/plugins（紙面の都合で改行）
 （紙面の都合により改行）docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 //}
 
@@ -59,21 +61,21 @@ curl http://localhost:9200
 //cmd{
 
 # curl http://localhost:9200
-{                                      
-  "name" : "7JNxM8W",                  
-  "cluster_name" : "docker-cluster",   
-  "cluster_uuid" : "uaHKm_QGR6yzRCbH87JIcA",                                  
-  "version" : {                        
-    "number" : "6.2.2",                
-    "build_hash" : "10b1edd",          
-    "build_date" : "2018-02-16T19:01:30.685723Z",                             
-    "build_snapshot" : false,          
-    "lucene_version" : "7.2.1",        
-    "minimum_wire_compatibility_version" : "5.6.0",                           
-    "minimum_index_compatibility_version" : "5.0.0"                           
-  },                                   
-  "tagline" : "You Know, for Search"   
-}       
+{
+  "name" : "7JNxM8W",
+  "cluster_name" : "docker-cluster",
+  "cluster_uuid" : "uaHKm_QGR6yzRCbH87JIcA",
+  "version" : {
+    "number" : "6.2.2",
+    "build_hash" : "10b1edd",
+    "build_date" : "2018-02-16T19:01:30.685723Z",
+    "build_snapshot" : false,
+    "lucene_version" : "7.2.1",
+    "minimum_wire_compatibility_version" : "5.6.0",
+    "minimum_index_compatibility_version" : "5.0.0"
+  },
+  "tagline" : "You Know, for Search"
+}
 
 //}
 
@@ -245,29 +247,29 @@ curl -XGET 'http://localhost:9200/<Index名>/_mapping/<Type名>?pretty'
 
 
 //list[elasticsearch-list07][Go言語を用いてElasticsearchに接続する]{
-package main                           
+package main
 
-import (                               
-        "context"                      
-        "fmt"                          
+import (
+        "context"
+        "fmt"
 
-        "github.com/olivere/elastic"   
-)                                      
+        "github.com/olivere/elastic"
+)
 
-func main() {                          
-        esURL := "http://localhost:9200"                                      
-        ctx := context.Background()    
+func main() {
+        esURL := "http://localhost:9200"
+        ctx := context.Background()
 
-        client, err := elastic.NewClient(                                     
-                elastic.SetURL(esURL), 
-        )                              
-        if err != nil {                
-                panic(err)             
-        }                              
+        client, err := elastic.NewClient(
+                elastic.SetURL(esURL),
+        )
+        if err != nil {
+                panic(err)
+        }
 
-        info, code, err := client.Ping(esURL).Do(ctx)                         
-        fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)                                                       
-}                                      
+        info, code, err := client.Ping(esURL).Do(ctx)
+        fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)
+}
 //}
 
 
@@ -1112,8 +1114,8 @@ func main() {
 
 //cmd{
 # go run term_query.go
-Chat message is: 明日は期末テストがあるけどなんにも勉強してない.... 
-Scrolled message is: あと十年あれば期末テストもきっと満点がとれたんだろうな 
+Chat message is: 明日は期末テストがあるけどなんにも勉強してない....
+Scrolled message is: あと十年あれば期末テストもきっと満点がとれたんだろうな
 //}
 
 
