@@ -1116,7 +1116,7 @@ Scrolled message is: あと十年あれば期末テストもきっと満点が�
 === Multi Fields
 
 
-ulti Fields機能を利用することで一つのフィールドに対して異なるデータ型やAnalyze設定を指定することができます。
+Multi Fields機能を利用することで一つのフィールドに対して異なるデータ型やAnalyze設定を指定することができます。
 といってもすぐにピンとこないかもしれませんので、実際にMulti Fieldsの設定をしているMapping定義をみていきましょう。
 
 
@@ -1143,11 +1143,10 @@ ulti Fields機能を利用することで一つのフィールドに対して異
 
 
 userフィールドのtypeにmulti_fieldを指定しています。以下のようにフィールドを指定して操作することができます。
- * user：Analyzeされていない
- * user.analyzed：Analyzeされている
+ * user： type textが適用されているuserフィールドにアクセスします
+ * user.analyzed：type keywordが適用されちえるフィールドにアクセスします
 
-
-インデクシングする際はuserフィールドにのみ投入すればOKです。
+ドキュメントを登録する際にはこれまで通りuserフィールドを明示して登録するだけでよいです。
 
 
 === エラーハンドリング
