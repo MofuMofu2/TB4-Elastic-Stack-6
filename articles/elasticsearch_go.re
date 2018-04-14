@@ -1179,7 +1179,7 @@ query := elastic.NewMatchQuery("message.keyword", "テスト")
 //list[elasticsearch-list19][エラーハンドリング]{
  err := client.IndexExists("chat").Do()
 if err != nil {
-    // Get *elastic.Error which contains additional information
+    // *elastic.Errorかどうかを判別
     e, ok := err.(*elastic.Error)
     if !ok {
         //エラーハンドリングを記載
