@@ -56,25 +56,26 @@ curl http://localhost:9200
 
 //cmd{
 # curl http://localhost:9200
-{
-  "name" : "TiaRqEF",
-  "cluster_name" : "docker-cluster",
-  "cluster_uuid" : "JMepnQSwQaGmI3fStZ_YTA",
-  "version" : {
-    "number" : "6.0.0",
-    "build_hash" : "8f0685b",
-    "build_date" : "2017-11-10T18:41:22.859Z",
-    "build_snapshot" : false,
-    "lucene_version" : "7.0.1",
-    "minimum_wire_compatibility_version" : "5.6.0",
-    "minimum_index_compatibility_version" : "5.0.0"
-  },
-  "tagline" : "You Know, for Search"
-}
+{                                      
+  "name" : "7JNxM8W",                  
+  "cluster_name" : "docker-cluster",   
+  "cluster_uuid" : "uaHKm_QGR6yzRCbH87JIcA",                                  
+  "version" : {                        
+    "number" : "6.2.2",                
+    "build_hash" : "10b1edd",          
+    "build_date" : "2018-02-16T19:01:30.685723Z",                             
+    "build_snapshot" : false,          
+    "lucene_version" : "7.2.1",        
+    "minimum_wire_compatibility_version" : "5.6.0",                           
+    "minimum_index_compatibility_version" : "5.0.0"                           
+  },                                   
+  "tagline" : "You Know, for Search"   
+}       
 //}
 
 
 ElasticsearchのDockerイメージの起動オプションなどはDockerHubのドキュメント（@<href>{https://hub.docker.com/_/elasticsearch/}）に記載があります。
+
 
 == クライアントライブラリの選定
 
@@ -88,11 +89,13 @@ Elastic社の公式クライアント@<href>{https://github.com/elastic/go-elast
 
 それではクライアントをインストールしましょう。
 今回はgo getでインストールしますが、実際のプロダクト利用時はdepなどのパッケージ管理ツールの利用をおすすめします。
+なおGoのインストール及びGOPATHの設定を事前にお願いします。
 
 
 //list[elasticsearch-list04][Elasticクライアントのインストール]{
 go get "github.com/olivere/elastic"
 //}
+
 
 == Elasticsearchでの準備
 
@@ -109,7 +112,6 @@ RDBMSで例えると以下に相当します。
 
  * Indexはスキーマ/データベース
  * Typeはテーブル
-
 
 
 と、このようにRDBMSで例えられることが多いのですが、TypeはElasticsearch 7系より廃止が予定されています。
@@ -239,30 +241,29 @@ curl -XGET 'http://localhost:9200/<Index名>/_mapping/<Type名>?pretty'
 
 
 //list[elasticsearch-list07][Go言語を用いてElasticsearchに接続する]{
-package main
+package main                           
 
-import (
-    "context"
-    "fmt"
+import (                               
+        "context"                      
+        "fmt"                          
 
-    "github.com/olivere/elastic"
-)
+        "github.com/olivere/elastic"   
+)                                      
 
-func main() {
-    esUrl := "http://localhost:9200"
-    ctx := context.Background()
+func main() {                          
+        esURL := "http://localhost:9200"                                      
+        ctx := context.Background()    
 
-    client, err := elastic.NewClient(
-        elastic.SetURL(esUrl),
-    )
-    if err != nil {
-        panic(err)
-    }
+        client, err := elastic.NewClient(                                     
+                elastic.SetURL(esURL), 
+        )                              
+        if err != nil {                
+                panic(err)             
+        }                              
 
-    info, code, err := client.Ping(esUrl).Do(ctx)
-    fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)
-
-}
+        info, code, err := client.Ping(esURL).Do(ctx)                         
+        fmt.Printf("Elasticsearch returned with code %d and version %s\n", code, info.Version.Number)                                                       
+}                                      
 //}
 
 
@@ -277,7 +278,7 @@ Elasticsearchのバージョン情報といったシステム情報を取得す�
 
 //list[elasticsearch-list08][Elasticsearchのバージョン情報を問い合わせる]{
 $ go run hello_elasticsearch.go
-Elasticsearch returned with code 200 and version 6.0.0
+Elasticsearch returned with code 200 and version 6.2.2
 //}
 
 
@@ -325,50 +326,55 @@ IDの振り方には登録時にクライアント側で設定するか、Elasti
 今回は登録時にクライアント側でドキュメントIDを指定します。
 さきほど作成したクライアントセッションを利用して操作をおこなっていきましょう。
 
-//list[elasticesearch-list08][クライアント側でドキュメントIDを付与する]{
+//list[elasticesearch-list08][クライアント側でドキュメントIDを付与する(index.go)]{
 package main
 
 import (
-    "context"
-    "time"
+        "context"
+        "fmt"
+        "time"
 
-    "github.com/olivere/elastic"
+        "github.com/olivere/elastic"
 )
 
 type Chat struct {
-    User    string    `json:"user"`
-    Message string    `json:"message"`
-    Created time.Time `json:"created"`
-    Tag     string    `json:"tag"`
+        User    string    `json:"user"`
+        Message string    `json:"message"`
+        Created time.Time `json:"created"`
+        Tag     string    `json:"tag"`
 }
-
-const (
-    ChatIndex = "Chat"
-)
 
 func main() {
-    esUrl := "http://localhost:9200"
-    ctx := context.Background()
+        esURL := "http://localhost:9200"
+        ctx := context.Background()
+        client, err := elastic.NewClient(
+                elastic.SetURL(esURL),
+        )
+        if err != nil {
+                panic(err)
+        }
 
-    client, err := elastic.NewClient(
-        elastic.SetURL(esUrl),
-    )
-    if err != nil {
-        panic(err)
-    }
+        //登録するドキュメントを作成
+        chatData := Chat{
+                User:    "user01",
+                Message: "test message",
+                Created: time.Now(),
+                Tag:     "tag01",
+        }
 
-    chatData := Chat{
-        User:    "user01",
-        Message: "test message",
-        Created: time.Now(),
-        Tag:     "tag01",
-    }
-
-    _, err = client.Index().Index("chat").Type("chat").Id("1").BodyJson(&chatData).Do(ctx)
-    if err != nil {
-        panic(err)
-    }
+        //ドキュメントIDを1として登録
+        indexedDoc, err := client.Index().Index("chat").Type("chat").Id("1").BodyJson(&chatData).Do(ctx)
+        if err != nil {
+                panic(err)
+        }
+        fmt.Printf("Index/Type: %s/%sへドキュメント(ID: %s)が登録されました\n", indexedDoc.Index, indexedDoc.Type, indexedDoc.Id)
 }
+//}
+
+
+//cmd{
+$ go run index.go
+Index/Type: chat/chatへドキュメント(ID: 1)が登録されました
 //}
 
 
@@ -379,36 +385,58 @@ func main() {
 @<code>{Elastic:An Elasticsearch client for the Go}では取得したドキュメントはStrucrtに保存し直し、そのStructのフィールドを経由してデータを取得できます。
 
 
-//list[elasticsearch-list09][ドキュメントの取得]{
+//list[elasticsearch-list09][ドキュメントの取得(get.go)]{
+
+package main
+
+import (
+        "context"
+        "encoding/json"
+        "fmt"
+        "time"
+
+        "github.com/olivere/elastic"
+)
 
 type Chat struct {
-  User string `json:"user"`,
-  Message string `json:"message"`
-  Created time.Time `json:"created"`
-  Tag string `json:"tag"`
+        User    string    `json:"user"`
+        Message string    `json:"message"`
+        Created time.Time `json:"created"`
+        Tag     string    `json:"tag"`
 }
 
 func main() {
-  esEndpoint := "http://localhost:9200"
-  ctx := context.Background()
+        esURL := "http://localhost:9200"
+        ctx := context.Background()
 
-  client, err := elastic.NewClient(
-    elastic.SetURL(esUrl),
-  )
-  if err != nil {
-    panic(err)
-  }
+        client, err := elastic.NewClient(
+                elastic.SetURL(esURL),
+        )
+        if err != nil {
+                panic(err)
+        }
 
-  document, err := client.Get().Index("chat").Type("chat").Id("1").Do(ctx)
-  if err != nil {
-    panic(err)
-  }
+        document, err := client.Get().Index("chat").Type("chat").Id("1").Do(ctx)
+        if err != nil {
+                panic(err)
+        }
 
-  if document.Found {
-  	fmt.Printf("Document ID is %s", document.Id)
-  }
+        if document.Found {
+                var chat Chat
+                err := json.Unmarshal(*document.Source, &chat)
+                if err != nil {
+                        fmt.Println(err)
+                }
+
+                fmt.Printf("Message:<%s> created by %s \n", chat.Message, chat.User)
+        }
 }
+//}
 
+
+//cmd{
+$ go run get.go
+Message:<test message> created by user01
 //}
 
 
@@ -419,44 +447,48 @@ func main() {
 登録したドキュメントを、@<code>{ドキュメントID}を指定して取得します。
 
 
-//list[elasticsearch-list10][ドキュメントの削除]{
+//list[elasticsearch-list10][ドキュメントの削除(delete.go)]{
 package main
 
 import (
-    "context"
-    "time"
+        "context"
+        "fmt"
+        "time"
 
-    "github.com/olivere/elastic"
+        "github.com/olivere/elastic"
 )
 
 type Chat struct {
-    User    string    `json:"user"`
-    Message string    `json:"message"`
-    Created time.Time `json:"created"`
-    Tag     string    `json:"tag"`
+        User    string    `json:"user"`
+        Message string    `json:"message"`
+        Created time.Time `json:"created"`
+        Tag     string    `json:"tag"`
 }
-
-const (
-    ChatIndex = "Chat"
-)
 
 func main() {
-    esUrl := "http://localhost:9200"
-    ctx := context.Background()
+        esURL := "http://localhost:9200"
+        ctx := context.Background()
 
-    client, err := elastic.NewClient(
-        elastic.SetURL(esUrl),
-    )
-    if err != nil {
-        panic(err)
-    }
+        client, err := elastic.NewClient(
+                elastic.SetURL(esURL),
+        )
+        if err != nil {
+                panic(err)
+        }
 
-    //削除
-    _, err = client.Delete().Index("chat").Type("chat").Id("1").Do(ctx)
-    if err != nil {
-        panic(err)
-    }
+        deletedDoc, err := client.Delete().Index("chat").Type("chat").Id("1").Do(ctx)
+        if err != nil {
+                panic(err)
+        }
+
+        fmt.Println(deletedDoc.Result)
 }
+//}
+
+
+//cmd{
+$ go run delete.go
+deleted
 //}
 
 
