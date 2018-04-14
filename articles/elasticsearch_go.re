@@ -23,11 +23,13 @@ docker pull docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 //}
 
 
-Dockerイメージが起動できるかを確認します。
+Dockerイメージが起動できるかを確認します。本書では後半でElasticsearchの外部プラグインをインストールします。
+Dockerイメージは停止するとイメージ内のデータは消えてしまいます。そのため本書ではインストールしたプラグインを保存する先としてpluginsディレクトリを作成し、
+Dockerイメージの起動時にマウントさせて利用します。ローカルPC上に作成したpluginsディレクトリが存在する場所でDockerイメージの起動をおこなってください。
 
 
 //list[elasticsearch-list02][Dockerイメージの起動]{
-docker run -p 9200:9200  -e "discovery.type=single-node" -e "network.publish_host=localhost"
+docker run -p 9200:9200  -e "discovery.type=single-node" -e "network.publish_host=localhost" -v plugins:/usr/share/elasticsearch/plugins
 （紙面の都合により改行）docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 //}
 
