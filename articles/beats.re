@@ -534,9 +534,8 @@ CPUやメモリ、プロセスの状態がDashboardに描画されています�
 //image[metricbeat03][MetricbeatのDashboard]{
 //}
 
-このようにサーバやコンテナなどにMetricbeatを導入することで一元的にサーバの状態をモニタリングすることができます。
-最後に、監査ログを容易に取り込むためのAuditbeatについてみていきます。
-
+サーバやコンテナなどにMetricbeatを導入すると、Kibanaを利用してサーバの状態をモニタリングすることができます。
+KibanaのDashboardだけで全てのサーバの状態が参照できるので、運用コストを下げることが可能です。
 
 == Auditbeat
 
