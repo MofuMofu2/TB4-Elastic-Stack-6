@@ -273,8 +273,7 @@ DRY-RUNのオプションをつけて、Curatorを実行します。
 curator --dry-run ~/.curator/close_indices.yml
 //}
 
-DRY-RUNでログの実行結果を確認します。
-close対象のindexがログの結果からわかります。
+ログの実行結果から、close対象のindexを確認します。
 
 
 //list[curator-18][ログの確認]{
