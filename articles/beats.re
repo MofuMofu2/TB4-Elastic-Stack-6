@@ -2,15 +2,11 @@
 = Beats
 
 
-Beatsは、シンプルなデータ取り込みツールです。
-あれ？Logstashは？と思う方もいると思いますが、Logstashは、豊富な機能を持ってます。
-改めてLogstashの役割を説明すると、様々なデータソースからデータを取得し、意味のあるフィールドに変換し、指定のOutput先にストリーミング処理をします。
-このことからETLとしてLogstashが必要な機能を持っているということがわかるかと思います。
-ではなぜ、LogstashだけでなくBeatsが登場したかというと、パフォーマンス問題を抱えていたためです。
-Logstashは、複数のパイプラインや高度なフィルタリングを施すことができますが、その分メモリを多く消費します。
-そこで軽量で手軽に導入できるBeatsが登場しました。
-何が手軽かというと、設定ファイルがYAMLで全て完結するのです。
-しかも、設定箇所も複数存在するわけではなく、最低限の設定で十分な機能を提供します。
+Beatsはデータを取得することに重きを置いたツールです。
+Logstashは複数のパイプラインや高度なフィルタリングを行うことが可能ですが、その分メモリを多く消費します。
+そこで、軽量で手軽に導入できるBeatsが登場しました。
+
+Beatsの設定ファイルはYAMLで全て完結します。よって、手軽に設定・動作させることが可能なのです。
 
 
 == Beats Family
@@ -50,7 +46,7 @@ Logstashに転送することでログを集約することができます。
 Moduleについては、後ほど説明します。
 
 
-それでは、Filebeatでデータを取得し、Logstashに転送し、Elasticsaerchに保存するところまでをみていきたいと思います。
+それではFilebeatでデータを取得し、Elasticsaerchに保存するところまでの一連の流れをみていきます。
 
 
 === Filebeatの構成について
@@ -109,7 +105,7 @@ tail -f /var/log/nginx/access.log
 
 === FilebeatからLogstashへ転送
 
-ここからはFilebeatがNginxのアクセスログを取得し、Logstashに転送し、LogstashがElasticsearchに取り込む設定を行なっていきます。
+次はFilebeatでNginxのアクセスログを取得し、Logstashへデータ転送をする設定を行います。
 
 
 ==== FilebeatとLogstashの設定
@@ -153,7 +149,10 @@ Filebeatで取得したNginxのアクセスログは、フィールド分割さ�
 
 //list[beats-06][パターンファイルの作成]{
 vim /etc/logstash/patterns/nginx_patterns
-NGINX_ACCESS_LOG %{IPORHOST:client_ip} (?:-|(%{WORD}.%{WORD})) %{USER:ident} \[%{HTTPDATE:date}\] "(?:%{WORD:verb} %{NOTSPACE:request}(?: HTTP/%{NUMBER:ver})?|%{DATA:rawrequest})" %{NUMBER:response} (?:%{NUMBER:bytes}|-) %{QS:referrer} %{QS:agent} %{QS:forwarder}
+NGINX_ACCESS_LOG %{IPORHOST:client_ip} (?:-|(%{WORD}.%{WORD})) （紙面の都合により改行）
+%{USER:ident} \[%{HTTPDATE:date}\] "(?:%{WORD:verb} （紙面の都合により改行）
+%{NOTSPACE:request}(?: HTTP/%{NUMBER:ver})?|%{DATA:rawrequest})"（紙面の都合により改行）
+%{NUMBER:response} (?:%{NUMBER:bytes}|-) %{QS:referrer} %{QS:agent} %{QS:forwarder}
 //}
 
 パイプラインファイルを作成します。
@@ -230,15 +229,14 @@ Outputは、@<chapref>{logstash}の設定と同様です。
   pipeline.batch.size: 125
   path.config: "/etc/logstash/conf.d/filebeat.cfg"
   pipeline.workers: 1
-//}  
+//}
 
 これでFilebeatとLogstashの環境が整いました。
-Filebeatから起動してしまうと転送先のLogstashにBeats設定が反映されていないため、エラーになります。
+Filebeatから起動すると、LogstashがFilebeatからデータを受け付ける設定が反映されていないため、エラーになってしまいます。
 そのため、Logstashから起動します。
 
 //list[beats-11][Logstashの起動]{
 sudo initctl start logstash
-logstash start/running, process 3845
 //}
 
 Filebeatを起動します。
@@ -246,22 +244,24 @@ Filebeatを起動します。
 
 //list[beats-12][Filebeatの起動]{
 sudo initctl start logstash
-logstash start/running, process 3845
 //}
 
 
 === 動作確認
 
-Elasticsearchにインデクシングされているかを確認します。
-想定通り取り込まれていることがわかります。
 
-Elasticsearchにデータが転送されているか、curlを発行して確認します。
+Elasticsearchにデータが転送されているか、curlコマンドを利用して確認します。
 以下のように@<code>{logstash-YYYY.MM.dd}で出力されていれば正常に保存されています。
 
 //list[beats-13][Filebeatの起動]{
 curl -XGET localhost:9200/_cat/indices/logstash*
+//}
+
+//cmd{
+curl -XGET localhost:9200/_cat/indices/logstash*
 yellow open logstash-2018.04.10 fzIOfXzOQK-p0_mmvO7wrw 5 1 8 0 93.2kb 93.2kb
 //}
+
 
 補足ですが、ステータスが"yellow"になっているのは、ノードが冗長化されていないため表示されています。
 今回は、1ノード構成のため"yellow"になってしまうので、無視してください。
@@ -373,7 +373,7 @@ Output先をElasticsearchに変更しています。
 #-------------------------- Elasticsearch output -------------------------------
 output.elasticsearch:
   enabled: true
-  
+
   hosts: ["localhost:9200"]
 //}
 
