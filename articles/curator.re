@@ -396,7 +396,7 @@ cat /var/log/curator
 2018-xx-xx xx:xx:xx,xx INFO      Job completed.
 //}
 
-次にDRY-RUNを外して実行します。
+次にDRY-RUNオプションを外してCuratorを実行します。
 
 
 //list[curator-26][Curatorでclose実行]{
