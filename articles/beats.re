@@ -309,10 +309,8 @@ Filebeat Modulesは、パイプラインを自動で作成します。
 sudo service elasticsearch restart
 //}
 
-今回は@<code>{Nginx Module}を例にModuleを利用すると、どのくらい構築コストが減少するのかを検証します。
-@<chapref>{logstash}でKibanaをインストールしている環境を引き続き利用することを前提として
-話を進めますが、もし新しい環境で始める場合は@<chapref>{logstash}や@<chapref>{Kibana-visualize}を参考に
-環境構築を行ってください。
+@<chapref>{logstash}でKibanaをインストールしている環境を引き続き利用することを前提として話を進めます。
+もし新しい環境でFilebeat Modulesを検証する場合、@<chapref>{logstash}や@<chapref>{Kibana-visualize}を参考に環境構築を行ってください。
 
 
 ==== Filebeat Modulesの設定
