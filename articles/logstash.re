@@ -1047,49 +1047,30 @@ Kibanaにアクセスするため、ブラウザを起動し、以下のIPアド
 http:"Global_IP":5601
 //}
 
-詳しい操作方法は@<chapref>{Kibana-visualize}も参照してください。
+紙面の都合上、画面キャプチャを載せていません。
+詳しい操作方法は@<chapref>{Kibana-visualize}を合わせて参照してください。
 
 Kibanaのトップページが開きますので、左ペインの@<code>{Management}をクリックしてください。
 また、@<code>{Collapse}をクリックすることで、サイドバーを縮小することができます。
-
-
-//image[kibana01][Managementへ遷移][scale=0.7]{
-//}
-
-@<code>{Index Patterns}をクリックします。
-
-//image[kibana02][Indexの設定][scale=0.7]{
-//}
-
+@<code>{Index Patterns}をクリックし、Indexを選択します。
 
 indexパターンを指定せずにElasticsearchに取り込んでいるため、@<code>{logstash-YYYY.MM.DD}のパターンで取り込まれます。
 そのため、@<code>{Define index pattern}の欄に@<code>{logstash-*}と入力します。
 
-//image[kibana03][Indexを選択][scale=0.7]{
-//}
-
 @<code>{Success! Your index pattern matches 1 index.}と表示されたことを確認し、@<code>{Next step}をクリックします。
 
-//image[kibana04][Indexが選択できたことの確認][scale=0.7]{
-//}
 
 @<code>{Time Filter field name}に@<code>{@timestamp}を選択し、@<code>{Create index pattern}をクリックします。
 
-//image[kibana05][Indexの作成][scale=0.7]{
-//}
+これでindexパターンの登録が完了した後、左ペインの@<code>{Discover}をクリックします。
 
-これでindexパターンの登録が完了したので、KibanaからElasticsearchのindexをビジュアライズする準備が整いました。
-左ペインの@<code>{Discover}をクリックします。
-
-//image[kibana06][Discover][scale=0.7]{
+//image[kibana07][Indexのセットアップを行い、Discoverに遷移した状態][scale=0.7]{
 //}
 
 あれ？@<code>{No results found}と画面に表示されており、取り込んだログがビジュアライズされてないですね。
 なぜかと言うと、時刻のデフォルト設定は、@<code>{Last 15 minutes}のため、現在時刻から15分前までの時間がサーチ対象となっているからです。
 今回取り込んだログの時刻が@<code>{2016-08-10T23:39:43}のため、該当する時間でサーチをかける必要があります。
 
-//image[kibana07][No results found画面][scale=0.7]{
-//}
 
 それでは、検索する時間を変更したいため、@<code>{Last 15 minutes}をクリックします。
 クリックすると、@<code>{Time Range}が表示されるので、@<code>{Absolute}をクリックし、以下を入力します。
