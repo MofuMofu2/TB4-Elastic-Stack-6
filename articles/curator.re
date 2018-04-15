@@ -267,7 +267,7 @@ actions:
 //}
 
 
-それではDRY-RUNで実行します。
+DRY-RUNのオプションをつけて、Curatorを実行します。
 
 //list[curator-17][CuratorをDRY-RUNでClose実行]{
 curator --dry-run ~/.curator/close_indices.yml
