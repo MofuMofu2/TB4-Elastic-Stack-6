@@ -83,7 +83,7 @@ Elasticsearchから取得しますし、グラフの描画はGUIを用いて行�
 しかし、せっかくElasticsearchに投入されているデータが大量にあるのですから、それをより詳しく分析したいですよね。ということで、ベータ版ではありますがKibanaのGUIから
 Vegaの機能を呼び出して利用できるようになりました。それがVisualize画面のVegaです。
 
-//image[kibana02-vega01][Vega]{
+//image[kibana02-vega01][Vega][scale=0.7]{
 //}
 
 
@@ -99,7 +99,7 @@ Vegaの機能を呼び出して利用できるようになりました。それ�
 @<chapref>{elasticsearch_go}の章ではコンソール上で直接ElasticsearchにQueryを発行していました。
 しかし、KibanaのGUIには@<code>{Dev Tools}という画面があります。これがすんばらしいのです。
 
-//image[kibana02-devtools01][Dev Toolsの画面]{
+//image[kibana02-devtools01][Dev Toolsの画面][scale=0.7]{
 //}
 
 
@@ -116,7 +116,7 @@ curl -XGET localhost:9200/_cat/indices/logstash-*
 
 でも、Kibanaの@<code>{Dev Tools}で同じように記載しようとすると…？
 
-//image[kibana02-devtools02][Queryの入力予測が出力される]{
+//image[kibana02-devtools02][Queryの入力予測が出力される][scale=0.7]{
 //}
 
 @<img>{kibana02-devtools02}のように、Queryの入力予測が画面に表示されます。
@@ -124,13 +124,13 @@ curl -XGET localhost:9200/_cat/indices/logstash-*
 
 Queryを発行するためには緑の@<code>{▶︎}ボタンをクリックします。
 
-//image[kibana02-devtools03][Queryを発行した状態]{
+//image[kibana02-devtools03][Queryを発行した状態][scale=0.7]{
 //}
 
 
 jsonで値が帰ってくる場合、自動でシンタックスハイライトが適用されているので、可読性も高いです。
 
-//image[kibana02-devtools04][jsonでデータが返却されたとき]{
+//image[kibana02-devtools04][jsonでデータが返却されたとき][scale=0.7]{
 //}
 
 
@@ -148,13 +148,13 @@ jsonで値が帰ってくる場合、自動でシンタックスハイライト�
 なので、このChartの切り替え機能はとても便利でありがたみがあります。心意気と優しさが身にしみますね。@<img>{kibana02-chart01}・@<img>{kibana02-chart02}・
 @<img>{kibana02-chart03}は@<code>{Chart Type}の以外は全て同じ設定を利用しています。利用しているデータ・表示期間も同じです。
 
-//image[kibana02-chart01][折れ線グラフのとき]{
+//image[kibana02-chart01][折れ線グラフのとき][scale=0.7]{
 //}
 
-//image[kibana02-chart02][面グラフのとき]{
+//image[kibana02-chart02][面グラフのとき][scale=0.7]{
 //}
 
-//image[kibana02-chart03][棒グラフのとき]{
+//image[kibana02-chart03][棒グラフのとき][scale=0.7]{
 //}
 
 グラフの種別が異なるだけで、受ける印象が変わりますね。
@@ -164,7 +164,7 @@ Kibanaの良いところは気軽にグラフを作成・削除できること�
 
 と言われても…という印象でしょうか？まず画像をみてください。
 
-//image[kibana02-search01][検索窓にQuery Syntax例が入っているぞ]{
+//image[kibana02-search01][検索窓にQuery Syntax例が入っているぞ][scale=0.7]{
 //}
 
 これのことです。
