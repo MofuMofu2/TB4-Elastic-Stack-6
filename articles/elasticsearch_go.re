@@ -93,9 +93,11 @@ Elastic社の公式クライアント@<href>{https://github.com/elastic/go-elast
 今回は@<code>{Elastic:An Elasticsearch client for the Go}（@<href>{https://github.com/olivere/elastic}）を利用します。
 こちらのクライアントは開発も活発で、Elasticの早いバージョンアップにもいち早く対応されています。
 
+本書で扱う内容もolivere/elasticのGetting Started(@<href>{https://olivere.github.io/elastic/})をもとにしているため、より多くの機能の使い方などを知るためにもぜひこちらもご参照ください。
+
 それではクライアントをインストールしましょう。
 今回はgo getでインストールしますが、実際のプロダクト利用時はdepなどのパッケージ管理ツールの利用をおすすめします。
-なおGoのインストール及びGOPATHの設定を事前にお願いします。
+Goのインストール及びGOPATHの設定を事前にお願いします。
 
 
 //list[elasticsearch-list04][Elasticクライアントのインストール]{
