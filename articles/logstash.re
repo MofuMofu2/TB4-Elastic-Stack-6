@@ -1053,42 +1053,42 @@ Kibanaのトップページが開きますので、左ペインの@<code>{Manage
 また、@<code>{Collapse}をクリックすることで、サイドバーを縮小することができます。
 
 
-//image[kibana01][Managementへ遷移]{
+//image[kibana01][Managementへ遷移][scale=0.8]{
 //}
 
 @<code>{Index Patterns}をクリックします。
 
-//image[kibana02][Indexの設定]{
+//image[kibana02][Indexの設定][scale=0.8]{
 //}
 
 
 インデックスパターンを指定せずにElasticsearchに取り込んでいるため、@<code>{logstash-YYYY.MM.DD}のパターンで取り込まれます。
 そのため、@<code>{Define index pattern}の欄に@<code>{logstash-*}と入力します。
 
-//image[kibana03][Indexを選択]{
+//image[kibana03][Indexを選択][scale=0.8]{
 //}
 
 @<code>{Success! Your index pattern matches 1 index.}と表示されたことを確認し、@<code>{Next step}をクリックします。
 
-//image[kibana04][Indexが選択できたことの確認]{
+//image[kibana04][Indexが選択できたことの確認][scale=0.8]{
 //}
 
 @<code>{Time Filter field name}に@<code>{@timestamp}を選択し、@<code>{Create index pattern}をクリックします。
 
-//image[kibana05][Indexの作成]{
+//image[kibana05][Indexの作成][scale=0.8]{
 //}
 
 これでインデックスパターンの登録が完了したので、KibanaからElasticsearchのインデックスをビジュアライズする準備が整いました。
 左ペインの@<code>{Discover}をクリックします。
 
-//image[kibana06][Discover]{
+//image[kibana06][Discover][scale=0.8]{
 //}
 
 あれ？@<code>{No results found}と画面に表示されており、取り込んだログがビジュアライズされてないですね。
 なぜかと言うと、時刻のデフォルト設定は、@<code>{Last 15 minutes}のため、現在時刻から15分前までの時間がサーチ対象となっているからです。
 今回取り込んだログの時刻が@<code>{2016-08-10T23:39:43}のため、該当する時間でサーチをかける必要があります。
 
-//image[kibana07][No results found画面]{
+//image[kibana07][No results found画面][scale=0.8]{
 //}
 
 それでは、検索する時間を変更したいため、@<code>{Last 15 minutes}をクリックします。
@@ -1097,7 +1097,7 @@ Kibanaのトップページが開きますので、左ペインの@<code>{Manage
  * From: 2016-08-11 00:00:00.000
  * To: 2016-08-11 23:59:59.999
 
-//image[kibana08][時間の指定]{
+//image[kibana08][時間の指定][scale=0.8]{
 //}
 
 先ほどの@<code>{No results found}画面ではなく、バーが表示されていることがわかるかと思います。
