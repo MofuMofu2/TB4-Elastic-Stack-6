@@ -651,7 +651,7 @@ Character Filters	kuromoji_iteration_mark	踊り字を正規化 e.g) すゝめ�
 Tokenizer	kuromoji_tokenizer	日本語での形態素解析により文章をトークン化
 Token Filters	kuromoji_baseform	動詞など活用になりかわる言葉を原形に変更 e.g) 読め→読む
 Token Filters	kuromoji_part_of_speech	助詞など検索時に利用されない品詞を削除
-Token Filters	ja_stop	文章中に頻出するor検索で利用されることがない言葉を削除 e.g) あれ、それ
+Token Filters	ja_stop	文章中に頻出するor検索で利用されない言葉を削除 e.g) あれ、それ
 Token Filters	kuromoji_number	漢数字を数字に変更 e.g) 五->5
 Token Filters	kuromoji_stemmer	単語の末尾につく長音を削除 e.g) サーバー→サーバ
 //}
