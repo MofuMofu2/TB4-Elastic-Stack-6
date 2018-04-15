@@ -367,7 +367,7 @@ actions:
       unit_count: 5
 //}
 
-DRY-RUNで実行します。
+DRY-RUNオプションを利用して、Curatorを実行します。
 
 
 //list[curator-24][CuratorをDRY-RUNでOpen実行]{
