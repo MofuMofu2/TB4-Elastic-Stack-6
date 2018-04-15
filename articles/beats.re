@@ -438,10 +438,6 @@ Filebeat Modulesの機能によって、あらかじめDashboardが準備され�
 他にも取り込みたいログがあれば、@<code>{filebeat.yml}のModuleを追加するだけで容易にモニタリングができるようになります。
 追加する場合は、@<code>{filebeat.reference.yml}にModulesが記載されているので、コピー&ペーストして有効化してください。
 
-
-次は、サーバのリソースを容易にモニタリングすることを可能とするMetricbeatについて説明します。
-
-
 == Metricbeat
 
 Metricbeatは、サーバのリソース(CPU/Mem/process..など)を容易にモニタリングすることができます。
