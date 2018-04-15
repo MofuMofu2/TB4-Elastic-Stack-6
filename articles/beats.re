@@ -594,7 +594,7 @@ output.elasticsearch:
 //}
 
 
-設定が完了したので、Auditbeatを起動します。
+@<list>{beats-28}の準備ができた後、Auditbeatを起動します。
 
 
 //list[beats-29][Auditbeatの起動]{
@@ -602,7 +602,7 @@ sudo service auditbeat start
 //}
 
 
-データが取り込まれているかをKibanaを開いて確認します。
+Elasticsearchにデータが保存されているか確認します。
 ブラウザを開いてKibanaへアクセスします。
 
 @<code>{Index Patterns}の画面を開くとFilebeatのインデックスパターンの他にAuditbeatのインデックスパターンがあることがわかります。
