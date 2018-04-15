@@ -187,7 +187,7 @@ INFO      Job completed.
 //}
 
 
-次にDRY-RUNを外して実行します。
+次にDRY-RUNをオプションから外して実行します。
 
 //list[curator-12][Curatorで削除実行]{
 curator ~/.curator/delete_indices.yml
