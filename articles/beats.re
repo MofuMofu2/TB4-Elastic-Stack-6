@@ -414,9 +414,9 @@ Index Patternsをクリックします。
 //image[filebeat05][Indexを選択]{
 //}
 
-Filebeatのインデックスパターンが登録されていることがわかります。
+Filebeatのindexパターンが登録されていることがわかります。
 
-//image[filebeat06][Filebeatのインデックスパターンを確認]{
+//image[filebeat06][Filebeatのindexパターンを確認]{
 //}
 
 左ペインにある@<code>{Dashboard}をクリックします。
@@ -515,14 +515,14 @@ sudo service metricbeat start
 Elasticsearchへデータが転送できたか、Kibanaを開いて確認します。
 ブラウザを開いてKibana（@<href>{http://{Global_IP\}:5601}）へアクセスします。
 
-Index Patternsの画面を開くとFilebeatのインデックスパターンの他にMetricbeatのインデックスパターンがあることがわかります。
+Index Patternsの画面を開くとFilebeatのindexパターンの他にMetricbeatのindexパターンがあることがわかります。
 
-//image[metricbeat01][Metricbeatのインデックスを確認その1]{
+//image[metricbeat01][Metricbeatのindexを確認その1]{
 //}
 
-Dashboardをクリックし、Metricbeatのインデックスを確認します。
+Dashboardをクリックし、Metricbeatのindexを確認します。
 
-//image[metricbeat02][Metricbeatのインデックスを確認その2]{
+//image[metricbeat02][Metricbeatのindexを確認その2]{
 //}
 
 @<code>{Metricbeat System Host Overview}というDashboardをクリックします。
@@ -602,9 +602,9 @@ sudo service auditbeat start
 Elasticsearchにデータが保存されているか確認します。
 ブラウザを開いてKibanaへアクセスします。
 
-@<code>{Index Patterns}の画面を開くと、Filebeatのインデックスパターンの他にAuditbeatのインデックスパターンがあることがわかります。
+@<code>{Index Patterns}の画面を開くと、Filebeatのindexパターンの他にAuditbeatのindexパターンがあることがわかります。
 
-//image[auditbeat01][Auditbeatのインデックス確認]{
+//image[auditbeat01][Auditbeatのindex確認]{
 //}
 
 左ペインにあるDashboardをクリックします。
