@@ -230,7 +230,7 @@ Outputは、@<chapref>{logstash}の設定と同様です。
   pipeline.batch.size: 125
   path.config: "/etc/logstash/conf.d/filebeat.cfg"
   pipeline.workers: 1
-//}  
+//}
 
 これでFilebeatとLogstashの環境が整いました。
 Filebeatから起動してしまうと転送先のLogstashにBeats設定が反映されていないため、エラーになります。
@@ -318,7 +318,7 @@ sudo service elasticsearch restart
 
 ==== Filebeat Modulesの設定
 
-Filebeatの設定ファイルを編集しますので、以下の設定ファイル@<code>{filebeat.yml}を使用します。
+Filebeatの設定ファイルを編集するため、@<list>{beats-17}の@<code>{filebeat.yml}を使用します。
 既存で設定してある内容は全て上書きしてください。
 
 //list[beats-17][filebeat.ymlのNginx Module編集]{
@@ -353,12 +353,12 @@ setup.kibana:
 #logging.level: info
 //}
 
-@<code>{filebeat.yml}の編集内容について説明します。
+@<list>{beats-17}の編集内容について説明します。
 Nginxの有効化を行います。Nginxのアクセスログのパス設定ですが、インストールした状態（デフォルト）のまま利用するのであればパスの変更は不要です。
 今回はデフォルト設定のまま利用しています。
 
 
-//list[beats-17][filebeat.ymlのNginx Module編集]{
+//list[beats-171][filebeat.ymlのNginx Module編集]{
 #-------------------------------- Nginx Module -------------------------------
 - module: nginx
   access:
@@ -373,7 +373,7 @@ Output先をElasticsearchに変更しています。
 #-------------------------- Elasticsearch output -------------------------------
 output.elasticsearch:
   enabled: true
-  
+
   hosts: ["localhost:9200"]
 //}
 
@@ -387,13 +387,14 @@ setup.dashboards.enabled: true
 //}
 
 
-今回の設定では、アウトプット先を複数にする設定は発生しないと思いますが、
-もし既存の設定が残っていた場合は、再起動時に以下のエラーが発生します。
+今回の設定では、アウトプット先を複数にする設定をしていません。
+もし既存の設定が残っていた場合、Beatsの再起動時に@<list>{beats-21}のエラーが発生します。
 このエラーが発生した場合は、アウトプット先が複数の可能性があるので確認してください。
 
 
-//list[beats-21][複数アウトプット指定した際のエラー]{
-error unpacking config data: more than one namespace configured accessing 'output' (source:'/etc/filebeat/filebeat.yml')
+//list[beats-21][複数のアウトプット先を指定した際に出力されるエラー]{
+error unpacking config data: more than one namespace configured accessing
+'output' (source:'/etc/filebeat/filebeat.yml')
 //}
 
 では、いよいよFilebeatを起動します。
@@ -425,14 +426,13 @@ Filebeatのインデックスパターンが登録されていることがわか
 //}
 
 左ペインにある@<code>{Dashboard}をクリックします。
-様々なDashboardが登録されていることがわかります。
-Logstashなどでログを取り込んだ場合は、Dashboardを一から作成する必要がありますが、Beatsの場合は、あらかじめ用意されています。
+Filebeat Modulesの機能によって、あらかじめDashboardが準備されています。
 
 //image[filebeat07][Dashboardの確認]{
 //}
 
 今回は、Nginxの@<code>{Filebeat Nginx Overview}というDashboardをクリックします。
-取り込んだログがDashboardに表示されていることがわかります。
+取得したログの情報がグラフィカルに表示されていますね。
 
 //image[filebeat08][Filebeat Nginx Overview]{
 //}
@@ -442,7 +442,7 @@ Logstashなどでログを取り込んだ場合は、Dashboardを一から作成
 追加する場合は、@<code>{filebeat.reference.yml}にModulesが記載されているので、コピー&ペーストして有効化してください。
 
 
-次は、サーバのリソースを容易にモニタリングすることを可能とするMetricbeatについてです。
+次は、サーバのリソースを容易にモニタリングすることを可能とするMetricbeatについて説明します。
 
 
 == Metricbeat
