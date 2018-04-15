@@ -441,10 +441,10 @@ Filebeat Modulesの機能によって、あらかじめDashboardが準備され�
 == Metricbeat
 
 Metricbeatは、サーバのリソース(CPU/Mem/process..など)を容易にモニタリングすることができます。
-その他にもDockerやElasticsaerchなどにも対応しており、様々なプロダクトをモニタリングすることが可能です。
+サーバ以外ににも、DockerやElasticsearchのリソース監視も可能です。
 
-また、先ほどのFilebeatと同様にYAMLを編集するだけなので、学習コストもかかりません。
-今回は、サーバのメトリックをモニタリングできるところまで見たいと思います。それでは、早速インストールしていきます。
+Filebeatと同様、YAMLを編集するだけで設定が完了します。
+今回は、サーバのメトリックをモニタリングできるところをゴールとします。
 
 
 //list[beats-24][Metricbeatのインストール]{
