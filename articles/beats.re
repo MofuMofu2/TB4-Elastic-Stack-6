@@ -452,8 +452,8 @@ sudo yum install metricbeat
 //}
 
 
-MetricbeatもFilebeat同様にベースの設定ファイル@<code>{metricbeat.reference.yml}があるのですが、
-デフォルト有効化されているModuleが多いため、以下の設定ファイルを使用します。
+Metricbeatも@<code>{metricbeat.reference.yml}があらかじめ存在します。
+しかし、デフォルトで有効化されているModuleが多いため、@<list>{beats-25}の@<code>{metricbeat.yml}を利用します。
 既存で設定してある内容は全て上書きしてください。
 
 
