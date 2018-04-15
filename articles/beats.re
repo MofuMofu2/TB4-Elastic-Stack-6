@@ -605,13 +605,13 @@ sudo service auditbeat start
 Elasticsearchにデータが保存されているか確認します。
 ブラウザを開いてKibanaへアクセスします。
 
-@<code>{Index Patterns}の画面を開くとFilebeatのインデックスパターンの他にAuditbeatのインデックスパターンがあることがわかります。
+@<code>{Index Patterns}の画面を開くと、Filebeatのインデックスパターンの他にAuditbeatのインデックスパターンがあることがわかります。
 
 //image[auditbeat01][Auditbeatのインデックス確認]{
 //}
 
 左ペインにあるDashboardをクリックします。
-検索ウィンドウから@<code>{Auditbeat}と入力すると様々なDashboardがヒットします。
+検索ウィンドウから@<code>{Auditbeat}と入力すると、複数のDashboardがヒットします。
 
 //image[auditbeat02][AuditbeatのDashboardを確認]{
 //}
