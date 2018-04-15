@@ -551,7 +551,8 @@ BeatsのAuditbeatを利用すると、FilebeatやMetricbeatのように少ない
 sudo yum install auditbeat
 //}
 
-@<list>{beats-28}の@<code>{auditbeat.yml}を既存で設定してある内容は全て上書きしてください。
+Auditbeatにも、既存の設定ファイル@@<code>{auditbeat.yml}が存在します。
+今回の要件に合わせて@<list>{beats-28}を準備しました。設定内容を上書きして保存します。
 
 
 //list[beats-28][/etc/auditbeat/auditbeat.ymlの編集]{
