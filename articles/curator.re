@@ -236,12 +236,14 @@ indexの削除を実施した時と同様、2018年4月1日〜4月5日までのi
 
 
 すでに@<code>{curator.yml}は作成済みなので、新しく@<code>{close_indices.yml}を作成します。
-対象は、最新のindex以外をclose設定とします。
-actionは、closeを指定します。
+
+Closeするindexの対象は、最新のindex以外とします。
 
 //list[curator-15][close_indices.ymlの作成]{
 vim ~/.curator/close_indices.yml
 //}
+
+actionに@<code>{close}を指定し、indexをCloseします。
 
 //list[curator-16][close_indices.yml]{
 ---
