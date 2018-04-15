@@ -414,10 +414,15 @@ INFO      Job completed.
 //}
 
 
-curコマンドを利用して、indexが存在することを確認します。
-indexがopenされていることがわかります。
+curlコマンドを利用して、indexが存在することを確認します。
 
 //list[curator-28][indexの確認]{
+curl -XGET localhost:9200/_cat/indices/logstash* | sort
+//}
+
+Closeしたindexが再びopenされ、利用できる状態となりました。
+
+//cmd{
 curl -XGET localhost:9200/_cat/indices/logstash* | sort
 yellow open logstash-2018.04.01 5 1 8 0  93.2kb  93.2kb
 yellow open logstash-2018.04.02 5 1 9 0 102.8kb 102.8kb
@@ -427,5 +432,5 @@ yellow open logstash-2018.04.05 5 1 4 0  14.5kb 104.5kb
 //}
 
 
-今回は、Curatorの全機能を紹介することができません。
-ご自分のユースケースに合わせて機能を試していただけると幸いです。
+今回はCuratorが持つ機能の一部分だけを紹介しました。
+みなさんのユースケースに合わせて、Curatorを使いこなしていただけると幸いです。
