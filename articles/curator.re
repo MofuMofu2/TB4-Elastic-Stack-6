@@ -306,21 +306,29 @@ DRY-RUNで実行した時と同様にログを確認します。
 //list[curator-20][ログの確認]{
 INFO      Preparing Action ID: 1, "close"
 INFO      Trying Action ID: 1, "close": close logstash index
-INFO      Closing selected indices: ['logstash-2018.04.01', 'logstash-2018.04.02', 'logstash-2018.04.03', 'logstash-2018.04.04']
+INFO      Closing selected indices: ['logstash-2018.04.01', （紙面の都合により改行）
+'logstash-2018.04.02', 'logstash-2018.04.03', 'logstash-2018.04.04']
 INFO      Action ID: 1, "close" completed.
 INFO      Job completed.
 //}
 
 curコマンドを利用して、indexが存在することを確認します。
-2018年4月5日以外のindexがcloseに変更されていることがわかります。
 
 //list[curator-21][indexの確認]{
 curl -XGET localhost:9200/_cat/indices/logstash* | sort
+//}
+
+2018年4月5日以外のindexがcloseされました。
+
+//cmd{
+curl -XGET localhost:9200/_cat/indices/logstash* | sort
+
 yellow close logstash-2018.04.01 5 1 8 0  93.2kb  93.2kb
 yellow close logstash-2018.04.02 5 1 9 0 102.8kb 102.8kb
 yellow close logstash-2018.04.03 5 1 9 0 102.8kb  72.8kb
 yellow close logstash-2018.04.04 5 1 4 0  14.5kb  14.5kb
 yellow open logstash-2018.04.05 5 1 4 0  14.5kb 104.5kb
+
 //}
 
 
