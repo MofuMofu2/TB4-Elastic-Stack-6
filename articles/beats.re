@@ -284,9 +284,6 @@ Filebeat Modulesでは、あらかじめデータソースに対応したModule�
 Filebeatのデータソースは、Nginxのアクセスログを利用します。
 Nginxのアクセスログは、Logstashを介さずにElasticsaerchに直接転送します。
 
-//image[filebeat03][Filebeatの構成]{
-//}
-
 
 ==== Ingest Node Pluginをインストール
 
