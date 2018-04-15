@@ -508,15 +508,14 @@ output.elasticsearch:
 #logging.level: debug
 //}
 
-設定が完了したのでMetricbeatを起動します。
-
+設定ファイルの準備ができた後、Metricbeatを起動します。
 
 //list[beats-26][Metricbeatの起動]{
 sudo service metricbeat start
 //}
 
 
-Filebeatと同様にデータが取り込まれているかをKibanaを開いて確認します。
+Elasticsearchへデータが転送できたか、Kibanaを開いて確認します。
 ブラウザを開いてKibana（@<href>{http://{Global_IP\}:5601}）へアクセスします。
 
 Index Patternsの画面を開くとFilebeatのインデックスパターンの他にMetricbeatのインデックスパターンがあることがわかります。
@@ -529,8 +528,8 @@ Dashboardをクリックし、Metricbeatのインデックスを確認します�
 //image[metricbeat02][Metricbeatのインデックスを確認その2]{
 //}
 
-今回は、@<code>{Metricbeat System Host Overview}というDashboardをクリックします。
-CPUやメモリ、プロセスの状態をニアリアルタイムにモニタリングができていることがわかります。
+@<code>{Metricbeat System Host Overview}というDashboardをクリックします。
+CPUやメモリ、プロセスの状態がDashboardに描画されています。
 
 //image[metricbeat03][MetricbeatのDashboard]{
 //}
