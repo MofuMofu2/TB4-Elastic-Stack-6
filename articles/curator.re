@@ -225,8 +225,9 @@ yellow open logstash-2018.04.05 5 1 4 0  14.5kb 104.5kb
 
 次は、indexのClose方法について説明します。
 ログをElasticsearchに保存し続け、かつパフォーマンスは低下させたくないときにCloseを利用します。
-indexをCloseすることでメモリを解放します。
-Closeしたindexは、再度利用する場合にopenを使用します。
+indexをCloseすることで、サーバのメモリを解放します。これにより、サーバのパフォーマンスを維持できます。
+
+Closeしたindexは、openを使用すれば再度データを閲覧することが可能です。
 
 === indexのClose
 
