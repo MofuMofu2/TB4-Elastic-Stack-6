@@ -861,7 +861,7 @@ output {
 
 
 以下に各オプションについて説明します。
-インデックスを任意の形で指定することも可能ですが、デフォルトのままとするため、指定はしていません。
+indexを任意の形で指定することも可能ですが、デフォルトのままとするため、指定はしていません。
 デフォルトだと@<code>{logstash-logs-%{+YYYYMMdd}で作成されます。
 
 //table[logstash-35][Elasticsearch-output-pluginの解説]{
@@ -915,10 +915,10 @@ sudo initctl start logstash
 //}
 
 
-インデックスが取り込まれているかを確認します。
-インデックスが日付単位で取り込まれていることがわかります。
+indexが取り込まれているかを確認します。
+indexが日付単位で取り込まれていることがわかります。
 
-//list[logstash-38][インデックスが作成されているか確認]{
+//list[logstash-38][indexが作成されているか確認]{
 ### Index confirmation
 curl -XGET localhost:9200/_cat/indices/logstash*
 //}
@@ -1062,7 +1062,7 @@ Kibanaのトップページが開きますので、左ペインの@<code>{Manage
 //}
 
 
-インデックスパターンを指定せずにElasticsearchに取り込んでいるため、@<code>{logstash-YYYY.MM.DD}のパターンで取り込まれます。
+indexパターンを指定せずにElasticsearchに取り込んでいるため、@<code>{logstash-YYYY.MM.DD}のパターンで取り込まれます。
 そのため、@<code>{Define index pattern}の欄に@<code>{logstash-*}と入力します。
 
 //image[kibana03][Indexを選択][scale=0.8]{
@@ -1078,7 +1078,7 @@ Kibanaのトップページが開きますので、左ペインの@<code>{Manage
 //image[kibana05][Indexの作成][scale=0.8]{
 //}
 
-これでインデックスパターンの登録が完了したので、KibanaからElasticsearchのインデックスをビジュアライズする準備が整いました。
+これでindexパターンの登録が完了したので、KibanaからElasticsearchのindexをビジュアライズする準備が整いました。
 左ペインの@<code>{Discover}をクリックします。
 
 //image[kibana06][Discover][scale=0.8]{
