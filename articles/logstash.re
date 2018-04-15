@@ -1041,10 +1041,10 @@ service kibana start
 ==== Kibanaで取り込んだログをビジュアライズ
 
 Kibanaにアクセスするため、ブラウザを起動し、以下のIPアドレスを入力します。
-@<code>{Globa_IP}については、AWSから払い出されたグローバルIPアドレスを入力してください。
+@<code>{Global_IP}については、AWSから払い出されたグローバルIPアドレスを入力してください。
 
 //list[logstash-42][KibanaにアクセスするためのURL]{
-http:"Globa_IP":5601
+http:"Global_IP":5601
 //}
 
 詳しい操作方法は@<chapref>{Kibana-visualize}も参照してください。
