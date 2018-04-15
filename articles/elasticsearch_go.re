@@ -8,7 +8,7 @@ Elasticsearchの入門の多くはREST APIを使ったものが多いのです�
 そうした際に意外と「あれ、これってどうやるんだ？」となる場合が多いものです。
 
 そこで、本章ではElasticsearchの基本操作を、Go言語を利用して体験していきます。Elasticsearchの基本的な操作を中心に、ちょっとしたTipsについても触れていきます。
-Elasticsearchはとても多くの機能を有しています。そのため、全ての機能をカバーすることは難しいです。よって、代表的な機能について本章では記載します。 また本章ではElasticsearchのAPIを主に扱います。Elasticsearchのクラスタリング機能などについては、最低限の情報しか記載していません。
+Elasticsearchはとても多くの機能を有しています。そのため、全ての機能をカバーすることは難しいです。よって、代表的な機能について本章では記載します。 また本章ではElasticsearchのAPIを主に扱います。
 
 
 == Elasticsearch環境の準備
@@ -38,7 +38,7 @@ docker run -p 9200:9200  -e "discovery.type=single-node" -e （紙面の都合�
 
 起動に成功すると、プロンプト上に起動ログが出力されます。
 ポートマッピングで指定している9200ポートはElasticsearchへのAPIを実行するためのエンドポイントです。
-Elastic社のDockerイメージを利用すると、Docker起動時に環境変数経由で設定を変更できます。
+Elastic社のDockerイメージを利用すると、Docker起動時に環境変数経由でElasticsearchの設定を変更できます。
 
 起動時にいくつかオプションを指定しているため解説します。
 まず、オプション@<code>{discovery.type}を@<code>{single-node}に設定しています。
@@ -46,8 +46,8 @@ Elastic社のDockerイメージを利用すると、Docker起動時に環境変�
 
 次に、@<code>{network.publish_host}を@<code>{loccalhost}に設定しました。
 ElasticsearchのAPIエンドポイントとして公開するIPアドレスを指定します。
-指定しなかった場合、Dockerコンテナ内部のプライベートIPアドレスになります。
-ローカルホストから直接エンドポイントへ接続することができないため、この設定を入れています。
+指定しなかった場合、Dockerコンテナ内部のプライベートIPアドレスとなり、
+ローカルホストから直接Elasticsearchのエンドポイントへ接続することができないため、この設定を入れています。
 
 
 Dockerが正常に起動しているか確認してみましょう。さきほどマッピングした9200ポートでElasticsearchはREST APIのエンドポイントを公開しています。
@@ -93,9 +93,11 @@ Elastic社の公式クライアント@<href>{https://github.com/elastic/go-elast
 今回は@<code>{Elastic:An Elasticsearch client for the Go}（@<href>{https://github.com/olivere/elastic}）を利用します。
 こちらのクライアントは開発も活発で、Elasticの早いバージョンアップにもいち早く対応されています。
 
+本書で扱う内容もolivere/elasticのGetting Started(@<href>{https://olivere.github.io/elastic/})をもとにしているため、より多くの機能の使い方などを知るためにもぜひこちらもご参照ください。
+
 それではクライアントをインストールしましょう。
 今回はgo getでインストールしますが、実際のプロダクト利用時はdepなどのパッケージ管理ツールの利用をおすすめします。
-なおGoのインストール及びGOPATHの設定を事前にお願いします。
+Goのインストール及びGOPATHの設定を事前にお願いします。
 
 
 //list[elasticsearch-list04][Elasticクライアントのインストール]{
@@ -128,8 +130,8 @@ RDBMSで例えると以下に相当します。
 また、ElasticsearchはMapping定義を作成しなくてもデータを投入することもできます。
 
 その際は投入したJSONデータにあわせたMappingが自動で作成されます。
-実際のアプリケーションでElasticsearchを利用する場合、Mapping定義によりデータスキーマを固めて利用することの方が多いかと思います。
-また、Mapping定義を作成することにより、各フィールド単位でより細かな検索設定をおこなうことが可能です。本章では動的Mappingは利用せず、Mapping定義を1から作成し利用します。
+実際の検索アプリケーションでElasticsearchを利用する場合、Mapping定義によりデータスキーマを固定して利用することの方が多いかと思います。
+また、Mapping定義を作成することにより、各フィールド単位でより細かな検索設定をおこなうことが可能なため本書ではMapping定義を1から作成し利用します。
 
 
 === Mapping
@@ -175,7 +177,7 @@ Elasticsearchの操作に必要なMapping定義を@<list>{elasticsearch-list05}�
 
 
 keyword型とtext型は両者ともString型に相当します。その違いはアナライザを設定できるか否かです。
-後ほど詳細を説明しますが、アナライザを適用することでそのフィールドに対し高度な全文検索を行うことができます。一方でkeyword型はアナライザが適用されないため、完全一致での検索が求められます。
+後ほど詳細を説明しますが、アナライザを適用することでそのフィールドに対し高度検索を行うことができます。一方でkeyword型はアナライザが適用されないため、完全一致での検索が求められます。
 また、フィールドに対してソートをおこなう場合、keyword型を指定する必要があります。
 
 
@@ -246,7 +248,7 @@ curl -XGET 'http://localhost:9200/<Index名>/_mapping/<Type名>?pretty'
 まず始めに、さきほどDockerで起動したElasticsearchへの接続確認をおこなうため、Elasticsearchのバージョン情報などを取得します。
 
 
-//list[elasticsearch-list07][Go言語を用いてElasticsearchに接続する]{
+//list[elasticsearch-list07][Go言語を用いてElasticsearchに接続する(hello_elasticsearch.go)]{
 package main
 
 import (
@@ -282,13 +284,24 @@ Elasticsearchのバージョン情報といったシステム情報を取得す�
 では実行してみましょう!
 
 
-//list[elasticsearch-list08][Elasticsearchのバージョン情報を問い合わせる]{
+//cmd{
 $ go run hello_elasticsearch.go
 Elasticsearch version 6.2.2
 //}
 
 
 ローカル環境で稼働させているElasticsearchのバージョンが表示されれば、Elasticsearchに接続できています。
+もし接続できない場合、正常にElasticsearchのコンテンが起動しているか、ポートマッピングが正しくおこなわれているかなどを確認してください。
+また以下のように、クライアント作成時に以下のオプションを付与して試してください。(以降のサンプルでも同様)
+
+
+//list[elasticsearch-list08][もしElasticsearchへの接続に失敗する場合]{
+client, err := elastic.NewClient(
+     elastic.SetURL(esURL),
+	 //sniff機能を無効化
+	 elastic.SetSniff(false),
+)
+//}
 
 
 === 単純なCRUD操作
