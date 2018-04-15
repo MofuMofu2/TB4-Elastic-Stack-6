@@ -269,20 +269,20 @@ yellow open logstash-2018.04.10 fzIOfXzOQK-p0_mmvO7wrw 5 1 8 0 93.2kb 93.2kb
 
 === Filbeat Modules
 
-ここまででFilebeatの使い方がわかったと思います。
-しかし、これではどこが手軽なの？むしろ重厚感が増したのでは？と思われる方もいると思います。
-ここからは、もっと手軽に導入するためのFilbeat Moduleについて触れていきたいと思います。
+Filebeatの利用方法を一通り紹介してきました。
+これではどこが手軽なの？むしろ重厚感が増したのでは？と思われる方がいるかもしれません。
+
+ここからは、Beatsをさらに手軽に導入できる、@<code>{Filbeat Module}について触れていきたいと思います。
 
 
-Filebeat Modulesは、あらかじめデータソースに対応した Moduleが用意されています。
-このModuleを使用することで、Logstashで複雑なフィルタなどを書かずに、意味のあるフィールドに変換し、Elasticsearchにインデクシングできます。
-また、Kibanaのダッシュボードも用意されているため、インデクシングされたデータを即時でビジュアライズすることができます。
-
+Filebeat Modulesでは、あらかじめデータソースに対応したModuleが用意されています。
+このModuleを使用することで、Logstashで複雑なフィルタなどを書くことなく、データの収集・加工・Elasticsearchへの保存が可能です。
+また、Elasticsearchへ保存されたデータをKibanaを用いて可視化することも可能です。この際、Kibanaのグラフを作成する必要はありません。
 
 ==== Filebeat Modulesの構成
 
-Filebeatのデータソースは、Nginxのアクセスログとします。
-先ほどの構成は、Logstashに転送していましたが、Elasticsaerchに直接保存する構成とします。
+Filebeatのデータソースは、Nginxのアクセスログを利用します。
+Nginxのアクセスログは、Logstashを介さずにElasticsaerchに直接転送します。
 
 //image[filebeat03][Filebeatの構成]{
 //}
@@ -302,8 +302,7 @@ Filebeat Modulesは、パイプラインを自動で作成します。
 /usr/share/elasticsearch/bin/elasticsearch-plugin install ingest-geoip
 //}
 
-
-インストールが完了したらElasticsearchを再起動します。
+プラグインのインストールが完了した後、Elasticsearchを再起動します。
 
 
 //list[beats-16][Elasticsaerchの再起動]{
