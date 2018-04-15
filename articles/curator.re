@@ -193,9 +193,9 @@ INFO      Job completed.
 curator ~/.curator/delete_indices.yml
 //}
 
-DRY-RUNで実行した時と同様にログを確認します。
+Curator実行後、動作ログを確認します。
 
-//list[curator-13][ログの確認]{
+//list[curator-13][/var/log/curatorの確認結果]{
 INFO      Preparing Action ID: 1, "delete_indices"
 INFO      Trying Action ID: 1, "delete_indices": delete logstash index
 INFO      Deleting selected indices: ['logstash-2018.04.10', 'logstash-2018.04.11']
@@ -208,12 +208,17 @@ INFO      Job completed.
 //}
 
 最後に、curlコマンドでindexが削除されているか確認します。
-2018年4月5日のindexのみが保存されていることがわかります。
 
 //list[curator-14][indexの確認]{
 curl -XGET localhost:9200/_cat/indices/logstash* | sort
+//}
+
+//cmd{
+curl -XGET localhost:9200/_cat/indices/logstash* | sort
 yellow open logstash-2018.04.05 5 1 4 0  14.5kb 104.5kb
 //}
+
+2018年4月5日のindexのみが保存されていることがわかります。
 
 
 == indexのCloseとOpen
