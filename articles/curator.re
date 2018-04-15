@@ -273,7 +273,7 @@ DRY-RUNのオプションをつけて、Curatorを実行します。
 curator --dry-run ~/.curator/close_indices.yml
 //}
 
-ログの実行結果から、close対象のindexを確認します。
+ログの実行結果から、Close対象のindexを確認します。
 
 
 //list[curator-18][ログの確認]{
@@ -318,7 +318,7 @@ curコマンドを利用して、indexが存在することを確認します。
 curl -XGET localhost:9200/_cat/indices/logstash* | sort
 //}
 
-2018年4月5日以外のindexがcloseされました。
+2018年4月5日以外のindexがCloseされました。
 
 //cmd{
 curl -XGET localhost:9200/_cat/indices/logstash* | sort
@@ -334,7 +334,7 @@ yellow open logstash-2018.04.05 5 1 4 0  14.5kb 104.5kb
 
 === indexのOpen
 
-先ほどCloseしたindexを対象にopenを行います。
+Closeしたindexを対象にopenを行います。
 
 
 @<code>{open_indices.yml}を作成します。
