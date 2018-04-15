@@ -150,8 +150,8 @@ No.	Item	Content
 
 インデックス削除の環境が整ったので、Curatorを実行します。
 Curatorのコマンドラインの引数について説明します。
-オプションの--configは、@<code>{curator.yml}を@<code>{~/.curator/curator.yml}以外に配置した場合に使用します。
-今回は、@<code>{~/.curator/curator.yml}に配置しているため、--configオプションは使用しません
+オプションの--configは、@<code>{curator.yml}を@<code>{~/.curator/curator.yml}以外のディレクトリに配置した場合、使用します。
+今回は、@<code>{~/.curator/curator.yml}に配置しているため、--configオプションは使用しません。
 
 //list[curator-09][Curatorの実行引数]{
 curator [--config CONFIG.YML] [--dry-run] delete_indices.yml
@@ -165,8 +165,7 @@ DRY-RUNを使用することで、設定ファイルに不備がないかを確�
 curator --dry-run ~/.curator/delete_indices.yml
 //}
 
-ログで実行結果を確認します。
-設定ファイルで指定した@<code>{/var/log/curator}に出力されているので確認します。
+設定ファイルで指定した@<code>{/var/log/curator}配下にCurator自体の操作ログが出力されます。
 DRY-RUNで実行した場合、ログにDRY-RUNと表記されます。
 最新のインデックス以外は削除対象という結果がログからわかります。
 
