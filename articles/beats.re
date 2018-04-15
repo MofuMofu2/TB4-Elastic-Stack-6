@@ -59,7 +59,7 @@ Filebeatを試す環境は、@<chapref>{logstash}を元として構成します�
 Logstashは、Filebeatから転送されたログをElasticsearchに保存するところまでを行います。
 
 
-//image[filebeat02][サーバの構成について]{
+//image[filebeat02][サーバの構成について][scale=0.8]{
 //}
 
 それでは、FilebeatとNginxのインストールを実施していきます。
@@ -71,7 +71,7 @@ Logstashは、Filebeatから転送されたログをElasticsearchに保存する
 Filebeatをインストールします。@<chapref>{logstash}でyumリポジトリの登録が完了していることを前提として進めます。
 
 
-//list[beats-01][Filebeatsのインストール]{
+//list[beats-01][Filebeatsのインストール][scale=0.8]{
 sudo yum install filebeat
 //}
 
@@ -406,29 +406,29 @@ sudo service filebeat start
 左ペインにあるManagementをクリックします。
 
 
-//image[filebeat04][Managementをクリック]{
+//image[filebeat04][Managementをクリック][scale=0.8]{
 //}
 
 Index Patternsをクリックします。
 
-//image[filebeat05][Indexを選択]{
+//image[filebeat05][Indexを選択][scale=0.8]{
 //}
 
 Filebeatのindexパターンが登録されていることがわかります。
 
-//image[filebeat06][Filebeatのindexパターンを確認]{
+//image[filebeat06][Filebeatのindexパターンを確認][scale=0.8]{
 //}
 
 左ペインにある@<code>{Dashboard}をクリックします。
 Filebeat Modulesの機能によって、あらかじめDashboardが準備されています。
 
-//image[filebeat07][Dashboardの確認]{
+//image[filebeat07][Dashboardの確認][scale=0.8]{
 //}
 
 今回は、Nginxの@<code>{Filebeat Nginx Overview}というDashboardをクリックします。
 取得したログの情報がグラフィカルに表示されていますね。
 
-//image[filebeat08][Filebeat Nginx Overview]{
+//image[filebeat08][Filebeat Nginx Overview][scale=0.8]{
 //}
 
 いかがでしたか？
@@ -517,18 +517,18 @@ Elasticsearchへデータが転送できたか、Kibanaを開いて確認しま�
 
 Index Patternsの画面を開くとFilebeatのindexパターンの他にMetricbeatのindexパターンがあることがわかります。
 
-//image[metricbeat01][Metricbeatのindexを確認その1]{
+//image[metricbeat01][Metricbeatのindexを確認その1][scale=0.8]{
 //}
 
 Dashboardをクリックし、Metricbeatのindexを確認します。
 
-//image[metricbeat02][Metricbeatのindexを確認その2]{
+//image[metricbeat02][Metricbeatのindexを確認その2][scale=0.8]{
 //}
 
 @<code>{Metricbeat System Host Overview}というDashboardをクリックします。
 CPUやメモリ、プロセスの状態がDashboardに描画されています。
 
-//image[metricbeat03][MetricbeatのDashboard]{
+//image[metricbeat03][MetricbeatのDashboard][scale=0.8]{
 //}
 
 サーバやコンテナなどにMetricbeatを導入すると、Kibanaを利用してサーバの状態をモニタリングすることができます。
@@ -604,19 +604,19 @@ Elasticsearchにデータが保存されているか確認します。
 
 @<code>{Index Patterns}の画面を開くと、Filebeatのindexパターンの他にAuditbeatのindexパターンがあることがわかります。
 
-//image[auditbeat01][Auditbeatのindex確認]{
+//image[auditbeat01][Auditbeatのindex確認][scale=0.8]{
 //}
 
 左ペインにあるDashboardをクリックします。
 検索ウィンドウから@<code>{Auditbeat}と入力すると、複数のDashboardがヒットします。
 
-//image[auditbeat02][AuditbeatのDashboardを確認]{
+//image[auditbeat02][AuditbeatのDashboardを確認][scale=0.8]{
 //}
 
 @<code>{Auditbeat File Integrity Overview}や@<code>{Auditbeat Auditd Overview}からモニタリングが可能です。
 
 
-//image[auditbeat03][Auditbeatを用いたモニタリング]{
+//image[auditbeat03][Auditbeatを用いたモニタリング][scale=0.8]{
 //}
 
 Beatsの機能、いかがだったでしょうか？
