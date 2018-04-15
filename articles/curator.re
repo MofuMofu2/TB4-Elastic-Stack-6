@@ -3,7 +3,7 @@
 == Curatorとは
 
 Curatorは、Elasticsearchに保存したログのindex操作や、スナップショットの取得などを行う運用支援ツールです。
-この章では、Elasticsearchに保存したインデックスの削除や、検索対象から外す方法について触れていきます。
+この章では、Elasticsearchに保存したindexの削除や、検索対象から外す方法について触れていきます。
 Curatorの詳細は、こちらのリンク@<href>{https://www.elastic.co/guide/en/elasticsearch/client/curator/current/index.html}を参照してください。
 
 Curatorの実行環境を構築します。
@@ -35,27 +35,27 @@ yum install elasticsearch-curator
 //}
 
 
-== インデックスの削除
+== indexの削除
 
 ログ分析などの運用を行うと、大量のログデータが溜まっていきます。
 ログを保存しているサーバのディスク容量を圧迫するので、結果としてパフォーマンス低下が発生する可能性があります。
 そこでCuratorの登場です。
-Curatorを使用すると、任意の期間を指定してインデックスを削除することが可能です。
+Curatorを使用すると、任意の期間を指定してindexを削除することが可能です。
 
 
-補足ですが、@<chapref>{logstash}や@<chapref>{beats}でElasticsearchに保存したログは、日ごとにインデックスが作成されていきます。
-例えば、2018年4月1日にLogstashがElasticsearchに保存したログは、@<code>{logstash-2018.04.01}というインデックスに保存されます。
-2018年4月2日に保存したログは、@<code>{logstash-2018.04.02}というインデックスに保存されます。
-100日経過した時には、100インデックスが作成されます。
-このように時系列で作成していくインデックスを時系列インデックスと言います。
+補足ですが、@<chapref>{logstash}や@<chapref>{beats}でElasticsearchに保存したログは、日ごとにindexが作成されていきます。
+例えば、2018年4月1日にLogstashがElasticsearchに保存したログは、@<code>{logstash-2018.04.01}というindexに保存されます。
+2018年4月2日に保存したログは、@<code>{logstash-2018.04.02}というindexに保存されます。
+100日経過した時には、100indexが作成されます。
+このように時系列で作成していくindexを時系列indexと言います。
 
 
-=== インデックスの削除操作
+=== indexの削除操作
 
-インデックスが2018年4月1日〜4月5日まであるとします。
-curコマンドを利用して、インデックスが存在することを確認します。
+indexが2018年4月1日〜4月5日まであるとします。
+curコマンドを利用して、indexが存在することを確認します。
 
-//list[curator-03][インデックスの確認]{
+//list[curator-03][indexの確認]{
 curl -XGET localhost:9200/_cat/indices/logstash* | sort
 yellow open logstash-2018.04.01 5 1 8 0  93.2kb  93.2kb
 yellow open logstash-2018.04.02 5 1 9 0 102.8kb 102.8kb
@@ -106,8 +106,8 @@ No.	Item	Content
 3	logfile	ログファイルの出力先の指定
 //}
 
-次にインデックス削除を定義したアクションファイルの@<code>{delete_indices.yml}を作成します。
-今回は、1日分のインデックス保持させるため、unit_countを1に指定します。
+次にindex削除を定義したアクションファイルの@<code>{delete_indices.yml}を作成します。
+今回は、1日分のindex保持させるため、unit_countを1に指定します。
 
 //list[curator-07][delete_indices.ymlの作成]{
 vim ~/.curator/delete_indices.yml
@@ -140,15 +140,15 @@ actions:
 No.	Item	Content
 -----------------
 1	action	アクションを指定します（今回は、削除を指定）
-2	filtertype	インデックスのフィルタ方式を指定します
-3	pattern	任意のインデックスパターンを指定する場合に使用します
+2	filtertype	indexのフィルタ方式を指定します
+3	pattern	任意のindexパターンを指定する場合に使用します
 4	age	時間指定する場合に使用します
 5	unit	時間単位を指定します
 6	unit_count	時間を指定します（今回は、unitでdayを指定しているため、1日分を保持）
 //}
 
 
-インデックス削除の環境が整ったので、Curatorを実行します。
+index削除の環境が整ったので、Curatorを実行します。
 Curatorのコマンドラインの引数について説明します。
 オプションの--configは、@<code>{curator.yml}を@<code>{~/.curator/curator.yml}以外のディレクトリに配置した場合、使用します。
 今回は、@<code>{~/.curator/curator.yml}に配置しているため、--configオプションは使用しません。
@@ -165,9 +165,9 @@ DRY-RUNを使用することで、設定ファイルに不備がないかを確�
 curator --dry-run ~/.curator/delete_indices.yml
 //}
 
-設定ファイルで指定した@<code>{/var/log/curator}配下にCurator自体の操作ログが出力されます。
+@<code>{/var/log/curator}配下にCuratorの動作ログが出力されます。
 DRY-RUNで実行した場合、ログにDRY-RUNと表記されます。
-最新のインデックス以外は削除対象という結果がログからわかります。
+動作ログから、最新のindex以外は削除対象となったことがわかります。
 
 //list[curator-11][ログの確認]{
 cat /var/log/curator
@@ -207,30 +207,30 @@ INFO      Action ID: 1, "delete_indices" completed.
 INFO      Job completed.
 //}
 
-最後に、curlコマンドでインデックスが削除されているか確認します。
-2018年4月5日のインデックスのみが保存されていることがわかります。
+最後に、curlコマンドでindexが削除されているか確認します。
+2018年4月5日のindexのみが保存されていることがわかります。
 
-//list[curator-14][インデックスの確認]{
+//list[curator-14][indexの確認]{
 curl -XGET localhost:9200/_cat/indices/logstash* | sort
 yellow open logstash-2018.04.05 5 1 4 0  14.5kb 104.5kb
 //}
 
 
-== インデックスのCloseとOpen
+== indexのCloseとOpen
 
-次は、インデックスのCloseです。
+次は、indexのCloseです。
 ログをElasticsearchに保存し続けたいが、パフォーマンスは低下させたくないといった時にCloseを利用します。
-インデックスをCloseすることでメモリを解放します。
-Closeしたインデックスは、再度利用する場合にopenを使用します。
+indexをCloseすることでメモリを解放します。
+Closeしたindexは、再度利用する場合にopenを使用します。
 
-=== インデックスのClose
+=== indexのClose
 
 
-インデックス削除を実施した時と同様に2018年4月1日〜4月5日までのインデックスがあるとします。
+index削除を実施した時と同様に2018年4月1日〜4月5日までのindexがあるとします。
 
 
 すでに@<code>{curator.yml}は、作成してあるので、@<code>{close_indices.yml}を作成します。
-対象は、最新のインデックス以外をclose設定とします。
+対象は、最新のindex以外をclose設定とします。
 actionは、closeを指定します。
 
 //list[curator-15][close_indices.ymlの作成]{
@@ -266,7 +266,7 @@ curator --dry-run ~/.curator/close_indices.yml
 //}
 
 DRY-RUNでログの実行結果を確認します。
-close対象のインデックスがログの結果からわかります。
+close対象のindexがログの結果からわかります。
 
 
 //list[curator-18][ログの確認]{
@@ -304,10 +304,10 @@ INFO      Action ID: 1, "close" completed.
 INFO      Job completed.
 //}
 
-curコマンドを利用して、インデックスが存在することを確認します。
-2018年4月5日以外のインデックスがcloseに変更されていることがわかります。
+curコマンドを利用して、indexが存在することを確認します。
+2018年4月5日以外のindexがcloseに変更されていることがわかります。
 
-//list[curator-21][インデックスの確認]{
+//list[curator-21][indexの確認]{
 curl -XGET localhost:9200/_cat/indices/logstash* | sort
 yellow close logstash-2018.04.01 5 1 8 0  93.2kb  93.2kb
 yellow close logstash-2018.04.02 5 1 9 0 102.8kb 102.8kb
@@ -317,9 +317,9 @@ yellow open logstash-2018.04.05 5 1 4 0  14.5kb 104.5kb
 //}
 
 
-=== インデックスのOpen
+=== indexのOpen
 
-先ほどCloseしたインデックスを対象にopenを行います。
+先ほどCloseしたindexを対象にopenを行います。
 
 
 @<code>{open_indices.yml}を作成します。
@@ -360,7 +360,7 @@ curator --dry-run ~/.curator/open_indices.yml
 //}
 
 DRY-RUNでログの実行結果を確認します。
-open対象のインデックスが、ログの結果からわかります。
+open対象のindexが、ログの結果からわかります。
 
 
 //list[curator-25][ログの確認]{
@@ -399,10 +399,10 @@ INFO      Job completed.
 //}
 
 
-curコマンドを利用して、インデックスが存在することを確認します。
-インデックスがopenされていることがわかります。
+curコマンドを利用して、indexが存在することを確認します。
+indexがopenされていることがわかります。
 
-//list[curator-28][インデックスの確認]{
+//list[curator-28][indexの確認]{
 curl -XGET localhost:9200/_cat/indices/logstash* | sort
 yellow open logstash-2018.04.01 5 1 8 0  93.2kb  93.2kb
 yellow open logstash-2018.04.02 5 1 9 0 102.8kb 102.8kb
