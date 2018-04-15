@@ -334,13 +334,13 @@ yellow open logstash-2018.04.05 5 1 4 0  14.5kb 104.5kb
 
 === indexのOpen
 
-Closeしたindexを対象にopenを行います。
+@<list>{curator-21}でCloseしたindexをopenします。
 
 
 @<code>{open_indices.yml}を作成します。
-過去5日分を対象にOpen設定とするため、unit_countを5に設定します。
+過去5日分を対象にopenするため、@<code>{unit_count}を5に設定します。
 directionで新しい方から数えるのか、古い方から数えるのかを指定できます。
-今回は、新しい方から数えるため、youngerを指定します（古い方からの場合は、olderです）
+今回は、新しい方から数えるため、youngerを指定します（古い方からの場合、olderを指定してください）。
 
 //list[curator-22][open_indices.ymlの作成]{
 vim ~/.curator/open_indices.yml
