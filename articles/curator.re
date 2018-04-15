@@ -232,10 +232,10 @@ Closeしたindexは、openを使用すれば再度データを閲覧すること
 === indexのClose
 
 
-index削除を実施した時と同様に2018年4月1日〜4月5日までのindexがあるとします。
+indexの削除を実施した時と同様、2018年4月1日〜4月5日までのindexがElasticsearchに保存されていると仮定します。
 
 
-すでに@<code>{curator.yml}は、作成してあるので、@<code>{close_indices.yml}を作成します。
+すでに@<code>{curator.yml}は作成済みなので、新しく@<code>{close_indices.yml}を作成します。
 対象は、最新のindex以外をclose設定とします。
 actionは、closeを指定します。
 
