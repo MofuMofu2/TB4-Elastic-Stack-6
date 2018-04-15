@@ -540,12 +540,12 @@ KibanaのDashboardだけで全てのサーバの状態が参照できるので�
 == Auditbeat
 
 Linuxサーバへ攻撃がないかを確認するため、auditdが出力する@<code>{audit.log}をモニタリングしている方は多いのではないでしょうか。
-ただ、これから@<code>{audit.log}をモニタリングしたいという人からしたらハードルが高く、モニタリングするまでに時間を要してしまいます。
-そこで、Beatsは、Auditbeatというデータシッパーがあるので容易に導入することができます。
-ここまでFilbeatやMetricbeatを触ってきたらわかるとおり、学習コストはほぼかからないでDashboardで閲覧するところまでできてしまいます。
+しかし、@<code>{audit.log}のモニタリングはハードルが高く、監視環境の構築に時間がかかります。
 
-それでは、ここからAuditbeatをインストールします。
+BeatsのAuditbeatを利用すると、FilebeatやMetricbeatのように少ない学習コストで@<code>{audit.log}のモニタリングが可能です。
+早速環境を構築していきましょう。
 
+始めに、Auditbeatをインストールします。
 
 //list[beats-27][Auditbeatのインストール]{
 sudo yum install auditbeat
