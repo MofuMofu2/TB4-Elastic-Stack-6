@@ -1,8 +1,8 @@
 = Curator
 
-== この章でやること
+== Curatorとは
 
-Curatorは、Elasticsearchに保存したログのインデックス操作や、スナップショットの取得などを行う運用支援ツールです。
+Curatorは、Elasticsearchに保存したログのindex操作や、スナップショットの取得などを行う運用支援ツールです。
 この章では、Elasticsearchに保存したインデックスの削除や、検索対象から外す方法について触れていきます。
 Curatorの詳細は、こちらのリンク@<href>{https://www.elastic.co/guide/en/elasticsearch/client/curator/current/index.html}を参照してください。
 
