@@ -9,8 +9,23 @@ CHAPS:
   - elasticsearch_go.re
   # Logstashを使ってみる
   - logstash.re
+  # LogstashのGrokフィルタを極める
+  - stage01.re
+  - stage02.re
+  - stage03.re
+  - stage04.re
+  - stage05.re
+  - stage06.re
+  - stage07.re
   # Logstashのマルチパイプラインを体験する
   - logstash_pipelines.re
+  # データ収集集ツール・fluentdとの比較
+  - chapterA.re
+  - chapterB.re
+  - chapterC.re
+  - chapterD.re
+  - chapterE.re
+  - chapterF.re
   # Beatsを体験する
   - beats.re
   # Curatorを用いてIndexを操作する
