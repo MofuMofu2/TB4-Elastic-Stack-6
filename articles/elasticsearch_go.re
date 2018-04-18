@@ -1,14 +1,15 @@
-
+﻿
 = GoではじめるElasticsearch
 
 == はじめに
 
 
-Elasticsearchの入門の多くはREST APIを使ったものが多いのですが、実際にアプリケーションを作成する際は何らかの言語のSDKを利用するかと思います。
+Elasticsearchの入門情報の多くはREST APIを使ったものが多いのですが、実際にアプリケーションを作成する際は何らかの言語のSDKを利用するかと思います。
 そうした際に意外と「あれ、これってどうやるんだ？」となる場合が多いものです。
 
-そこで、本章ではElasticsearchの基本操作を、Go言語を利用して体験していきます。Elasticsearchの基本的な操作を中心に、ちょっとしたTipsについても触れていきます。
-Elasticsearchはとても多くの機能を有しています。そのため、全ての機能をカバーすることは難しいです。よって、代表的な機能について本章では記載します。また本章ではElasticsearchのAPIを主に扱います。
+そこで、本章ではElasticsearchの基本操作をGo言語を利用して体験していきます。Elasticsearchの基本的な操作を中心に、ちょっとしたTipsについても触れていきます。
+
+Elasticsearchはとても多くの機能を有しています。そのため、本書で全ての機能をカバーすることは難しいです。よって、代表的な機能について本章では記載します。また本章ではElasticsearchのAPIを主に扱います。
 
 
 == Elasticsearch環境の準備
@@ -37,15 +38,16 @@ docker run -p 9200:9200  -e "discovery.type=single-node" -e （紙面の都合�
 
 
 起動に成功すると、プロンプト上に起動ログが出力されます。
-ポートマッピングで指定している9200ポートはElasticsearchへのAPIを実行するためのエンドポイントです。
+ポートマッピングで指定している9200ポートは、ElasticsearchへのAPIを実行するためのエンドポイントです。
 Elastic社のDockerイメージを利用すると、Docker起動時に環境変数経由でElasticsearchの設定を変更できます。
 
 起動時にいくつかオプションを指定しているため解説します。
+
 まず、オプション@<code>{discovery.type}を@<code>{single-node}に設定しています。
-このElasticsearchはクラスタを構成せず、シングルノード構成であることを明示します。すると、起動時に自分自身をマスタノードとして設定し起動します。
+これはElasticsearchはクラスタを構成せず、シングルノード構成であることを明示しています。すると、起動時に自分自身をマスタノードとして設定し起動します。
 
 次に、@<code>{network.publish_host}を@<code>{loccalhost}に設定しました。
-ElasticsearchのAPIエンドポイントとして公開するIPアドレスを指定します。
+ここではElasticsearchのAPIエンドポイントとして公開するIPアドレスを指定します。
 指定しなかった場合、Dockerコンテナ内部のプライベートIPアドレスとなり、
 ローカルホストから直接Elasticsearchのエンドポイントへ接続することができないため、この設定を入れています。
 
@@ -80,24 +82,25 @@ curl http://localhost:9200
 //}
 
 
-ElasticsearchのDockerイメージの起動オプションなどはDockerHubのドキュメント（@<href>{https://hub.docker.com/_/elasticsearch/}）に記載があります。
+ElasticsearchのDockerイメージの起動オプションなどは、DockerHubのドキュメント（@<href>{https://hub.docker.com/_/elasticsearch/}）に記載があります。
 
 
 == クライアントライブラリの選定
 
 
 まずはElasticsearchを操作するためのクライアントライブラリを決める必要があります。
-Elastic社の公式クライアント@<href>{https://github.com/elastic/go-elasticsearch}もあるのですが、現時点では絶賛開発中なうえにあまり活発にメンテナンスもされていません…。
+Elastic社の公式クライアント@<href>{https://github.com/elastic/go-elasticsearch}もあるのですが、現時点では依然開発中なうえにあまり活発にメンテナンスもされていません。
 
 
 今回は@<code>{Elastic:An Elasticsearch client for the Go}（@<href>{https://github.com/olivere/elastic}）を利用します。
-こちらのクライアントは開発も活発で、Elasticの早いバージョンアップにもいち早く対応されています。
+こちらのクライアントは開発も活発で、Elasticの早いバージョンアップにもいち早く対応しています。
 
-本書で扱う内容もolivere/elasticのGetting Started(@<href>{https://olivere.github.io/elastic/})をもとにしているため、より多くの機能の使い方などを知るためにもぜひこちらもご参照ください。
+本書で扱う内容もolivere/elasticのGetting Started（@<href>{https://olivere.github.io/elastic/}）をもとにしているため、より多くの機能の使い方などを知るためにもぜひこちらもご参照ください。
 
 それではクライアントをインストールしましょう。
 今回はgo getでインストールしますが、実際のプロダクト利用時はdepなどのパッケージ管理ツールの利用をおすすめします。
-Goのインストール及びGOPATHの設定を事前にお願いします。
+
+また、事前にGoのインストール及びGOPATHの設定をしてください。
 
 
 //list[elasticsearch-list04][Elasticクライアントのインストール]{
@@ -109,29 +112,30 @@ go get "github.com/olivere/elastic"
 
 
 さて、いよいよGoでElasticsearchを操作していきましょう。
-しかしその前に検索するデータを投入するためのIndexとTypeを作成していきます。
+その前に、検索するデータを投入するためのIndexとTypeを作成していきます。
 
 
 === IndexとType
 
 
 Elasticsearchで検索をおこなうために、まずIndexとTypeを作成する必要があります。
-RDBMSで例えると以下に相当します。
+これらはRDBMSで例えると以下に相当します。
 
- * Indexはスキーマ/データベース
- * Typeはテーブル
+ * Index：スキーマ/データベース
+ * Type：テーブル
 
 
-と、このようにRDBMSで例えられることが多いのですが、TypeはElasticsearch 7系より廃止が予定されています。
+このようにRDBMSで例えられることが多いのですが、TypeはElasticsearch7系以降に廃止が予定されています。
 また5系までは1つのIndexに複数のTypeを作成できたのですが、6系では1つのIndexに1つのTypeのみ作成できる仕様へ変わっています
 （参考：@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/master/removal-of-types.html}）。
 
 本章ではElasticsearch6系を利用するため、1 Indexに1 Typeを作成します。
-また、ElasticsearchはMapping定義を作成しなくてもデータを投入することもできます。
 
+また、ElasticsearchはMapping定義を作成しなくてもデータを投入することもできます。
 その際は投入したJSONデータにあわせたMappingが自動で作成されます。
+
 実際の検索アプリケーションでElasticsearchを利用する場合、Mapping定義によりデータスキーマを固定して利用することの方が多いかと思います。
-また、Mapping定義を作成することにより、各フィールド単位でより細かな検索設定をおこなうことが可能なため本書ではMapping定義を1から作成し利用します。
+また、Mapping定義を作成することにより、各フィールド単位でより細かな検索設定をおこなうことが可能なため本章ではMapping定義を最初から作成して利用します。
 
 
 === Mapping
@@ -169,19 +173,17 @@ Elasticsearchの操作に必要なMapping定義を@<list>{elasticsearch-list05}�
 今回は@<code>{chat}というTypeへドキュメントを登録していきます。また、@<code>{properties}にフィールドの項目を設定します。
 フィールド名とそのデータ型を@<code>{type}で指定していきます。今回指定しているデータ型について説明します。
 
-@<code>{keyword}はいわゆるString型です。後述するtext型もString型に相当します。しかしkeyword型の場合、そのフィールドへアナライザは適用されません。
-
-@<code>{text}はString型に相当します。text型を指定したフィールドはアナライザと呼ばれるElasticsearchの高度な検索機能を利用した検索が可能となります。
-
-@<code>{date}は日付型です。Elasticsearchへのデータ投入はJSONを介して行うため、実際にデータを投入する際はdateフォーマットに即した文字列を投入することになります。
+ * @<code>{keyword}はいわゆるString型です。後述するtext型もString型に相当します。しかしkeyword型の場合、そのフィールドへアナライザは適用されません。
+ * @<code>{text}はString型に相当します。text型を指定したフィールドはアナライザと呼ばれるElasticsearchの高度な検索機能を利用した検索が可能となります。
+ * @<code>{date}は日付型です。Elasticsearchへのデータ投入はJSONを介して行うため、実際にデータを投入する際はdateフォーマットに即した文字列を投入することになります。
 
 
 keyword型とtext型は両者ともString型に相当します。その違いはアナライザを設定できるか否かです。
-後ほど詳細を説明しますが、アナライザを適用することでそのフィールドに対し高度検索を行うことができます。一方でkeyword型はアナライザが適用されないため、完全一致での検索が求められます。
+後ほど詳細を説明しますが、アナライザを適用することでそのフィールドに対し高度な検索を行うことができます。一方でkeyword型はアナライザが適用されないため、完全一致での検索が求められます。
 また、フィールドに対してソートをおこなう場合、keyword型を指定する必要があります。
 
 
-Elasticsearch 6系のデータ型の詳細は公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html}）を参照してください。
+Elasticsearch6系のデータ型の詳細は公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping-types.html}）を参照してください。
 多くのデータ型が標準でサポートされています。
 
 
@@ -292,7 +294,7 @@ Elasticsearch version 6.2.2
 
 ローカル環境で稼働させているElasticsearchのバージョンが表示されれば、Elasticsearchに接続できています。
 もし接続できない場合、正常にElasticsearchのコンテンが起動しているか、ポートマッピングが正しくおこなわれているかなどを確認してください。
-また以下のように、クライアント作成時に以下のオプションを付与して試してください。(以降のサンプルでも同様)
+また以下のように、クライアント作成時にオプションを付与して試してください。（以降のサンプルでも同様）
 
 
 //list[elasticsearch-list08][もしElasticsearchへの接続に失敗する場合]{
@@ -307,16 +309,16 @@ client, err := elastic.NewClient(
 === 単純なCRUD操作
 
 
-それでは@<list>{elasticsearch-list0}で作成したIndexを対象に基本的なCRUD操作をおこなってみましょう。
+それでは@<list>{elasticsearch-list0}で作成したIndexを対象に、基本的なCRUD操作をおこなってみましょう。
 操作を始めるために、まずはクライアントのオブジェクトを作成します。
 
-
+#@# ここリスト抜けてませんか？（「・・・クライアントのオブジェクトを作成します。」に対応するもの）
 
 このクライアントオブジェクトを通じてElasticsearchを操作していきます。
 クライアントの作成時に以下の2つのオプションを指定しています。
 特にSetSniffはElasticsearchのDockerコンテナへ接続する際に必要となる設定です。
 
-
+#@# ２つのオブジェクト、の列挙、あるいはオブジェクトを指定するリストがありませんか？（SetSniffしか本文に出てこない）
 
 操作にあたっては、さきほど作成したMappingに対応するStructを通じておこなっていきます。
 よって、今回サンプルとして利用するChat Mappingに対応するStructを定義します。
@@ -332,7 +334,7 @@ type Chat struct {
 //}
 
 
-GoのクライアントとElasticsearch間はHTTP(S)で通信され、JSONでデータのやり取りがおこなわれます。
+GoのクライアントとElasticsearch間はHTTP（S）で通信され、JSONでデータのやり取りがおこなわれます。
 そのため、StructにはMappingで定義したフィールド名をjsonタグで指定することでMapping定義上のフィールド名とマッピングします。
 
 
@@ -516,8 +518,10 @@ deleted
 
 
 さて、基本的なCRUDを通じてElasticsearchの基本をおさえたところで、検索処理について詳しく掘り下げていきます。
-Elasticsearchは多くの検索機能をサポートしています。本章ではその中でも代表的な昨日について取り上げます。
+Elasticsearchは多くの検索機能をサポートしています。本章ではその中でも代表的な機能について取り上げます。
+
 Elasticsearchの高度な検索を支える仕組みにAnalyzerがあります。これらの検索クエリもAnalyzerの機能を利用することで、より柔軟な検索をおこなうことができます。
+
 まずはElasticsearchのAnalyzerについてみていきましょう。
 
  * Match Query
@@ -532,10 +536,11 @@ Elasticsearchの高度な検索を支える仕組みにAnalyzerがあります�
 
 
 ここでAnalyzerについて簡単に説明します。Analyzerの設定は全文検索処理の要です。そのため、設定内容も盛り沢山ですし、自然言語処理の知識も必要となってくるため、ここではあくまで触りだけを説明します。
-この本をきっかけにElasticsearchにもっと興味を持っていただけた方はAnalyzerを深掘ってみてください。
+
+この本をきっかけにElasticsearchにもっと興味を持っていただけた方は、Analyzerを深掘ってみてください。
 
 
-Analyzerは以下の要素から構成されています。これらを組み合わせることでより柔軟な検索をおこなうためのインデックスを作成することが可能です。
+Analyzerは以下の要素から構成されています。これらを組み合わせることで、より柔軟な検索をおこなうためのインデックスを作成することが可能です。
 
  * Tokenizer
  ** ドキュメントをどのようにトークン分割するかを定義します。トークン分割には様々な方法があり、有名なものだと形態素解析やN-Gramなどがあります。Tokenizerにより分割されたトークンをもとに検索文字列との比較がおこなわれます。各Analyzerは1つのTokenizerを持つことができます。
@@ -556,7 +561,7 @@ Tokenizerで形態素解析を用いた場合の例を@<img>{analyzer_sample}に
 //}
 
 
-このようにTokenizerだけでなく任意のFiltersを組みわせることで、検索要件に適したAnalyzerを作成し適用することができます。
+このようにTokenizerだけでなく任意のFiltersを組みあわせることで、検索要件に適したAnalyzerを作成し適用することができます。
 本書では日本語形態素解析プラグインであるKuromojiを利用しAnalyzerの設定をおこなっていきます。
 
 
@@ -658,7 +663,7 @@ Token Filters	kuromoji_stemmer	単語の末尾につく長音を削除 e.g) サ�
 
 
 作成したAnalyzerを適用したいMappingフィールドに指定することで、そのフィールドにAnalyzerで指定したインデクシングを施すことができます。
-Chatマッピングの１階層下に存在する、messageフィールドの@<code>{analyzer}にさきほど作成した@<code>{Analyzer}を指定することで適用します。
+Chatマッピングの1階層下に存在する、messageフィールドの@<code>{analyzer}にさきほど作成した@<code>{Analyzer}を指定することで適用します。
 
 
 
@@ -672,7 +677,7 @@ Chatマッピングの１階層下に存在する、messageフィールドの@<c
 //}
 
 
-作成しなおしたインデックスに確認用のデータを登録します。(登録するデータがいささいか少ないですが、、すいません)
+作成しなおしたインデックスに確認用のデータを登録します。（登録するデータがいささか少ないですが…）
 
 
 //list[elasticesearch-list112][テストデータの登録]{
@@ -746,13 +751,13 @@ func main() {
 
 
 
-これで準備が整いました！それではここの詳細に移っていきましょう。
+これで準備が整いました！それでは詳細の説明に移っていきましょう。
 
 
 === Match Query
 
 
-atchQueryは全文検索の肝です。MatchQueryでは、指定した検索文字列がAnalyzerにより言語処理がなされ検索がおこなわれます。
+MatchQueryは全文検索の肝です。MatchQueryでは、指定した検索文字列がAnalyzerにより言語処理がなされ検索がおこなわれます。
 olivere/elasticで検索機能を利用する際は、client経由でSearchメソッドを実行します。
 Searchメソッドはelastic.SearchServiceのQueryメソッドに、検索条件を指定した@<code>{elastic.MatchQuery}を代入します。
 取得できたドキュメントをStruct経由で操作する際はreflectパッケージを使って操作します。
@@ -816,7 +821,7 @@ Chat message is: 明日は期末テストがあるけどなんにも勉強して
 
 
 意図した通りのドキュメントを取得することができました！では、この検索結果はどのように導かれたのでしょうか。
-AnalyzerこれらのドキュメントがどのようにAnalyzeされインデクシングされているのか確認します。
+Analyzerで、これらのドキュメントがどのようにAnalyzeされインデクシングされているのか確認します。
 
 
 
@@ -904,7 +909,7 @@ AnalyzerこれらのドキュメントがどのようにAnalyzeされインデ�
 
 
 TermQueryを利用することで、指定した文字列を完全に含むドキュメントを検索することができます。
-atchQueryと違い、検索文字列がAnalyzeされないため、指定した文字列と完全に一致する転地インデックスを検索します。
+MatchQueryと違い、検索文字列がAnalyzeされないため、指定した文字列と完全に一致する転地インデックスを検索します。
 そのため、例えばタグ情報など指定した検索文字列と完全に一致させて検索をさせたい際に利用します。
 Elastic:An Elasticsearch client for the GoでTermQueryを利用する際はTerm Queryは@<code>{elastic.TermQuery}を利用します。
 elastic.NewTermQueryは検索対象のフィールドと検索文字列を指定します。
@@ -978,7 +983,7 @@ Query	説明	oliver/elasticでの指定方法
 -----------------
 must	ANDに相当	boolQuery := elastic.NewBoolQuery()@<br>{}boolQuery.Must(elastic.NewTermQuery("field", "value")
 should	ORに相当	boolQuery := elastic.NewBoolQuery()@<br>{}boolQuery.Should(elastic.NewTermQuery("field", "value")
-must_not	NOT	boolQuery := elastic.NewBoolQuery()@<br>{}boolQuery.MustNot(elastic.NewTermQuery("field", "value")
+must_not	NOTに相当	boolQuery := elastic.NewBoolQuery()@<br>{}boolQuery.MustNot(elastic.NewTermQuery("field", "value")
 //}
 
 
@@ -1067,6 +1072,7 @@ Cnat message is: あと十年あれば期末テストもきっと満点がとれ
 Scroll APIを利用することで、スクロールタイプのページング機能を手軽に利用することができます。Elasticsearchでは@<code>{limit&offset}を用いた値の取得もできます。
 ただし、@<code>{limit&offset}を利用した場合、検索がおこなわれる度に指定したoffsetからlimit数分のドキュメントを取得します。そのため、取得結果に抜け漏れや重複が生じる可能性があります。
 一方でScroll APIを利用した場合、初回検索時にスナップショットが生成されます。そのため、Scroll APIが返すスクロールIDを利用することで、初回検索時のスナップショットに対して任意の箇所からページングをおこなうことができます。
+
 使い方はとても簡単で、@<code>{elastic.ScrollService}を介して操作することが可能です。
 
 
@@ -1143,7 +1149,7 @@ Scrolled message is: あと十年あれば期末テストもきっと満点が�
 === Multi Fields
 
 
-Multi Fields機能を利用することで一つのフィールドに対して異なるデータ型やAnalyze設定を指定することができます。
+Multi Fields機能を利用することで、一つのフィールドに対して異なるデータ型やAnalyze設定を指定することができます。
 といってもすぐにピンとこないかもしれませんので、実際にMulti Fieldsの設定をしているMapping定義をみていきましょう。
 
 
@@ -1174,9 +1180,9 @@ userフィールドのtypeにmulti_fieldを指定しています。以下のよ�
  * user： type textが適用されているuserフィールドにアクセスします
  * user.keyword：type keywordが適用されうるフィールドにアクセスします
 
-ドキュメントを登録する際にはこれまで通りuserフィールドを明示して登録するだけでよいです。
+ドキュメントを登録する際にはこれまで通りuserフィールドを明示して登録するだけです。
 
-例えばMatchQueryの場合だと以下のようになります。
+例えばMatchQueryの場合、以下のようになります。
 
 
 //list[elasticsearch-list177][user(type text)に対する検索]{

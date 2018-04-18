@@ -410,26 +410,23 @@ sudo service filebeat start
 //}
 
 Index Patternsをクリックします。
-
-//image[filebeat05][Indexを選択][scale=0.8]{
-//}
-
 Filebeatのindexパターンが登録されていることがわかります。
 
-//image[filebeat06][Filebeatのindexパターンを確認][scale=0.8]{
+//image[filebeat05][Filebeatのindexパターンを確認][scale=0.8]{
 //}
 
 左ペインにある@<code>{Dashboard}をクリックします。
 Filebeat Modulesの機能によって、あらかじめDashboardが準備されています。
+今回は、Nginxの@<code>{Filebeat Nginx Overview}というDashboardをクリックします。
 
-//image[filebeat07][Dashboardの確認][scale=0.8]{
+//image[filebeat06][Dashboardの選択][scale=0.8]{
 //}
 
-今回は、Nginxの@<code>{Filebeat Nginx Overview}というDashboardをクリックします。
 取得したログの情報がグラフィカルに表示されていますね。
 
-//image[filebeat08][Filebeat Nginx Overview][scale=0.8]{
+//image[filebeat07][Dashboardの表示][scale=0.8]{
 //}
+
 
 いかがでしたか？
 他にも取り込みたいログがあれば、@<code>{filebeat.yml}のModuleを追加するだけで容易にモニタリングができるようになります。
