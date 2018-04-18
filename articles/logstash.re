@@ -1,7 +1,5 @@
 = Logstashを使ってみる
 
-== この章でやること
-
 
 AWSを利用してWebサイトを運営しているとき、ELBのアクセスログを用いてアクセス元の国やUserAgentを知りたくなることが
 あるかもしれません。しかし、これらの情報の中にはCloudWatchではモニタリングできないものがあります。
@@ -12,16 +10,16 @@ ELBはログを出力しているので、そのログを何らかの形で取�
 
 この章で目指すことは次の2点です。
 
- * ALB(AWSのアプリケーションロードバランサ)のログをLogstashからElasticsearchに保存する
+ * ALB（AWSのアプリケーションロードバランサ）のログをLogstashからElasticsearchに保存する
  * Elasticsearchに保存したログをKibanaでビジュアライズできるようになる
 
 
 == 実行環境を準備する
 
 Logstashの使い方を知る前に、実行環境を整える必要があります。
-サーバは、AWSのEC2を利用し、OSは、AmazonLinuxで構築していきます。
+サーバはAWSのEC2を利用し、OSはAmazonLinuxで構築していきます。
 インスタンスタイプは、稼働に最低限必要なリソースのものを選択しています。
-OSによって発行するコマンドが変わってくるので、その辺は公式HPをみて頂ければと思います。
+OSによって発行するコマンドが変わってくるので、詳しくは公式HPを確認してください。
 
  * Amazon Linux AMI 2017.09.1 (HVM), SSD Volume Type - ami-97785bed
  * t2.medium(vCPU: 2,Mem: 4)
@@ -38,11 +36,11 @@ OSによって発行するコマンドが変わってくるので、その辺は
 各プロダクトはこちらのリンク（@<href>{https://www.elastic.co/jp/products}）から
 ダウンロードすることが可能です。
 
-=== こんな環境を想定しているよ
+=== 想定される環境
 
 
-ユーザがWebサイトにアクセスした際にALBで出力したアクセスログをS3に保存します。
-S3に保存されたアクセスログをLogstashが定期的に取得する構成です。
+ユーザがWebサイトにアクセスした際に、ALBで出力したアクセスログをS3に保存します。
+S3に保存されたアクセスログを、Logstashが定期的に取得する構成です。
 
 //image[logstash01][本章で想定している環境構成]{
 //}
@@ -58,9 +56,9 @@ AWSの公式ドキュメントなどを参考に設定してください。
 
 == ミドルウェアのインストール
 
-次の順番でインストールを実施します。
+次の順番でインストールします。
 
- 1. Java 8
+ 1. Java（バージョン8）
  2. Elasticsearch
  3. Logstash
  4. Kibana
@@ -75,7 +73,7 @@ java -version
 //}
 
 AmazonLinuxの場合、Javaが最初からインストールされています。
-ただしバージョンは7のため、Java 8を新しくインストールする必要があります。
+ただしバージョンが7のため、Java 8を新しくインストールする必要があります。
 
 //list[logstash-02][Java 8のインストール]{
 sudo yum -y install java-1.8.0-openjdk-devel
@@ -83,7 +81,7 @@ sudo yum -y install java-1.8.0-openjdk-devel
 
 === Javaのバージョンを変更
 
-JavaをインストールしただけではOSが利用するJavaのバージョンが切り替わりません。
+Javaをインストールしただけでは、OSが利用するJavaのバージョンが切り替わりません。
 @<code>{alternatives}コマンドを利用して利用するJavaのバージョンを切り替えましょう。
 
 
@@ -116,11 +114,11 @@ OpenJDK 64-Bit Server VM (build 25.161-b14, mixed mode)
 === Elasticsearchのインストール
 
 
-ここからは、Elastic Stackのインストールを実施していきます。
-ちなみに、英語ドキュメント（@<href>{https://www.elastic.co/guide/en/logstash/current/installing-logstash.html,Install Logstash}
+ここからは、Elastic Stackのインストールを行います。
+ちなみに、公式ドキュメントは英語（@<href>{https://www.elastic.co/guide/en/logstash/current/installing-logstash.html,Install Logstash}
 ）です。
-やはり英語だと抵抗感を抱く人がいると思うので、できる限りわかりやすく日本語で書きます。
-正直、英語ぐらいわかるわー！って人は、飛ばしちゃってください。
+やはり英語だと抵抗感を抱く人がいると思うので、本章ではできる限りわかりやすく日本語で説明します。
+英語のドキュメントで問題ない方はこの項は読み飛ばしていただいても問題ありません。
 
 
 始めに、Elasticsearchなどのパッケージをダウンロードするため、GPGキーをインポートします。
@@ -132,7 +130,7 @@ rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 
 キーの登録が完了したので、YUMリポジトリを追加します。
 @<code>{/etc/yum.repo/}配下に@<code>{elasticstack.repo}というファイルを作成します。
-公式ドキュメントでは、logstash.repoとなっていますが、今回はElasticsearchなども一緒にインストールするため、Elastic Stackという名前にしました。
+公式ドキュメントではlogstash.repoとなっていますが、今回はElasticsearchなども一緒にインストールするため、elasticstack.repoという名前にしました。
 ファイル名は自由につけてよい、ということです。
 
 
@@ -204,7 +202,7 @@ sudo yum install logstash
 //}
 
 
-今回はログの取得元をAWSのS3としています。S3からログを取得するには追加でプラグインをインストールする必要があります。
+今回はログの取得元をAWSのs3としています。s3からログを取得するには追加でプラグインをインストールする必要があります。
 それでは、@<code>{S3 Input Plugin}（@<href>{https://www.elastic.co/guide/en/logstash/current/plugins-inputs-s3.html}
 ）をインストールします。
 
@@ -261,8 +259,8 @@ kibana      0:off   1:off   2:on    3:on    4:on    5:on    6:off
 == ミドルウェアの設定
 
 
-ここからミドルウェアに対して、必要な設定を実施していきます。
-以下の流れでミドルウェアの設定をしていきます。
+ここからミドルウェアに対して、必要な設定を行います。
+以下の流れでミドルウェアの設定をします。
 
  1. Elastcisearchの設定
  2. Logstshの設定
@@ -283,19 +281,19 @@ kibana      0:off   1:off   2:on    3:on    4:on    5:on    6:off
 //}
 
 @<code>{/etc/elasticsearch}配下に3つのファイルが配置されてます。
-Elasticsearchを構成する際に@<code>{jvm.options}と@<code>{elasticsearch.yml}を主に設定します。
+Elasticsearchを構成する際には@<code>{jvm.options}と@<code>{elasticsearch.yml}を主に設定します。
 @<code>{log4j2.properties}は、ログの出力形式など変更が必要な際に設定してください。
 
 
 今回は@<code>{jvm.options}と@<code>{elasticsearch.yml}を編集します。
-この二つの設定ファイルの変更と設定についての考慮点などを記載したいと思います。
+この二つの設定ファイルの変更と設定について考慮が必要な点などを記載したいと思います。
 
 
 ==== jvm.optionsについて
 
 Elasticsearchのヒープサイズを変更したい場合、jvm.optionsを編集します。
 例えば、ヒープサイズの最大と最小を設定する場合は、@<code>{Xms(minimum heap size)}と@<code>{Xmx(maximum heap size)}を変更します。
-じゃあ、いくつに設定すればいいの？と思う方もいるかと思いますが、要件によって変わってくる項目です。
+いくつに設定すればいいの？と思う方もいるかと思いますが、これは要件によって変わってくる項目です。
 公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html,Settings the heap size:}）にも考慮点が記載されているので、そちらも参考に値を決めてください。
 
  * 最小ヒープサイズ(Xms)と最大ヒープサイズ(Xmx)の値を等しくする
@@ -393,7 +391,7 @@ No.	Item	Content
 
 ==== logstash.ymlの編集
 
-今回はlogstash.ymlの編集は行いませんが、@<code>{logstash.yml}の役割について解説します。
+今回はlogstash.ymlの編集を行いませんが、@<code>{logstash.yml}の役割について解説します。
 
 このファイルでは、パイプラインのバッチサイズやディレイ設定を行います。
 Logstashの動作についてのハンドリングをすることが可能です。
@@ -423,7 +421,7 @@ Logstashは@<code>{Input}、@<code>{Filter}、@<code>{Output}の3つで構成さ
 
 
 Logstashの起動方法は、コマンド起動とサービス起動の2種類が存在します。
-最終的にはサービス起動を利用したほうが利便性も高いですが、最初はコマンド起動を利用してLogstashの操作に慣れると良いでしょう。
+最終的にはサービス起動を利用したほうが利便性も高いのですが、最初はコマンド起動を利用してLogstashの操作に慣れると良いでしょう。
 
 Logstashを起動するため、パイプラインファイルを作成します。
 このパイプラインは、単純に標準入力からLogstashを通して標準出力を行うものです。
@@ -468,7 +466,7 @@ arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789
 //}
 
 
-このサンプルログを@<code>{/etc/logstash/}配下に@<code>{alb.log}として保存します。ファイル名は任意で良いです。
+このサンプルログを@<code>{/etc/logstash/}配下に@<code>{alb.log}として保存します。ファイル名は任意です。
 
 ログファイルの準備が整ったので、パイプラインファイルを新しく作成します。
 先程作成したtest.confは、Inputを標準入力としていました。
@@ -523,8 +521,8 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 
 標準入力で実行した時と同様にmessageに取り込んだログが出力されていることがわかります。
 ただ、これでは構造化した形でElasticsearchにデータ転送できないので、検索性が損なわれます。
-messageというキーに全てのログの全てのデータが入ってしまうとKibanaで検索する際に不都合が発生するのです。
-Filterを利用してmessageからデータを分割していきます。
+messageというキーに全てのログの全てのデータが入ってしまうと、Kibanaで検索する際に不都合が発生するのです。
+そこで、Filterを利用してmessageからデータを分割していきます。
 
 
 ==== LogstashのFilterを使ってみる
@@ -534,7 +532,7 @@ Filterを利用してmessageからデータを分割していきます。
 Filterにはログの種別に合わせた処理をするためのプラグインが存在します。
 今回のALBもGrokフィルタなどを使うことで構造化したほうが良いでしょう。
 
-とはいえ、どのように構造化すればいいのか迷ってしまいます。まずはALBのログフォーマットを把握し、作戦を立てると良いです。
+とはいえ、どのように構造化すればいいのか迷ってしまいます。まずはALBのログフォーマットを把握し、作戦を立てます。
 
 各フィールドを@<table>{table01}にまとめました。
 このようにログを取り込む前にログフォーマットを確認し、フィールド名を定義します。
@@ -579,9 +577,10 @@ drwxr-xr-x 2 root root 4096 xxx xx xx:xx patterns
 //}
 
 ディレクトリが作成できたので、ALBのパターンファイルを作成します。
-中身については、闇深いのでここでは説明しません。りまりま団の著書『@<b>{データを加工する技術}』でGrokフィルタの書き方について解説しているのでboothでPDFを買うと良いですよ。（ステマ）
+中身についての詳細？？？？章で解説しています。
 また、Typeは、インデックステンプレートで作成するのが一般的かと思いますが、今回は、パターンファイルの中で指定します（いろんなやり方があるんだよという意味で）
 
+#@# ここ、？？？章、とした部分、追加で加えた部分に入っていますか？であればそこを参照したほうがいいですね
 
 このパターンファイルを呼び出す時は、ファイル名の指定だけでなく@<code>{Grok-Patterns}の指定も必要です。
 ここでいう@<code>{Grok-Patterns}は、@<code>{ALB ACCESS LOG}に該当します。
@@ -684,34 +683,36 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 今回使用しているフィルタは次の通りです。
 
  1. grok
- 1. date
- 1. geoip
-
-===== grok-filter
+ 2. date
+ 3. geoip
+ 4. mutate
+　
+　
+１．grok-filter
 
 正規表現でデータをパースする際に使用します。
-@<code>{patterns dir}で外だししているパターンファイルを呼び出すことができます。
-また、@<code>{match}でmessageに取り込まれている値を対象にGrok-Patterns(ここでいうALB ACCESS_LOG)を適用しています。
-
-===== date-filter
+@<code>{patterns dir}で外出ししているパターンファイルを呼び出すことができます。
+また、@<code>{match}でmessageに取り込まれている値を対象にGrok-Patterns（ここでいうALB ACCESS_LOG）を適用しています。
+　
+２．date-filter
 
 実際のログが出力された時間を@<code>{@timestamp}に置き換えています。
-置き換えないとLogstashがデータを取得した時刻が@<code>{@timestamp}に記録されてしまうからです。
+そのままではLogstashがデータを取得した時刻が@<code>{@timestamp}に記録されてしまうからです。
 今回は@<code>{date}を@<code>{@timestamp}に置き換えています。
 また、タイムゾーンを日本にしたいため、"Asia/Tokyo"を指定しています。
-
-===== geoip-filter
+　
+３．geoip-filter
 
 IPアドレスから地理情報を取得することが可能です。@<fn>{1}
-例えば、どこかのグローバルIPアドレスからWhoisでどこの国からのアクセスかな？って調べる時があると思います。
-その動作を一つひとつのログに対してやっていたら死んでしまいます…。しかし、geoip-filterを使用すれば、自動で地理情報を付与してくれるのです。
-ちなみにですが、Logstashが内部で保持しているデータベースを照合して地理情報を付与してくれています。
+例えば、どこかのグローバルIPアドレスからWhoisでどこの国からのアクセスかな？と調べる時があります。
+その動作を一つひとつのログに対して行うのは大変です。しかし、geoip-filterを使用すれば、自動で地理情報を付与してくれるのです。
+これはLogstashが内部で保持しているデータベースを照合して地理情報を付与しています。
 
 
-geoip-filterを適用するフィールドを指定します。
+ここではgeoip-filterを適用するフィールドを指定します。
 今回は、クライアントのIPアドレスを元にどこからアクセスされているかを知りたいため、フィールド名の"client_ip"を指定します。
-
-===== mutate-filter
+　
+４．mutate-filter
 
 不要なフィールドの削除を行うなど、データやログの編集が可能です。
 例えば、messageの値は、全てkey-valueで分割されて保存されています。そのため、無駄なリソースを使いたくない場合は、削除するというような運用を行います。
@@ -744,7 +745,7 @@ filter {
 
 ==== 実行時のエラーが発生した場合
 
-補足ですが、コマンドラインで実行している際に次のようなエラーが発生した場合は、Logstashのプロセスがすでに立ち上がっている可能性があります。
+コマンドラインで実行している際に次のようなエラーが発生した場合は、Logstashのプロセスがすでに立ち上がっている可能性があります。
 
 
 //cmd{
@@ -808,15 +809,15 @@ $ kill -9 32061
 
 
 現在の設定は、Inputをローカルファイル指定しており、Outputが標準出力にしてあります。
-ここからは、InputをS3に変更し、OutputをElasticsearchに変更します。
+ここからは、Inputをs3に変更し、OutputをElasticsearchに変更します。
 まずは、Inputから編集します。
 
-
-===== Inputの編集
+　　
+１．Inputの編集
 
 @<code>{alb.conf}へS3からデータを取得する設定を行います。
 
-//list[logstash-32][alb.confへS3をInputにする設定を追記]{
+//list[logstash-32][alb.confへs3をInputにする設定を追記]{
 input {
   s3 {
     region => "ap-northeast-1"
@@ -845,8 +846,8 @@ No.	Item	Content
 今回は、AWSのアクセスキーとシークレットキーを指定せず、IAM Role
 （@<href>{https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html}）をインスタンスに割り当てています。
 オプションで指定することも可能ですが、セキュリティ面からIAM Roleで制御しています。
-
-===== Outputの編集
+　
+２．Outputの編集
 
 最後にOutputを標準出力からElasticsearchに変更します。
 
@@ -862,7 +863,7 @@ output {
 
 以下に各オプションについて説明します。
 indexを任意の形で指定することも可能ですが、デフォルトのままとするため、指定はしていません。
-デフォルトだと@<code>{logstash-logs-%{+YYYYMMdd}で作成されます。
+デフォルトでは@<code>{logstash-logs-%{+YYYYMMdd}で作成されます。
 
 //table[logstash-35][Elasticsearch-output-pluginの解説]{
 No.	Item	Content
@@ -1011,7 +1012,7 @@ Elasticsearchに取り込まれたことが確認できました。
 ==== kibana.ymlの編集
 
 
-Kibanaはフロント部分のため、アクセス元を絞ったり、参照するElasticsearchの指定たりするなどが可能です。
+Kibanaはフロント部分のため、アクセス元を絞ったり、参照するElasticsearchの指定したりするなどが可能です。
 今回の設定は、アクセス元の制限はしない設定にします。方法は、IPアドレスによる制限になります。
 どこからでもアクセスできるように設定するため、@<code>{0.0.0.0}のデフォルトルート設定とします（絞りたい場合は、厳密にIPアドレスを指定することで制限をかけることが可能です）
 
