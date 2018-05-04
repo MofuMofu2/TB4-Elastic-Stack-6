@@ -2,8 +2,8 @@
 
 Elastic Stackは、Elasticsearch社が提供するプロダクトです。
 以前まではELKという言葉で、Elasticsearch、Logstash、Kibanaの頭文字をとった呼び名で親しまれていました。
-しかし、Beatsという新たなプロダクトが増えたことにより、ELKでは違和感があるのと、ELKにうまい具合にB（Beatsの頭文字）を追加することも難しいという事態が発生しました。
-そこで、ELKをやめて、Elastic Stackという名前に統合し、以下の4つがプロダクトとして構成されています。
+しかし、Beatsという新たなプロダクトが増えたことにより、ELKでは違和感があるのと、ELKにうまい具合にB（Beatsの頭文字）を追加することも難しくなりました。
+そこでELKではなく「Elastic Stack」という呼び方に統合し、次の4つがプロダクトとして構成されています。
 
  * Elasticsearch
  * Logstash
@@ -32,7 +32,7 @@ Elasticsearchは、Javaで作られている分散処理型の検索エンジン
 //}
 
 と説明されています。
-用途としては、リアルタイムデータ分析、ログ解析、全文検索など様々なところで利用されています。
+用途としては、リアルタイムデータ分析、ログ解析、全文検索などさまざまなところで利用されています。
 
 昔は自分たちでElasticsearchを構築・運用するか、AWSの機能として@<code>{Amazon Elasticsearch Service}（@<href>{https://aws.amazon.com/jp/elasticsearch-service/}）を利用するしかありませんでした。
 しかし、Elastic Stack5からはElasticsearch社が提供するクラウドサービス@<code>{Elastic Cloud}（@<href>{https://www.elastic.co/jp/cloud}）を利用することで、Elasticsearchの管理・バージョンアップ・
@@ -59,11 +59,11 @@ Logstashは各環境に散らばっているログを集め、指定した対象
 ログの取得というとファイルからの取得を思い浮かべますが、プラグインを利用することでAmazon s3やTwitterから直接データを取得することも可能です。
 
 類似プロダクトとしてはTresure Data社製のOSSである、@<code>{fluentd}（@<href>{https://www.fluentd.org}）が存在します。
-エラーのわかりやすさ、環境構築の簡単さを取るのであればfluentdを、Elastic Stackとしてプロダクトをセットで運用するのであればLogstashを利用すると良いでしょう。
+エラーのわかりやすさ、環境構築の簡単さを取るのであればfluentdを、Elastic Stackとしてプロダクトをセットで運用するのであればLogstashを利用するとよいでしょう。
 
 Logstashはバージョン6からLogstashのプロセスを@<code>{Multiple pipeline}として分割できるようになりました。これを利用すると、AのデータとBのデータをLogstashで取得したいときに
 Logstashプロセスを2つ作ることができます。片方のプロセスが止まっても、もう片方のデータ連係は継続して行うことができるので、対障害性が上がります。
-詳しくは@<chapref>{logstash}を参照してください。
+詳しくは「AWSでLogstashを使ってみる」を参照してください。
 
 === Beats
 
@@ -73,7 +73,7 @@ Beatsは用途に合わせてデータを簡単に送ることができる軽量
 //footnote[introES-fn04][https://www.elastic.co/guide/en/beats/libbeat/current/beats-reference.html]
 
 Elastic Stack6からは@<code>{Modules}という機能が追加されました。Modulesを利用すると、Elasticsearchへのデータ連係とKibanaのグラフ作成を自動で行ってくれます。
-Apacheのaccess.logなど、利用できるデータは限られています。公式ドキュメント、またはKibanaのGUIで確認してください。
+ただし、Apacheのaccess.logなど利用できるデータが限られています。公式ドキュメント、またはKibanaのGUIで確認してください。
 
 ==== Filebeat
 
@@ -87,7 +87,7 @@ Apacheのaccess.logなど、利用できるデータは限られています。�
 
 
 メトリックという名前だけあって、システムやサービスのメトリックを収集することができます。
-例えば、サーバのCPUや、メモリの使用率、ディスクIOなどのデータだけでなく、プロセスなども収集できます。
+たとえば、サーバのCPUや、メモリの使用率、ディスクIOなどのデータだけでなく、プロセスなども収集できます。
 また、ビジュアライズするためのダッシュボードもあらかじめ用意されており、こちらも導入が簡単です。
 
 
@@ -99,16 +99,16 @@ Apacheのaccess.logなど、利用できるデータは限られています。�
 
 
 ネットワークを流れるパケットを収集することができます。
-パケットを収集するときにWiresharkなどで取得する場面があると思いますが、より簡単に専門的な知識がなくてもビジュアライズまで可能とするものです。
-様々なプロトコルに対応しているため、MySQLのクエリなどをKibanaを用いてビジュアライズすることも可能です。
+パケットを収集するためにWiresharkなどで取得する場面があると思いますが、Packetbeatはより簡単に専門的な知識がなくてもビジュアライズまで可能とするものです。
+さまざまなプロトコルに対応しているため、MySQLのクエリなどをKibanaを用いてビジュアライズすることも可能です。
 
 
 ==== Winlogbeat
 
 
 Windowsのイベントログを収集することができます。
-例えば、Windowsサーバを運用しており、監査目的でログオンしたユーザを把握したい場合は、イベントIDの"ログオン: 4624"や"ログオン失敗: 4625"を指定するだけで、収集することが可能です。
-このように取得したいイベントIDを指定するだけなので、簡単に導入できます。
+たとえば、Windowsサーバを運用しており、監査目的でログオンしたユーザを把握したい場合は、イベントIDの"ログオン: 4624"や"ログオン失敗: 4625"を指定するだけでイベントログを収集することが可能です。
+取得したいイベントIDを指定するだけなので、簡単に導入できます。
 
 Windowsの動作ログを取得したい場合、1番導入が簡単で手軽なプロダクトなのではないでしょうか。
 
@@ -130,7 +130,7 @@ ICMPでサーバの稼働状況を把握することも可能ですし、HTTPで
 === Kibana
 
 KibanaはElasticsearch内に保存されているデータを参照し、グラフを利用して可視化できるツールです。Elastic Stack6からは拡張機能を利用することで
-Logstashのプロセスの流れをGUIで見える化（@<code>{Logstash pipeline}）することや、Elasticsearchのデータを元に閾値を超えたら通知などのアクションをすることができるようになる
+Logstashのプロセスの流れをGUIで可視化（@<code>{Logstash pipeline}）することや、Elasticsearchのデータを元に閾値を超えたら通知などのアクションをすることができるようになる
 @<code>{Machine Learning}を利用できます。なお、Logstash pipelineとMachine Learningは有償になっています。
 
 == 今後のElastic Stackはどうなりそう？
