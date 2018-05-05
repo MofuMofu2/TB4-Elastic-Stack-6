@@ -1,7 +1,6 @@
 PREDEF:
   # 前書き
   - introduciton.re
-
 CHAPS:
   # Elastic Stackとは？
   - introduciton-Elastic_Stack.re
@@ -21,16 +20,16 @@ CHAPS:
   - Kibana-visualize.re
   # Kibana6の見所
   - Kibana-alpha.re
-  # データ収集集ツール・fluentdとの比較
-  - chapterA.re
-  - chapterB.re
-  - chapterC.re
-  - chapterD.re
-  - chapterE.re
-  - chapterF.re
-APPENDIX:
 
+APPENDIX:
+  # データ収集集ツール・fluentdとの比較
+#  - chapterA.re
+#  - chapterB.re
+#  - chapterC.re
+#  - chapterD.re
+#  - chapterE.re
+#  - chapterF.re
 
 POSTDEF:
-  # 著者リスト
+  # 著者プロフィール
   - editor.re

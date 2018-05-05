@@ -6,12 +6,11 @@ Curatorは、Elasticsearchに保存したログのindex操作や、スナップ�
 この章では、Elasticsearchに保存したindexの削除や、検索対象から外す方法について触れていきます。
 Curatorの詳細は、こちらのリンク@<href>{https://www.elastic.co/guide/en/elasticsearch/client/curator/current/index.html}を参照してください。
 
-Curatorの実行環境を構築します。
-
+まず、Curatorの実行環境を構築します。
 
 === Curatorのインストール
 
-まず始めに、Curatorのパッケージを取得するため、リポジトリの登録をします。
+始めに、Curatorのパッケージを取得するため、リポジトリの登録をします。
 ここで登録するリポジトリは、「AWSでLogstashを使ってみる」とは別のため登録が必要です。
 
 //list[curator-01][curator.repoの追加]{
@@ -53,7 +52,7 @@ Curatorを使用すると、任意の期間を指定してindexを削除する�
 === indexの削除操作
 
 indexが2018年4月1日〜4月5日まであるとします。
-curコマンドを利用して、indexが存在することを確認します。
+curlコマンドを利用して、indexが存在することを確認します。
 
 //list[curator-03][indexの確認]{
 curl -XGET localhost:9200/_cat/indices/logstash* | sort
@@ -149,7 +148,8 @@ No.	Item	Content
 
 
 index削除の環境が整ったので、Curatorを実行します。
-Curatorのコマンドラインの引数について説明します。
+
+まずCuratorのコマンドラインの引数について説明します。
 オプションの--configは、@<code>{curator.yml}を@<code>{~/.curator/curator.yml}以外のディレクトリに配置した場合、使用します。
 今回は、@<code>{~/.curator/curator.yml}に配置しているため、--configオプションは使用しません。
 
