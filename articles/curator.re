@@ -1,4 +1,4 @@
-= Curatorを用いてIndexを操作する
+﻿= Curatorを用いてIndexを操作する
 
 == Curatorとは
 

@@ -1,4 +1,4 @@
-= 複数のデータソースを取り扱う
+﻿= 複数のデータソースを取り扱う
 
 
 「AWSでLogstashを使ってみる」では、LogstashでS3にあるALBのログを取得し、Elasticsearchに送付しました。
@@ -136,7 +136,7 @@ No.	Item	Content
 @<list>{logstash_pipelines-01}では、Inputで定義した@<code>{tags}をベースにif分岐を用いた処理を行いました。
 if文の記述方法はRubyの記法で記述します。
 
-ここでもGrok処理を行なっているのですが、Apache用のパターンファイルを準備できていないので@<code>{httpd_patterns}を作成します。
+ここでもGrok処理を行っているのですが、Apache用のパターンファイルを準備できていないので@<code>{httpd_patterns}を作成します。
 
 
 //list[logstash_pipelines-03][Apacheのアクセスログ用パターンファイル]{
