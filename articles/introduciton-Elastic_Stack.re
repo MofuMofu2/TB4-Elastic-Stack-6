@@ -1,9 +1,9 @@
 ﻿= Elastic Stackとは
 
 Elastic Stackは、Elasticsearch社が提供するプロダクトです。
-以前まではELKという言葉で、Elasticsearch、Logstash、Kibanaの頭文字をとった呼び名で親しまれていました。
+2016年までは、Elasticsearch、Logstash、Kibanaの頭文字をとったELKという呼び名で親しまれていました。
 しかし、Beatsという新たなプロダクトが増えたことにより、ELKでは違和感があるのと、ELKにうまい具合にB（Beatsの頭文字）を追加することも難しくなりました。
-そこでELKではなく「Elastic Stack」という呼び方に統合し、次の4つがプロダクトとして構成されています。
+そこでELKではなく「Elastic Stack」という呼び方に統合し、主に次の4つがプロダクトとして構成されています。
 
  * Elasticsearch
  * Logstash
@@ -13,14 +13,15 @@ Elastic Stackは、Elasticsearch社が提供するプロダクトです。
 この4つは有名かつOSSとして利用できるプロダクトです。特に検索エンジンとしてのElasticsearchは競合がいないのでは？というくらい
 よく使われているミドルウェアです。
 
-やりたいことに合わせて柔軟に答えていけるだけのカスタマイズ性の高さ、より利便性を求めてアップデートをかけていく姿勢が魅力です。
+Elasticsearchのプロセス監視に特化したWatcher、Elasticsearchに保存されているデータの傾向を観察し
+異常なデータがあればアラートをあげるMachine LearningなどもElastic Stackの中に含まれています。しかし、これらのプロダクトは有償利用となるため
+この本では扱いません。
 
-== 主要プロダクト
+Elastic Stackはやりたいことを実現できるだけのカスタマイズ性の高さ、より利便性を求めてアップデートをかけていく姿勢が魅力です。
 
-Elastic Stackが今の形になったのは2016年です。Elastic Stack5までは各プロダクトのバージョンはバラバラに管理されており、リリース時期も
-プロダクトごとに異なっていました。さらに、5以前はElasticsearch・Logstash・Kibanaしかプロダクトは存在しませんでした。
+== 主要プロダクトの紹介
 
-これら3つのプロダクトの記事を読む際は、バージョンが5より前か後かをきちんと確認してください。コンセプトも少しずつ変化していますし、何より機能の統廃合が進みすぎているので
+Elasticsearh・Logstash・Kibanaの記事を読む際は、バージョンが5より前か後かをきちんと確認してください。コンセプトも少しずつ変化していますし、何より機能の統廃合が進みすぎているので
 昔「ELK」と呼ばれていたものと現在のElastic Stackはもはや別物です。
 
 === Elasticsearch
@@ -133,12 +134,12 @@ KibanaはElasticsearch内に保存されているデータを参照し、グラ�
 Logstashのプロセスの流れをGUIで可視化（@<code>{Logstash pipeline}）することや、Elasticsearchのデータを元に閾値を超えたら通知などのアクションをすることができるようになる
 @<code>{Machine Learning}を利用できます。なお、Logstash pipelineとMachine Learningは有償になっています。
 
-== 今後のElastic Stackはどうなりそう？
+== 今後のElastic Stack
 
-筆者は2017年12月に開催されたElastic {ON} Tour Tokyoに参加してました。
-そこで聞いた情報・また、2018年2月に開催されたカンファレンスElastic {ON}で発表された情報を列挙します。
+2017年12月に開催されたElastic {ON} Tour Tokyoで発表された情報と、
+2018年2月に開催されたカンファレンスElastic {ON}で発表された情報から、注目度が高いものを記述します。
 
-=== SQLが使えるようになる！
+=== Elaticsearchへクエリを投げる際、SQLが利用可能に
 
 Elastic Stackへのクエリを投げるために、今までElasticsearch独自のクエリを書く必要がありました。
 しかし、独自のクエリを覚えたり調べたりするのは大変ですよね。
@@ -146,10 +147,9 @@ Elastic Stackへのクエリを投げるために、今までElasticsearch独自
 今後のアップデートで、SQLクエリを利用してElasticsearhにクエリを発行できるようになります。
 Insertなど特定のクエリのみ、かつ標準SQLのサポートになりますが、それでも大分楽になりますね。
 
-=== X-Pack（有償）機能のソースコードを公開！
+=== X-Pack（有償）機能のソースコードを公開
 
 Elasticsearch社からライセンスを購入しないと利用できない機能の名前を@<code>{X-Pack}といいます。今まではソースコードが非公開となっていました。
 しかし、Elastic {ON}でX-Packのソースコードが公開されることが発表されました。
 
 @<b>{有償版の機能は引き続きライセンスを買わないと使うことはできません}。OSSになったわけではありません。
-
