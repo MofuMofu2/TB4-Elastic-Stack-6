@@ -134,12 +134,12 @@ KibanaはElasticsearch内に保存されているデータを参照し、グラ�
 Logstashのプロセスの流れをGUIで可視化（@<code>{Logstash pipeline}）することや、Elasticsearchのデータを元に閾値を超えたら通知などのアクションをすることができるようになる
 @<code>{Machine Learning}を利用できます。なお、Logstash pipelineとMachine Learningは有償になっています。
 
-== 今後のElastic Stackはどうなりそう？
+== 今後のElastic Stack
 
-筆者は2017年12月に開催されたElastic {ON} Tour Tokyoに参加してました。
-そこで聞いた情報・また、2018年2月に開催されたカンファレンスElastic {ON}で発表された情報を列挙します。
+2017年12月に開催されたElastic {ON} Tour Tokyoで発表された情報と、
+2018年2月に開催されたカンファレンスElastic {ON}で発表された情報から、注目度が高いものを記述します。
 
-=== SQLが使えるようになる！
+=== Elaticsearchへクエリを投げる際、SQLが利用可能に
 
 Elastic Stackへのクエリを投げるために、今までElasticsearch独自のクエリを書く必要がありました。
 しかし、独自のクエリを覚えたり調べたりするのは大変ですよね。
@@ -147,7 +147,7 @@ Elastic Stackへのクエリを投げるために、今までElasticsearch独自
 今後のアップデートで、SQLクエリを利用してElasticsearhにクエリを発行できるようになります。
 Insertなど特定のクエリのみ、かつ標準SQLのサポートになりますが、それでも大分楽になりますね。
 
-=== X-Pack（有償）機能のソースコードを公開！
+=== X-Pack（有償）機能のソースコードを公開
 
 Elasticsearch社からライセンスを購入しないと利用できない機能の名前を@<code>{X-Pack}といいます。今まではソースコードが非公開となっていました。
 しかし、Elastic {ON}でX-Packのソースコードが公開されることが発表されました。
