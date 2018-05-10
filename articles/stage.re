@@ -418,7 +418,7 @@ HTTPDATE %{MONTHDAY}/%{MONTH}/%{YEAR}:%{TIME} %{INT}
   Grok Constructor
 //}
 
-あれ？"NOT MATCHED"ですね……。
+@<code>{NOT MATCHED}と表示されています。当てはまるGrokPatternが存在しなかったようです。
 実は、@<code>{%{HTTPDATE}}に該当しない@<code>{[]}があるのです。
 そこで@<img>{stage04-06}の図で示しているとおり、@<code>{[]}を取り除く必要があります。
 無効化するにはエスケープ（\：バックスラッシュ）を使用します。
