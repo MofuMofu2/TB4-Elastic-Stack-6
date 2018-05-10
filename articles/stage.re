@@ -1090,7 +1090,7 @@ Apacheアクセスログと同様に@<code>{IPORHOST}を使用したくなりま
 
 === backend_ip & backend_port
 上記のclient_ipとclinet_port同様です。
-しかし、バックエンドから応答がない場合は、@<code>{-}となるため、@<code>{|}で@<code>{-}も記載します。
+しかし、バックエンドから応答がない場合は、@<code>{-}とログに出力されるため、@<code>{|}で@<code>{-}も記載します。
 
 //list[stage06_list04][backend_ipとbackend_portのGrokPattern]{
 (?:%{IP:backend_ip}:%{INT:backend_port:int}|-)
@@ -1182,7 +1182,7 @@ SSL通信時に使用するフィールドで、使用していない場合は�
 == Grok Constructorでテスト
 個々のテスト結果は省いてますが、慣れるまでは一つ一つクリアしていってください！
 ちなみに、今回作成したGrokPattern名がELBではなくCLBなのは、Application Load Balancer（以下、ALB）と区別するためです。
-ALBとCLBでは、ログフォーマットが若干違うため、区別しています。
+ALBとCLBでは、ログフォーマットが異なるため、区別しています。
 
 ALB版も合わせてGrokPatternを記載します。
 
