@@ -1161,7 +1161,7 @@ ELB_URIPATHPARAM %{URIPATH:path}(?:%{URIPARAM:params})?
 
 === user_agent
 Apacheアクセスログで使用したGrokPatternの@<code>{DATA}を使用します。
-@<code>{GREEDYDATA}というGrokPatternもあるのですが、最長マッチになってしまうため、想定外のものとマッチしてしまうため、@<code>{DATA}を使用します。
+@<code>{GREEDYDATA}というGrokPatternもあるのですが、意図したデータのみ取得したいため@<code>{DATA}を使用します。
 
 
 //list[stage06_list11][user_agent用のGrokPattern]{
