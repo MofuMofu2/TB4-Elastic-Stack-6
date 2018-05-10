@@ -112,7 +112,7 @@ Logstashをサービス起動で実行させることもできます。
 //cmd{
 $ /usr/share/logstash/bin/logstash -f conf.d/test01.conf
 
-# 実行すると入力を待ってるぜ！って言われるので
+# 入力を受け付けている状態
 The stdin plugin is now waiting for input:
 
 # Helloと入力
@@ -131,24 +131,23 @@ Hello
 
 
 == Apacheのアクセスログを取り込む
-#@#ページ上の方みて欲しいんですが、章と節の見出しが被ってしまったのでタイトル変えました…すまぬ。
 
 それでは早速ApacheのアクセスログをLogstashで取り込みます。
 
 今回は@<list>{stage03_list05}のアクセスログで試してみます。
 Apacheのログフォーマットは、@<code>{common}とします。
 
-#@#Apacheのアクセスログはcommonフォーマットを使った、という解釈ですがあってますか？
 
-5.10.83.30のグローバルIPはElasticsearch社公式HPのサンプルで使用しているグローバルIPを使っています。
+5.10.83.30のグローバルIPはElasticsearch社公式HPのサンプルで使用しているグローバルIPを利用します。
 
 //list[stage03_list05][Apacheのアクセスログ（サンプル）]{
 5.10.83.30 - - [10/Oct/2000:13:55:36 -0700] "GET /test.html HTTP/1.0" 200 2326
 //}
 
 === アクセスログを取り込むための準備
-まずは、先ほど同様にtest02.confという名前でconfファイルを作成します。
-配置先は先ほどと同様に@<code>{/etc/logstash}とします。
+
+標準出力の動作時と同様、test02.confという名前でconfファイルを作成します。
+配置先は@<code>{/etc/logstash}とします。
 
 このtest02.confですが、inputに@<code>{file}プラグインを記載しています。
 このプラグインは、インプットデータとしてファイルを指定できます。
@@ -170,10 +169,9 @@ output {
 //}
 
 次にログファイルの格納場所を作成し、ログを配置します。
-#@#これは/etc配下？
 
 //cmd{
-# ログディレクトリとサンプルログを配置
+# 保存先のディレクトリを作成し、サンプルログを配置
 $ mkdir log
 $ vim log/httpd_access.log
 5.10.83.30 - - [10/Oct/2000:13:55:36 -0700] "GET /test.html HTTP/1.0" 200 2326
