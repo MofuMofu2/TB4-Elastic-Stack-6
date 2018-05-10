@@ -475,7 +475,6 @@ NOTSPACE \S+
 
 
 === response & bytes
-ここまできたらあと少しです。
 
 responseはステータスコードなので、@<code>{NUMBER}を使用します。
 また、bytesも同様に@<code>{NUMBER}を使用しますが、オブジェクトが送れなかった場合は@<code>{-}になるため、@<code>{|}で@<code>{-}を追加します。
@@ -496,17 +495,17 @@ responseはステータスコードなので、@<code>{NUMBER}を使用します
   Grok Constructor
 //}
 
-問題なくマッチしましたね！
-
+GrokPattenに当てはまるものが完成しました。
 
 =={01-logstash} logstashを動かしてみる
-やっとここでLogstashのconfファイルが登場します。
+
+GrokPattenの準備が終了した後に、Logstashのconfファイルが登場します。
 それでは、confファイルを作成します。
 
 今まではINPUTとOUTPUTのみでしたが、先ほど作成したGrokPatternを埋め込みたいので、FILTERを追加します。
-GrokPatternをFILTERに直接コーディングすることも可能ですが、可読性を意識したいため、GrokPatternをconfファイルとして外出しします。
+GrokPatternをFILTERに直接コーディングすることも可能ですが、可読性を意識したいため、GrokPatternをconfファイルとして別ファイルとして保存します。
 
-外出しするために、次の作業を実施します。
+別ファイルとして保存するために、次の作業を実施します。
 
 #@#ファイル名をvimで編集するファイルに追記（%{IPORHOST}の前）
 
@@ -879,7 +878,7 @@ CISCOFW606001 :\sASDM\ssession\snumber(?<ASDM-session-number>\s[0-9]+)
 
 ここまできたらあと少し！ということでApacheのアクセスログのときと同様にconfファイルを作成します。
 
-今回もパターンファイルに外出しします。
+今回もパターンファイルに別ファイルとして保存します。
 
 === パターンファイル
 タイムスタンプやホスト名、イベントIDそしてイベントメッセージのGrokPatternをパターンファイルに定義します。
