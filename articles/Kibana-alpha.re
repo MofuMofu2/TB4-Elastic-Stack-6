@@ -158,14 +158,12 @@ Kibanaの良いところは気軽にグラフを作成・削除できること�
 
 === Discoverの検索窓にQueryのSyntax例が入っている
 
-といわれても……という印象でしょうか？まず画像をみてください。
+まず、@<img>{kibana02-search01}をみてください。
 
-//image[kibana02-search01][検索窓にQuery Syntax例が入っているぞ][scale=0.7]{
+//image[kibana02-search01][検索窓にQuery Syntax例][scale=0.7]{
 //}
 
-これのことです。
-
-Kibana5までは検索用Queryを入力する窓には何も書いてありませんでした。@<code>{Kibana Discover}でインターネットの画像検索をしてみると
+Kibana5までは検索用Queryを入力するためのテキストボックスは真っ白なものでした。@<code>{Kibana Discover}でインターネットの画像検索をしてみると
 Kibana4・Kibana5の画面が出てきますので気になる方はどうぞ。
 
 今までは検索用Queryがわからないとき、ブラウザを開いてQueryの記述方法を調べるか、データが存在しない時刻を表示してQueryが記載されている画面を出すしかありませんでした。
