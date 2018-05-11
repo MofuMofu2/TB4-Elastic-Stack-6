@@ -163,8 +163,9 @@ Kibanaの良いところは気軽にグラフを作成・削除できること�
 //image[kibana02-search01][検索窓にQuery Syntax例][scale=0.7]{
 //}
 
-Kibana5までは検索用Queryを入力するためのテキストボックスは真っ白なものでした。@<code>{Kibana Discover}でインターネットの画像検索をしてみると
-Kibana4・Kibana5の画面が出てきますので気になる方はどうぞ。
+Kibana5までは検索用Queryを入力するためのテキストボックスは真っ白なものでした。@<fn>{kibana02-fnSearch01}
+//footnote[kibana02-fnSearch01][@<code>{Kibana Discover}でインターネットの画像検索をすると、Kibana4・Kibana5の画面を閲覧することが可能です。]
+
 
 今までは検索用Queryがわからないとき、ブラウザを開いてQueryの記述方法を調べるか、データが存在しない時刻を表示してQueryが記載されている画面を出すしかありませんでした。
 しかし、検索窓に例が記述されていれば何かしらの検索はすぐできますよね。これはとてもありがたいことです。この細やかで目立たないけれど利便性を上げる努力から、Elastic社が
