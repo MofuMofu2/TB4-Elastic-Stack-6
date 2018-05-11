@@ -132,7 +132,7 @@ git log  --oneline --pretty=format:'{"commit_hash":"%h","author_name":"%an",
 "change_summary":"update","subject":"[update] コマンドと出力結果の見せ方をわけた"}
 //}
 
-JSONのようになりました。これをKibanaで利用するサンプルデータとしたいと思います。
+JSON形式でログが出力されました。これをKibanaで利用するサンプルデータとしたいと思います。
 
 @<code>{git-log-to-json}というnpmパッケージを利用すると（@<href>{https://www.npmjs.com/package/git-log-to-json}）、Node.jsを
 利用してgit logをJSON形式で出力できるようです。今回は本題から外れるので扱いませんが、活用してみてください。
