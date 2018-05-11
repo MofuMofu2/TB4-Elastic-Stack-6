@@ -116,8 +116,8 @@ c0a1712, MofuMofu2, 2018-02-18T19:10:17+09:00, add-npm-git-log-json, [add] npm�
 Authorのメールアドレスは誌面に掲載する都合上オプションから取り除いています。
 では、これを本物のJSONのように整形していきたいと思います。
 
-@<code>{--pretty=format}オプションの引数には、文字のベタ打ちも指定することが可能です。……といっても、具体的に説明したほうが分かりやすいですね。
-実際の出力結果をみるために、まずは@<list>{kibana01-list05}を実行してみましょう。
+@<code>{--pretty=format}オプションの引数には、文字のベタ打ちも指定することが可能です。
+実際の出力結果をみるために、まずは@<list>{kibana01-list05}を実行します。
 
 //list[kibana01-list05][Gitのコミットログをjsonっぽく整形する]{
 git log  --oneline --pretty=format:'{"commit_hash":"%h","author_name":"%an",
