@@ -103,22 +103,20 @@ Vegaの機能を呼び出して利用できるようになりました。それ�
 
 なにがすばらしいのか？それは、Queryを入力する途中で入力補完が出てくるというところです。
 
-たとえば、今Elasticsearchに存在するindexを出したいなーと思ったとします。
+たとえば、今Elasticsearchに存在するindexを出したいなと思ったとします。
 
-コンソール上でQueryを発行するのであれば、次のように手で記入しますよね。
+コンソール上でQueryを発行するのであれば、次のように手で記入します。
 
 //list[kibana02-list01][Indexの存在を確認する]{
 curl -XGET localhost:9200/_cat/indices/logstash-*
 //}
 
 
-でも、Kibanaの@<code>{Dev Tools}で同じように記載しようとすると…？
-
 //image[kibana02-devtools02][Queryの入力予測が出力される][scale=0.7]{
 //}
 
-@<img>{kibana02-devtools02}のように、Queryの入力予測が画面に表示されます。
-毎度Queryを調べる必要がなくなりますし、コマンドラインで複雑なQueryを発行するよりも圧倒的に利便性が高いです。
+Kibanaの@<code>{Dev Tools}で同じように記載する場合、@<img>{kibana02-devtools02}のように、Queryの入力予測が画面に表示されます。
+毎度Queryを調べる必要はありません。コマンドラインで複雑なQueryを発行するよりも圧倒的に利便性が高いです。
 
 Queryを発行するためには緑の@<code>{▶︎}ボタンをクリックします。
 
