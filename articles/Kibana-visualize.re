@@ -171,9 +171,9 @@ drwxr-xr-x@ 16 mofumofu  staff   512  3  7 10:51 logstash-6.2.2
 
 === Logstashの起動
 
-Kibanaで閲覧するGitのコミットログをElasticsearchに投入するため、Logstashを利用します。
-Kibana5.4（beta版）ではKibanaのUIからCSVをElasticsearchに投入できる機能があったのですが、現在のバージョンでは廃止されました。
-というわけでここではLogstashを利用します。何らかの形でElasticsearchにデータを投入しましょう。
+Kibanaで閲覧するGitのコミットログをElasticsearchに投入するため、Logstashを利用しました。
+このユースケースでは、Elasticsearchにデータを投入する手段にLogstashを利用しています。しかし、
+他のプロダクトやElasticsearchのAPIなどを利用してデータを投入しても問題はありません。
 
 筆者は@<code>{config/conf.d}フォルダに@<code>{gitlog-logstash.conf}を作成しました。
 
