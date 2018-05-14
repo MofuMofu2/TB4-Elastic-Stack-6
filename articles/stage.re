@@ -805,7 +805,7 @@ ASDM session number(?<ASDM-sesion-number>\s[0-9]+)
 これは、@<code>{ASDM session nubber}をマッチしても値は取得したくない場合に使う方法です。
 そこで、隣の@<code>{(?<ASDM-session-number>\s[0-9]+)}というCustomPatternで取得した値が
 @<code>{ASDM-session-number}というフィールドに入ります。
-正規表現部分は、@<code>{\s}のスペースと@<code>{0-9}の数字が複数並んでも対応できるように@<code>{+}を使用してます。
+正規表現部分は、@<code>{\s}のスペースと@<code>{0-9}の数字が複数ならんでも対応できるように@<code>{+}を使用してます。
 
 最終的に先頭の@<code>{:}とスペースも含むので以下な感じになります。
 

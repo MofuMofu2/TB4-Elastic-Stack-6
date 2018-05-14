@@ -20,7 +20,7 @@ Beatsにはどんな種類があるのかを紹介します。
  * Auditbeat
  * Heartbeat
 
-今回はこの中から、次の3つのBeatsの利用方法について触れていきます。
+今回はこの中から、Beatsの利用方法について次の3つを紹介します。
 
  * Filebeat
  * Metricbeat
