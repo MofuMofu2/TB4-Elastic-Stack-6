@@ -1,6 +1,6 @@
 PREDEF:
   # 前書き
-  - introduciton.re
+  - introduction.re
 CHAPS:
   # Elastic Stackとは？
   - introduciton-Elastic_Stack.re
