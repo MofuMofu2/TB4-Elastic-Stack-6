@@ -399,7 +399,7 @@ sudo service filebeat start
 //}
 
 
-あとは、データが取り込まれているかをKibana@<href>{http://{Global_IP\}:5601}を開いて確認します。
+あとは、データが取り込まれているかをKibana（@<href>{http://localhost/:5601}）を開いて確認します。
 
 
 トップページが開きます。
@@ -510,7 +510,7 @@ sudo service metricbeat start
 
 
 Elasticsearchへデータが転送できたか、Kibanaを開いて確認します。
-ブラウザを開いてKibana（@<href>{http://{Global_IP\}:5601}）へアクセスします。
+ブラウザを開いてKibana（@<href>{http://localhost:5601}）へアクセスします。
 
 Index Patternsの画面を開くとFilebeatのindexパターンの他にMetricbeatのindexパターンがあることがわかります。
 
