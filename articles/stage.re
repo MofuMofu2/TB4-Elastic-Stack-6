@@ -398,7 +398,6 @@ Grok Constructorの使い方を@<img>{stage04-02}で解説します。
 === auth
 authもUserと同様の定義でよいので、GrokPatternの@<code>{USER}を使用します。
 また、identとauthの間もスペースがあるので@<code>{\s}もしくはスペースを入力する必要があります。
-図の記載では\sを¥sで記載しています。
 
 
 
