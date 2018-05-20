@@ -210,6 +210,8 @@ sudo yum install logstash
 /usr/share/logstash/bin/logstash-plugin install logstash-input-s3
 //}
 
+　
+
 //cmd{
 $ /usr/share/logstash/bin/logstash-plugin install logstash-input-s3
 Validating logstash-input-s3
@@ -223,6 +225,8 @@ LogstashもElasticsearchと同様、サービス自動起動の設定をして�
 //list[logstash-13][Logstashの自動起動設定]{
 sudo chkconfig --add logstash
 //}
+
+　
 
 //cmd{
 $ sudo chkconfig --add logstash
@@ -246,6 +250,8 @@ Kibanaも他のミドルウェアと同様に、サービス自動起動の設�
 //list[logstash-12][Kibanaの自動起動設定]{
 sudo chkconfig --add kibana
 //}
+
+　
 
 //cmd{
 $ sudo chkconfig --add kibana
@@ -280,7 +286,7 @@ kibana      0:off   1:off   2:on    3:on    4:on    5:on    6:off
  ┗ log4j2.properties
 //}
 
-@<code>{/etc/elasticsearch}配下に3つのファイルが配置されてます。
+@<code>{/etc/elasticsearch}配下に3つのファイルが配置されています。
 Elasticsearchを構成する際には@<code>{jvm.options}と@<code>{elasticsearch.yml}を主に設定します。
 @<code>{log4j2.properties}は、ログの出力形式など変更が必要な際に設定してください。
 
@@ -294,7 +300,7 @@ Elasticsearchを構成する際には@<code>{jvm.options}と@<code>{elasticsearc
 Elasticsearchのヒープサイズを変更したい場合、jvm.optionsを編集します。
 たとえば、ヒープサイズの最大と最小を設定する場合は、@<code>{Xms(minimum heap size)}と@<code>{Xmx(maximum heap size)}を変更します。
 いくつに設定すればいいの？と思う方もいるかと思いますが、これは要件によって変わってくる項目です。
-いくつかのポイントを挙げますが、公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html,Settings the heap size:}）にも考慮点が記載されているので、そちらも参考に値を決めてください。
+いくつかのポイントを挙げますが、公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html, Settings the heap size}）にも考慮点が記載されているので、そちらも参考に値を決めてください。
 
  * 最小ヒープサイズ（Xms）と最大ヒープサイズ（Xmx）の値を等しくする
  * ヒープサイズを上げすぎるとGCの休止を招く可能性がある
