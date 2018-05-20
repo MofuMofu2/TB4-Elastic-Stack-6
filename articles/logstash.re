@@ -466,9 +466,11 @@ ALBのログは、AWS公式ページ（@<href>{https://docs.aws.amazon.com/elast
 https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188
 192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57
 "GET https://www.example.com:443/ HTTP/1.1" "curl/7.46.0" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2
-arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067
+arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/
+my-targets/73e2d6bc24d8a067
 "Root=1-58337281-1d84f3d73c47ec4e58577259" www.example.com
-arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012
+arn:aws:acm:us-east-2:123456789012:certificate/
+12345678-1234-1234-1234-123456789012
 //}
 
 
@@ -518,7 +520,10 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 {
     "@timestamp" => 2018-02-26T08:15:31.322Z,
           "path" => "/etc/logstash/alb.logs",
-       "message" => "https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57 "GET https://www.example.com:443/ HTTP/1.1" "curl/7.46.0" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067 "Root=1-58337281-1d84f3d73c47ec4e58577259" www.example.com arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012,
+       "message" => "https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57 "GET https://www.example.com:443/ HTTP/1.1" "curl/7.46.0" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:123456789012:
+       targetgroup/my-targets/73e2d6bc24d8a067 "Root=1-58337281-1d84f3d73c47ec4e58577259" 
+       www.example.com arn:aws:acm:us-east-2:123456789012:certificate/
+       12345678-1234-1234-1234-123456789012,
       "@version" => "1",
           "host" => "ip-xxx-xx-Xx-xx"
 }
@@ -527,7 +532,7 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 
 標準入力で実行した時と同様にmessageに取り込んだログが出力されていることがわかります。
 ただ、これでは構造化した形でElasticsearchにデータ転送できないので、検索性が損なわれます。
-messageというキーに全てのログの全てのデータが入ってしまうと、Kibanaで検索する際に不都合が発生するのです。
+messageというキーに全てのログのデータが入ってしまうと、Kibanaで検索する際に不都合が発生するのです。
 そこで、Filterを利用してmessageからデータを分割していきます。
 
 
