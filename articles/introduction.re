@@ -8,11 +8,13 @@ Elastic Stackはバージョンアップがかなり早いツールです。バ�
 
  * Elastic Stackとは？
  * GoではじめるElasticsearch
- * Logstashを使ってみる
+ * AWSでLogstashを使ってみる
+ * LogstashのGrokフィルタを極める
+ * 複数のデータソースを取り扱う
  * Beatsを体験する
  * Curatorを用いてIndexを操作する
- * Kibanaを使ってデータを可視化してみる
- * もっと便利にKibana6を使っていく
+ * Kibanaを使ってデータを可視化する
+ * もっと便利にKibana6を利用するために
 
 #@# LogstashとBeatsは内容見て更新
 #@# 追加された部分をここにあとで反映（山城）
