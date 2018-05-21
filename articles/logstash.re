@@ -1,11 +1,11 @@
-= Logstashを使ってみる
+﻿= AWSでLogstashを使ってみる
 
 
 AWSを利用してWebサイトを運営しているとき、ELBのアクセスログを用いてアクセス元の国やUserAgentを知りたくなることが
 あるかもしれません。しかし、これらの情報の中にはCloudWatchではモニタリングできないものがあります。
 
 でも大丈夫です！
-ELBはログを出力しているので、そのログを何らかの形で取得し可視化すれば良いのです！
+ELBはログを出力しているので、そのログを何らかの形で取得し可視化すればよいのです！
 ちなみに、今回はALB（Application loadbalancer）からデータを取得します。
 
 この章で目指すことは次の2点です。
@@ -24,7 +24,7 @@ OSによって発行するコマンドが変わってくるので、詳しくは
  * Amazon Linux AMI 2017.09.1 (HVM), SSD Volume Type - ami-97785bed
  * t2.medium(vCPU: 2,Mem: 4)
 
-今回導入するミドルウェアのバージョンは次の通りです。
+今回導入するミドルウェアのバージョンは次のとおりです。
 
  * Elasticsearch 6.2.2
  * Logstash 6.2.2
@@ -56,7 +56,7 @@ AWSの公式ドキュメントなどを参考に設定してください。
 
 == ミドルウェアのインストール
 
-次の順番でインストールします。
+次の順番で必要なミドルウェアをインストールします。
 
  1. Java（バージョン8）
  2. Elasticsearch
@@ -115,7 +115,7 @@ OpenJDK 64-Bit Server VM (build 25.161-b14, mixed mode)
 
 
 ここからは、Elastic Stackのインストールを行います。
-ちなみに、公式ドキュメントは英語（@<href>{https://www.elastic.co/guide/en/logstash/current/installing-logstash.html,Install Logstash}
+ただし公式ドキュメントは英語（@<href>{https://www.elastic.co/guide/en/logstash/current/installing-logstash.html,Install Logstash}
 ）です。
 やはり英語だと抵抗感を抱く人がいると思うので、本章ではできる限りわかりやすく日本語で説明します。
 英語のドキュメントで問題ない方はこの項は読み飛ばしていただいても問題ありません。
@@ -218,7 +218,7 @@ Installation successful
 //}
 
 
-LogstashもElasticsearchと同様、サービス自動起動の設定をしておくと良いでしょう。
+LogstashもElasticsearchと同様、サービス自動起動の設定をしておくとよいでしょう。
 
 //list[logstash-13][Logstashの自動起動設定]{
 sudo chkconfig --add logstash
@@ -259,8 +259,8 @@ kibana      0:off   1:off   2:on    3:on    4:on    5:on    6:off
 == ミドルウェアの設定
 
 
-ここからミドルウェアに対して、必要な設定を行います。
-以下の流れでミドルウェアの設定をします。
+ミドルウェアに対して、必要な設定を行います。
+次の流れでミドルウェアの設定をします。
 
  1. Elastcisearchの設定
  2. Logstshの設定
@@ -286,17 +286,17 @@ Elasticsearchを構成する際には@<code>{jvm.options}と@<code>{elasticsearc
 
 
 今回は@<code>{jvm.options}と@<code>{elasticsearch.yml}を編集します。
-この二つの設定ファイルの変更と設定について考慮が必要な点などを記載したいと思います。
+このふたつの設定ファイルの変更と設定について考慮が必要な点などを説明します。
 
 
 ==== jvm.optionsについて
 
 Elasticsearchのヒープサイズを変更したい場合、jvm.optionsを編集します。
-例えば、ヒープサイズの最大と最小を設定する場合は、@<code>{Xms(minimum heap size)}と@<code>{Xmx(maximum heap size)}を変更します。
+たとえば、ヒープサイズの最大と最小を設定する場合は、@<code>{Xms(minimum heap size)}と@<code>{Xmx(maximum heap size)}を変更します。
 いくつに設定すればいいの？と思う方もいるかと思いますが、これは要件によって変わってくる項目です。
-公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html,Settings the heap size:}）にも考慮点が記載されているので、そちらも参考に値を決めてください。
+いくつかのポイントを挙げますが、公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html,Settings the heap size:}）にも考慮点が記載されているので、そちらも参考に値を決めてください。
 
- * 最小ヒープサイズ(Xms)と最大ヒープサイズ(Xmx)の値を等しくする
+ * 最小ヒープサイズ（Xms）と最大ヒープサイズ（Xmx）の値を等しくする
  * ヒープサイズを上げすぎるとGCの休止を招く可能性がある
  * Xmxは、物理メモリの50%を割り当てて、ファイルシステム側にも十分に残すようにする
  * 割り当てるメモリは、32GB以下にする
@@ -361,7 +361,7 @@ Elasticsearchからレスポンスが返ってきましたね。
 === Logstashの環境準備
 
 
-Elasticsearchの時と同様に、Logstashもディレクトリ構成を確認します。
+Elasticsearchの際と同様に、Logstashもディレクトリ構成を確認します。
 
 
 //cmd{
@@ -377,7 +377,7 @@ Elasticsearchの時と同様に、Logstashもディレクトリ構成を確認�
 
 各ファイルやディレクトリについて説明します。
 
-//table[logstash-19][]{
+//table[logstash-19][Logstashのファイルやディレクトリ]{
 No.	Item	Content
 -----------------
 1	conf.d	Input/Filter/Outputのパイプラインを記載したファイルの格納場所
@@ -421,7 +421,7 @@ Logstashは@<code>{Input}、@<code>{Filter}、@<code>{Output}の3つで構成さ
 
 
 Logstashの起動方法は、コマンド起動とサービス起動の2種類が存在します。
-最終的にはサービス起動を利用したほうが利便性も高いのですが、最初はコマンド起動を利用してLogstashの操作に慣れると良いでしょう。
+最終的にはサービス起動を利用したほうが利便性も高いのですが、最初はコマンド起動を利用してLogstashの操作に慣れるとよいでしょう。
 
 Logstashを起動するため、パイプラインファイルを作成します。
 このパイプラインは、単純に標準入力からLogstashを通して標準出力を行うものです。
@@ -469,7 +469,7 @@ arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789
 このサンプルログを@<code>{/etc/logstash/}配下に@<code>{alb.log}として保存します。ファイル名は任意です。
 
 ログファイルの準備が整ったので、パイプラインファイルを新しく作成します。
-先程作成したtest.confは、Inputを標準入力としていました。
+さきほど作成したtest.confは、Inputを標準入力としていました。
 
 今回はファイルを取り込むので@<code>{File input plugin}を使用します。
 このプラグインは標準でインストールされているので、インストールは不要です。
@@ -530,7 +530,7 @@ messageというキーに全てのログの全てのデータが入ってしま�
 
 取得したログを正規表現でパースするためのGrokフィルタや、地理情報を得るためのGeoIPフィルタなど、
 Filterにはログの種別に合わせた処理をするためのプラグインが存在します。
-今回のALBもGrokフィルタなどを使うことで構造化したほうが良いでしょう。
+今回のALBもGrokフィルタなどを使うことで構造化したほうがよいでしょう。
 
 とはいえ、どのように構造化すればいいのか迷ってしまいます。まずはALBのログフォーマットを把握し、作戦を立てます。
 
@@ -577,10 +577,9 @@ drwxr-xr-x 2 root root 4096 xxx xx xx:xx patterns
 //}
 
 ディレクトリが作成できたので、ALBのパターンファイルを作成します。
-中身についての詳細？？？？章で解説しています。
 また、Typeは、インデックステンプレートで作成するのが一般的かと思いますが、今回は、パターンファイルの中で指定します（いろんなやり方があるんだよという意味で）
 
-#@# ここ、？？？章、とした部分、追加で加えた部分に入っていますか？であればそこを参照したほうがいいですね
+
 
 このパターンファイルを呼び出す時は、ファイル名の指定だけでなく@<code>{Grok-Patterns}の指定も必要です。
 ここでいう@<code>{Grok-Patterns}は、@<code>{ALB ACCESS LOG}に該当します。
@@ -680,7 +679,7 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 
 
 それでは、Filterで記載している内容について説明します。
-今回使用しているフィルタは次の通りです。
+今回使用しているフィルタは次のとおりです。
 
  1. grok
  2. date
@@ -688,12 +687,14 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
  4. mutate
 　
 　
+
 １．grok-filter
 
 正規表現でデータをパースする際に使用します。
 @<code>{patterns dir}で外出ししているパターンファイルを呼び出すことができます。
 また、@<code>{match}でmessageに取り込まれている値を対象にGrok-Patterns（ここでいうALB ACCESS_LOG）を適用しています。
 　
+
 ２．date-filter
 
 実際のログが出力された時間を@<code>{@timestamp}に置き換えています。
@@ -701,22 +702,27 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 今回は@<code>{date}を@<code>{@timestamp}に置き換えています。
 また、タイムゾーンを日本にしたいため、"Asia/Tokyo"を指定しています。
 　
+
 ３．geoip-filter
 
 IPアドレスから地理情報を取得することが可能です。@<fn>{1}
-例えば、どこかのグローバルIPアドレスからWhoisでどこの国からのアクセスかな？と調べる時があります。
-その動作を一つひとつのログに対して行うのは大変です。しかし、geoip-filterを使用すれば、自動で地理情報を付与してくれるのです。
+たとえば、どこかのグローバルIPアドレスからWhoisでどこの国からのアクセスかな？と調べる時があります。
+その動作をそれぞれのログに対して行うのは大変です。しかし、geoip-filterを使用すれば、自動で地理情報を付与してくれるのです。
 これはLogstashが内部で保持しているデータベースを照合して地理情報を付与しています。
 
+//footnote[1][地理情報の精度を上げたい場合は、有償版のデータをインポートする必要があります]
 
 ここではgeoip-filterを適用するフィールドを指定します。
 今回は、クライアントのIPアドレスを元にどこからアクセスされているかを知りたいため、フィールド名の"client_ip"を指定します。
 　
+
 ４．mutate-filter
 
 不要なフィールドの削除を行うなど、データやログの編集が可能です。
-例えば、messageの値は、全てkey-valueで分割されて保存されています。そのため、無駄なリソースを使いたくない場合は、削除するというような運用を行います。
-個人的には、保存されたデータでパースが上手くいかず@<code>{_grokparsefailure}が発生した時の場合も踏まえると、残した方が良いのではないかと考えています。@<fn>{2}
+たとえば、messageの値は、全てkey-valueで分割されて保存されています。そのため、無駄なリソースを使いたくない場合は、削除するというような運用を行います。
+個人的には、保存されたデータでパースが上手くいかず@<code>{_grokparsefailure}が発生した時の場合も踏まえると、残した方がよいのではないかと考えています。@<fn>{2}
+
+//footnote[2]["_grokparsefailure"は、grokフィルタでパースできない場合に発生します]
 
 mutate-filterの設定を追加したalb.confは次のようになります。
 
@@ -813,6 +819,7 @@ $ kill -9 32061
 まずは、Inputから編集します。
 
 　　
+
 １．Inputの編集
 
 @<code>{alb.conf}へS3からデータを取得する設定を行います。
@@ -847,6 +854,7 @@ No.	Item	Content
 （@<href>{https://docs.aws.amazon.com/ja_jp/AWSEC2/latest/UserGuide/iam-roles-for-amazon-ec2.html}）をインスタンスに割り当てています。
 オプションで指定することも可能ですが、セキュリティ面からIAM Roleで制御しています。
 　
+
 ２．Outputの編集
 
 最後にOutputを標準出力からElasticsearchに変更します。
@@ -861,7 +869,7 @@ output {
 //}
 
 
-以下に各オプションについて説明します。
+@<table>{logstash-35}に各オプションについて説明します。
 indexを任意の形で指定することも可能ですが、デフォルトのままとするため、指定はしていません。
 デフォルトでは@<code>{logstash-logs-%{+YYYYMMdd}で作成されます。
 
@@ -873,7 +881,7 @@ No.	Item	Content
 
 
 これで完成です！
-以下に最終的なパイプラインの設定ファイルを記載します。
+@<list>{logstash-36}が最終的なパイプラインの設定ファイルです。
 
 
 //list[logstash-36][alb.confの設定]{
@@ -1024,7 +1032,7 @@ server.host: 0.0.0.0
 
 これで設定は完了です。
 参照先のElasticsearchの指定は、デフォルトのままとします。デフォルトの設定が、ローカルホストを指定しているためです。
-もしリモートにElasticsearchがある場合は、以下のコメントアウトを外し、IPアドレスを指定してください。
+もしリモートにElasticsearchがある場合は、@<list>{logstash-40}のコメントアウトを外し、IPアドレスを指定してください。
 
 
 //list[logstash-40][elasticesearch.ymlの設定]{
@@ -1041,14 +1049,14 @@ service kibana start
 
 ==== Kibanaで取り込んだログをビジュアライズ
 
-Kibanaにアクセスするため、ブラウザを起動し、以下のIPアドレスを入力します。
+Kibanaにアクセスするため、ブラウザを起動し、@<list>{logstash-42}のようにIPアドレスを入力します。
 @<code>{Global_IP}については、AWSから払い出されたグローバルIPアドレスを入力してください。
 
 //list[logstash-42][KibanaにアクセスするためのURL]{
 http:"Global_IP":5601
 //}
 
-詳しい操作方法は@<chapref>{Kibana-visualize}も参照してください。
+詳しい操作方法は「Kibanaを使ってデータを可視化してみる！」の章も参照してください。
 
 Kibanaのトップページが開きますので、左ペインの@<code>{Management}をクリックしてください。
 また、@<code>{Collapse}をクリックすることで、サイドバーを縮小することができます。
@@ -1086,8 +1094,8 @@ indexパターンを指定せずにElasticsearchに取り込んでいるため�
 //}
 
 あれ？@<code>{No results found}と画面に表示されており、取り込んだログがビジュアライズされてないですね。
-なぜかと言うと、時刻のデフォルト設定は、@<code>{Last 15 minutes}のため、現在時刻から15分前までの時間がサーチ対象となっているからです。
-今回取り込んだログの時刻が@<code>{2016-08-10T23:39:43}のため、該当する時間でサーチをかける必要があります。
+なぜならば、時刻のデフォルト設定は、@<code>{Last 15 minutes}のため、現在時刻から15分前までの時間がサーチ対象となっているからです。
+今回取り込んだログの時刻が@<code>{2016-08-10T23:39:43}であるため、該当する時間でサーチをかける必要があります。
 
 //image[kibana07][No results found画面][scale=0.7]{
 //}
@@ -1101,10 +1109,10 @@ indexパターンを指定せずにElasticsearchに取り込んでいるため�
 //image[kibana08][時間の指定][scale=0.7]{
 //}
 
-先ほどの@<code>{No results found}画面ではなく、バーが表示されていることがわかるかと思います。
+先ほどの@<code>{No results found}画面ではなく、バーが表示されていることが分かるかと思います。
 これで取り込んだログをKibanaから確認することができました。
 @<code>{Visualize}で、グラフやを作成したり世界地図などにマッピングしたりすることで好みのダッシュボードが作成できます。
 
-//footnote[1][地理情報の精度を上げたい場合は、有料版のデータをインポートする必要があります]
 
-//footnote[2]["_grokparsefailure"は、grokフィルタでパースできない場合に発生します]
+
+

@@ -1,4 +1,4 @@
-= Curator
+﻿= Curatorを用いてIndexを操作する
 
 == Curatorとは
 
@@ -6,13 +6,12 @@ Curatorは、Elasticsearchに保存したログのindex操作や、スナップ�
 この章では、Elasticsearchに保存したindexの削除や、検索対象から外す方法について触れていきます。
 Curatorの詳細は、こちらのリンク@<href>{https://www.elastic.co/guide/en/elasticsearch/client/curator/current/index.html}を参照してください。
 
-Curatorの実行環境を構築します。
-
+まず、Curatorの実行環境を構築します。
 
 === Curatorのインストール
 
-まず始めに、Curatorのパッケージを取得するため、リポジトリの登録をします。
-ここで登録するリポジトリは、@<chapref>{logstash}とは別のため登録が必要です。
+始めに、Curatorのパッケージを取得するため、リポジトリの登録をします。
+ここで登録するリポジトリは、「AWSでLogstashを使ってみる」とは別のため登録が必要です。
 
 //list[curator-01][curator.repoの追加]{
 sudo vim /etc/yum.repos.d/curator.repo
@@ -43,8 +42,8 @@ yum install elasticsearch-curator
 Curatorを使用すると、任意の期間を指定してindexを削除することが可能です。
 
 
-補足ですが、@<chapref>{logstash}や@<chapref>{beats}でElasticsearchに保存したログは、日ごとにindexが作成されていきます。
-例えば、2018年4月1日にLogstashがElasticsearchに保存したログは、@<code>{logstash-2018.04.01}というindexに保存されます。
+補足ですが、「AWSでLogstashを使ってみる」や「Beatsを体験する」でElasticsearchに保存したログは、日ごとにindexが作成されていきます。
+たとえば、2018年4月1日にLogstashがElasticsearchに保存したログは、@<code>{logstash-2018.04.01}というindexに保存されます。
 2018年4月2日に保存したログは、@<code>{logstash-2018.04.02}というindexに保存されます。
 100日経過した時には、100indexが作成されます。
 このように時系列で作成していくindexを時系列indexと言います。
@@ -53,7 +52,7 @@ Curatorを使用すると、任意の期間を指定してindexを削除する�
 === indexの削除操作
 
 indexが2018年4月1日〜4月5日まであるとします。
-curコマンドを利用して、indexが存在することを確認します。
+curlコマンドを利用して、indexが存在することを確認します。
 
 //list[curator-03][indexの確認]{
 curl -XGET localhost:9200/_cat/indices/logstash* | sort
@@ -149,7 +148,8 @@ No.	Item	Content
 
 
 index削除の環境が整ったので、Curatorを実行します。
-Curatorのコマンドラインの引数について説明します。
+
+まずCuratorのコマンドラインの引数について説明します。
 オプションの--configは、@<code>{curator.yml}を@<code>{~/.curator/curator.yml}以外のディレクトリに配置した場合、使用します。
 今回は、@<code>{~/.curator/curator.yml}に配置しているため、--configオプションは使用しません。
 
@@ -432,5 +432,5 @@ yellow open logstash-2018.04.05 5 1 4 0  14.5kb 104.5kb
 //}
 
 
-今回はCuratorが持つ機能の一部分だけを紹介しました。
+今回はCuratorの機能の一部分だけを紹介しました。
 みなさんのユースケースに合わせて、Curatorを使いこなしていただけると幸いです。

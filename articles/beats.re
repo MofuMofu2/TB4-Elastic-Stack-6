@@ -1,5 +1,5 @@
-
-= Beats
+﻿
+= Beatsを体験する
 
 
 Beatsはデータを取得することに重きを置いたツールです。
@@ -11,7 +11,7 @@ Beatsの設定ファイルはYAMLで全て完結します。よって、手軽�
 
 == Beats Family
 
-Beatsはどんな種類があるのかを改めて記載します。
+Beatsにはどんな種類があるのかを紹介します。
 
  * Filebeat
  * Metricbeat
@@ -20,7 +20,7 @@ Beatsはどんな種類があるのかを改めて記載します。
  * Auditbeat
  * Heartbeat
 
-今回は、3つのBeatsの利用方法について触れていきます。
+今回はこの中から、Beatsの利用方法について次の3つを紹介します。
 
  * Filebeat
  * Metricbeat
@@ -32,7 +32,7 @@ Beatsはどんな種類があるのかを改めて記載します。
 
 Filebeatは、ログを一箇所に転送する用途で使用します。
 また、TLS暗号化をサポートしているため、セキュアに転送することができます。
-たとえば、以下の構成図がFilebeatのよくある構成です。
+たとえば、@<img>{filebeat01}の構成図がFilebeatのよくある構成です。
 
 //image[filebeat01][Filebeatの構成]{
 //}
@@ -51,27 +51,26 @@ Moduleについては、後ほど説明します。
 
 === Filebeatの構成について
 
-Filebeatを試す環境は、@<chapref>{logstash}を元として構成します。
+Filebeatを試す環境は、「AWSでLogstashを使ってみる」を元に構成します。
 新たにFilebeatとNginxを追加します。
 
 
-今回想定するケースは、NginxのアクセスログををFilebeatが取得し、Logstashに転送します。
+今回想定するケースは、NginxのアクセスログをFilebeatが取得し、Logstashに転送するというものです。
 Logstashは、Filebeatから転送されたログをElasticsearchに保存するところまでを行います。
 
 
 //image[filebeat02][サーバの構成について][scale=0.8]{
 //}
 
-それでは、FilebeatとNginxのインストールを実施していきます。
+それでは、FilebeatとNginxをインストールしていきます。
 
 
 === Filebeatをインストール
 
 
-Filebeatをインストールします。@<chapref>{logstash}でyumリポジトリの登録が完了していることを前提として進めます。
+Filebeatをインストールします。「AWSでLogstashを使ってみる」でyumリポジトリの登録が完了していることを前提として進めます。
 
-
-//list[beats-01][Filebeatsのインストール][scale=0.8]{
+//list[beats-01][Filebeatsのインストール]{
 sudo yum install filebeat
 //}
 
@@ -185,7 +184,7 @@ output {
 //}
 
 
-パターンファイルのInputにFilebeatからデータを受信するためBeatsブラグインを使用します。
+パターンファイルのInputにFilebeatからデータを受信するため、Beatsプラグインを使用します。
 Beatsプラグインは、デフォルトでインストールされています。
 ポートは、先ほどfilebeat.ymlのoutput.logstashで指定したポートを指定します。
 今回は、デフォルトの5044とします。
@@ -218,7 +217,7 @@ filter {
 }
 //}
 
-Outputは、@<chapref>{logstash}の設定と同様です。
+Outputは、「AWSでLogstashを使ってみる」の設定と同様です。
 
 
 最後に、作成したパイプラインファイルを読み込むため、pipelines.ymlの設定をします。
@@ -251,7 +250,7 @@ sudo initctl start logstash
 
 
 Elasticsearchにデータが転送されているか、curlコマンドを利用して確認します。
-以下のように@<code>{logstash-YYYY.MM.dd}で出力されていれば正常に保存されています。
+@<list>{beats-13}のように@<code>{logstash-YYYY.MM.dd}で出力されていれば正常に保存されています。
 
 //list[beats-13][Filebeatの起動]{
 curl -XGET localhost:9200/_cat/indices/logstash*
@@ -269,7 +268,7 @@ yellow open logstash-2018.04.10 fzIOfXzOQK-p0_mmvO7wrw 5 1 8 0 93.2kb 93.2kb
 
 === Filbeat Modules
 
-Filebeatの利用方法を一通り紹介してきました。
+Filebeatの利用方法をひととおり紹介してきました。
 これではどこが手軽なの？むしろ重厚感が増したのでは？と思われる方がいるかもしれません。
 
 ここからは、Beatsをさらに手軽に導入できる、@<code>{Filbeat Module}について触れていきたいと思います。
@@ -306,8 +305,8 @@ Filebeat Modulesは、パイプラインを自動で作成します。
 sudo service elasticsearch restart
 //}
 
-@<chapref>{logstash}でKibanaをインストールしている環境を引き続き利用することを前提として話を進めます。
-もし新しい環境でFilebeat Modulesを検証する場合、@<chapref>{logstash}や@<chapref>{Kibana-visualize}を参考に環境構築を行ってください。
+「AWSでLogstashを使ってみる」でKibanaをインストールしている環境を引き続き利用することを前提として話を進めます。
+もし新しい環境でFilebeat Modulesを検証する場合、「AWSでLogstashを使ってみる」や後述の「Kibanaを使ってデータを可視化する」を参考に環境構築を行ってください。
 
 
 ==== Filebeat Modulesの設定
@@ -348,7 +347,8 @@ setup.kibana:
 //}
 
 @<list>{beats-17}の編集内容について説明します。
-Nginxの有効化を行います。Nginxのアクセスログのパス設定ですが、インストールした状態（デフォルト）のまま利用するのであればパスの変更は不要です。
+
+まずNginxの有効化を行います。Nginxのアクセスログのパス設定ですが、インストールした状態（デフォルト）のまま利用するのであればパスの変更は不要です。
 今回はデフォルト設定のまま利用しています。
 
 
@@ -399,7 +399,7 @@ sudo service filebeat start
 //}
 
 
-あとは、データが取り込まれているかをKibana@<href>{http://{Global_IP\}:5601}を開いて確認します。
+あとは、データが取り込まれているかをKibana（@<href>{http://localhost/:5601}）を開いて確認します。
 
 
 トップページが開きます。
@@ -434,7 +434,7 @@ Filebeat Modulesの機能によって、あらかじめDashboardが準備され�
 
 == Metricbeat
 
-Metricbeatは、サーバのリソース(CPU/Mem/process..など)を容易にモニタリングすることができます。
+Metricbeatは、サーバのリソース（CPU/Mem/process……など）を容易にモニタリングすることができます。
 サーバ以外ににも、DockerやElasticsearchのリソース監視も可能です。
 
 Filebeatと同様、YAMLを編集するだけで設定が完了します。
@@ -448,7 +448,7 @@ sudo yum install metricbeat
 
 Metricbeatも@<code>{metricbeat.reference.yml}があらかじめ存在します。
 しかし、デフォルトで有効化されているModuleが多いため、@<list>{beats-25}の@<code>{metricbeat.yml}を利用します。
-既存で設定してある内容は全て上書きしてください。
+すでに設定されている内容は全て上書きしてください。
 
 
 //list[beats-25][/etc/metricbeat/metricbeat.ymlの編集]{
@@ -510,7 +510,7 @@ sudo service metricbeat start
 
 
 Elasticsearchへデータが転送できたか、Kibanaを開いて確認します。
-ブラウザを開いてKibana（@<href>{http://{Global_IP\}:5601}）へアクセスします。
+ブラウザを開いてKibana（@<href>{http://localhost:5601}）へアクセスします。
 
 Index Patternsの画面を開くとFilebeatのindexパターンの他にMetricbeatのindexパターンがあることがわかります。
 
@@ -620,13 +620,3 @@ Beatsの機能、いかがだったでしょうか？
 Moduleを有効化するだけで、簡単にサーバの情報を可視化できる環境が手に入ります。
 他のBeatsについては今回扱いませんが、少ない学習コストで情報の可視化が可能です。みなさんもぜひ試してみてはいかがでしょうか。
 
-
-== まとめ
-
-
-いかがでしたか？
-LogstashとBeatsの両方を操作できると、ログ収集時の選択肢が増えます。
-2つのプロダクトの違いを理解できると、状況に合わせて適切なプロダクトの使い分けが可能となります。
-みなさんがログと素敵な時間を過ごせることを願っています。
-
-@micci184
