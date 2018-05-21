@@ -32,10 +32,10 @@ Dockerイメージの起動時にマウントさせて利用します。ロー�
 
 
 //list[elasticsearch-list02][Dockerイメージの起動]{
-docker run -p 9200:9200  -e "discovery.type=single-node" -e （紙面の都合で改行）
-"network.publish_host=localhost"（紙面の都合で改行）
+docker run -p 9200:9200  -e "discovery.type=single-node"（紙面の都合で改行）
+-e "network.publish_host=localhost"（紙面の都合で改行）
 -v plugins:/usr/share/elasticsearch/plugins（紙面の都合で改行）
-（紙面の都合により改行）docker.elastic.co/elasticsearch/elasticsearch:6.2.2
+docker.elastic.co/elasticsearch/elasticsearch:6.2.2
 //}
 
 
@@ -739,11 +739,16 @@ func main() {
 		Created: time.Now(),
 		Tag:     "ファンタジー",
 	}
-	_, err = client.Index().Index("chat").Type("chat").Id("1").BodyJson(&chatData01).Do(ctx)
-	_, err = client.Index().Index("chat").Type("chat").Id("2").BodyJson(&chatData02).Do(ctx)
-	_, err = client.Index().Index("chat").Type("chat").Id("3").BodyJson(&chatData03).Do(ctx)
-	_, err = client.Index().Index("chat").Type("chat").Id("4").BodyJson(&chatData04).Do(ctx)
-	_, err = client.Index().Index("chat").Type("chat").Id("5").BodyJson(&chatData05).Do(ctx)
+	_, err = client.Index().Index("chat"). (紙面の都合で改行)
+	Type("chat").Id("1").BodyJson(&chatData01).Do(ctx)
+	_, err = client.Index().Index("chat"). (紙面の都合で改行)
+	Type("chat").Id("2").BodyJson(&chatData02).Do(ctx)
+	_, err = client.Index().Index("chat"). (紙面の都合で改行)
+	Type("chat").Id("3").BodyJson(&chatData03).Do(ctx)
+	_, err = client.Index().Index("chat"). (紙面の都合で改行) 
+	Type("chat").Id("4").BodyJson(&chatData04).Do(ctx)
+	_, err = client.Index().Index("chat"). (紙面の都合で改行) 
+	Type("chat").Id("5").BodyJson(&chatData05).Do(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -1124,7 +1129,8 @@ func main() {
 	}
 
 	//さきほどの検索結果からスクロールIDを取得し、前回検索結果の続きからを取得
-	nextResults, err := client.Scroll("chat").Query(matchQuery).Size(1).ScrollId(results.ScrollId).Do(ctx)
+	nextResults, err := client.Scroll("chat").Query(matchQuery).Size(1). (紙面の都合で改行) 
+	ScrollId(results.ScrollId).Do(ctx)
 	if err != nil {
 		panic(err)
 	}
