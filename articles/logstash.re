@@ -210,6 +210,8 @@ sudo yum install logstash
 /usr/share/logstash/bin/logstash-plugin install logstash-input-s3
 //}
 
+　
+
 //cmd{
 $ /usr/share/logstash/bin/logstash-plugin install logstash-input-s3
 Validating logstash-input-s3
@@ -223,6 +225,8 @@ LogstashもElasticsearchと同様、サービス自動起動の設定をして�
 //list[logstash-13][Logstashの自動起動設定]{
 sudo chkconfig --add logstash
 //}
+
+　
 
 //cmd{
 $ sudo chkconfig --add logstash
@@ -246,6 +250,8 @@ Kibanaも他のミドルウェアと同様に、サービス自動起動の設�
 //list[logstash-12][Kibanaの自動起動設定]{
 sudo chkconfig --add kibana
 //}
+
+　
 
 //cmd{
 $ sudo chkconfig --add kibana
@@ -280,7 +286,7 @@ kibana      0:off   1:off   2:on    3:on    4:on    5:on    6:off
  ┗ log4j2.properties
 //}
 
-@<code>{/etc/elasticsearch}配下に3つのファイルが配置されてます。
+@<code>{/etc/elasticsearch}配下に3つのファイルが配置されています。
 Elasticsearchを構成する際には@<code>{jvm.options}と@<code>{elasticsearch.yml}を主に設定します。
 @<code>{log4j2.properties}は、ログの出力形式など変更が必要な際に設定してください。
 
@@ -294,7 +300,7 @@ Elasticsearchを構成する際には@<code>{jvm.options}と@<code>{elasticsearc
 Elasticsearchのヒープサイズを変更したい場合、jvm.optionsを編集します。
 たとえば、ヒープサイズの最大と最小を設定する場合は、@<code>{Xms(minimum heap size)}と@<code>{Xmx(maximum heap size)}を変更します。
 いくつに設定すればいいの？と思う方もいるかと思いますが、これは要件によって変わってくる項目です。
-いくつかのポイントを挙げますが、公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html,Settings the heap size:}）にも考慮点が記載されているので、そちらも参考に値を決めてください。
+いくつかのポイントを挙げますが、公式ドキュメント（@<href>{https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html, Settings the heap size}）にも考慮点が記載されているので、そちらも参考に値を決めてください。
 
  * 最小ヒープサイズ（Xms）と最大ヒープサイズ（Xmx）の値を等しくする
  * ヒープサイズを上げすぎるとGCの休止を招く可能性がある
@@ -460,9 +466,11 @@ ALBのログは、AWS公式ページ（@<href>{https://docs.aws.amazon.com/elast
 https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188
 192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57
 "GET https://www.example.com:443/ HTTP/1.1" "curl/7.46.0" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2
-arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067
+arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/
+my-targets/73e2d6bc24d8a067
 "Root=1-58337281-1d84f3d73c47ec4e58577259" www.example.com
-arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012
+arn:aws:acm:us-east-2:123456789012:certificate/
+12345678-1234-1234-1234-123456789012
 //}
 
 
@@ -512,7 +520,10 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 {
     "@timestamp" => 2018-02-26T08:15:31.322Z,
           "path" => "/etc/logstash/alb.logs",
-       "message" => "https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57 "GET https://www.example.com:443/ HTTP/1.1" "curl/7.46.0" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067 "Root=1-58337281-1d84f3d73c47ec4e58577259" www.example.com arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012,
+       "message" => "https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57 "GET https://www.example.com:443/ HTTP/1.1" "curl/7.46.0" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:123456789012:
+       targetgroup/my-targets/73e2d6bc24d8a067 "Root=1-58337281-1d84f3d73c47ec4e58577259" 
+       www.example.com arn:aws:acm:us-east-2:123456789012:certificate/
+       12345678-1234-1234-1234-123456789012,
       "@version" => "1",
           "host" => "ip-xxx-xx-Xx-xx"
 }
@@ -521,7 +532,7 @@ $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 
 標準入力で実行した時と同様にmessageに取り込んだログが出力されていることがわかります。
 ただ、これでは構造化した形でElasticsearchにデータ転送できないので、検索性が損なわれます。
-messageというキーに全てのログの全てのデータが入ってしまうと、Kibanaで検索する際に不都合が発生するのです。
+messageというキーに全てのログのデータが入ってしまうと、Kibanaで検索する際に不都合が発生するのです。
 そこで、Filterを利用してmessageからデータを分割していきます。
 
 
