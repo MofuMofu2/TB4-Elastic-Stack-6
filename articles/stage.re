@@ -786,7 +786,7 @@ HOSTNAME \s%{NOTSPACE:hostname}
 
 
 //list[stage05_list08][イベントごとに異なる部分のログ（抜粋）]{
-: ASDM session number 0 from 192.168.1.254 ended
+: ASDM session number 0 from 192.168.1.254 started
 //}
 
 
@@ -851,18 +851,12 @@ IPアドレスのGrokPatternのように他にも確立されているものは�
 
 
 =={02-grekconstructor} Grok Constructorでテスト
-パターンファイルを抽出し、テストを実施します。
+最終的なGrokPatternでテストを実施します。
 
-//list[stage05_list14][パターンファイルまとめ]{
-CISCOTIMESTAMP %{MONTH} +%{MONTHDAY}(?: %{YEAR})? %{TIME}
-EVENTID \s: %(?<EventID>ASA-\d{1}-\d{6})
-CISCOFW606001 :\sASDM\ssession\snumber(?<ASDM-session-number>\s[0-9]+)
-(\sfrom\s%{IP:src_ip})\s(?<session>\bstarted|\bended)
-//}
-
-
-//list[stage05_list15][Grock用の設定]{
-%{CISCOTIMESTAMP:date}\s%{NOTSPACE:hostname}%{EVENTID}%{CISCOFW606001}
+//list[stage05_list14][最終的なGrokPattern]{
+%{CISCOTIMESTAMP:date}\s%{NOTSPACE:hostname}\s:\s%(?<EventID>ASA-\d{1}-\d{6})
+:\sASDM session number(?<ASDM-session-number>\s[0-9]+)(\sfrom\s%{IP:src_ip})
+\s(?<session>\bstarted|\bended)
 //}
 
 
@@ -886,9 +880,8 @@ GrokPatternの"CISCOFW606001"に"606002"も含んでいるのですが、文字�
 
 //cmd{
 $ vim patterns/asa_patterns
-CISCOTIMESTAMP %{MONTH} +%{MONTHDAY}(?: %{YEAR})? %{TIME}
 EVENTID \s: %(?<EventID>ASA-\d{1}-\d{6})
-CISCOFW606001 :\sASDM\ssession\snumber(?<ASDM-session-number>\s[0-9]+)
+CISCOFW606001 :\sASDM session number(?<ASDM-session-number>\s[0-9]+)
 (\sfrom\s%{IP:src_ip})\s(?<session>\bstarted|\bended)
 //}
 
