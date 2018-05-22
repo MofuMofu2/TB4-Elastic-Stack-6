@@ -1,4 +1,4 @@
-
+﻿
 = Multiple Pipelinesの世界へようこそ
 
 == 複数のログを取り扱う場合
@@ -140,7 +140,7 @@ vim /etc/logstash/pipelines.yml
 
 
 
-logstash.ymlでは、"path.config"の指定を以下のように一律で行なっていました。
+logstash.ymlでは、"path.config"の指定を以下のように一律で行っていました。
 
 
 //quote{

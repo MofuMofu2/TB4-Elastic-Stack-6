@@ -3,7 +3,7 @@
 
 
 Beatsはデータを取得することに重きを置いたツールです。
-Logstashは複数のパイプラインや高度なフィルタリングを行うことが可能ですが、その分メモリを多く消費します。
+Logstashは複数のパイプラインや高度なフィルタリングを行うことが可能ですが、その分メモリーを多く消費します。
 そこで、軽量で手軽に導入できるBeatsが登場しました。
 
 Beatsの設定ファイルはYAMLで全て完結します。よって、手軽に設定・動作させることが可能なのです。
@@ -276,7 +276,7 @@ Filebeatの利用方法をひととおり紹介してきました。
 
 Filebeat Modulesでは、あらかじめデータソースに対応したModuleが用意されています。
 このModuleを使用することで、Logstashで複雑なフィルターなどを書くことなく、データの収集・加工・Elasticsearchへの保存が可能です。
-また、Elasticsearchへ保存されたデータをKibanaを用いて可視化することも可能です。この際、Kibanaのグラフを作成する必要はありません。
+また、Elasticsearchへ保存されたデータについてKibanaを用いて可視化することも可能です。この際、Kibanaのグラフを作成する必要はありません。
 
 ==== Filebeat Modulesの構成
 
@@ -523,7 +523,7 @@ Dashboardをクリックし、Metricbeatのindexを確認します。
 //}
 
 @<code>{Metricbeat System Host Overview}というDashboardをクリックします。
-CPUやメモリ、プロセスの状態がDashboardに描画されています。
+CPUやメモリー、プロセスの状態がDashboardに描画されています。
 
 //image[metricbeat03][MetricbeatのDashboard][scale=0.8]{
 //}
