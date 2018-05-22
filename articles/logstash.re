@@ -89,6 +89,8 @@ Javaをインストールしただけでは、OSが利用するJavaのバージ�
 sudo alternatives --config java
 //}
 
+　
+
 //cmd{
 $ sudo alternatives --config java
 
@@ -164,6 +166,8 @@ Elasticsearchのバージョンを念のため確認します。
 /usr/share/elasticsearch/bin/elasticsearch --version
 //}
 
+　
+
 //cmd{
 $ /usr/share/elasticsearch/bin/elasticsearch --version
 Version: 6.2.2, Build: 10b1edd/2018-02-16T19:01:30.685723Z, JVM: 1.8.0_161
@@ -210,6 +214,8 @@ sudo yum install logstash
 /usr/share/logstash/bin/logstash-plugin install logstash-input-s3
 //}
 
+　
+
 //cmd{
 $ /usr/share/logstash/bin/logstash-plugin install logstash-input-s3
 Validating logstash-input-s3
@@ -223,6 +229,8 @@ LogstashもElasticsearchと同様、サービス自動起動の設定をして�
 //list[logstash-13][Logstashの自動起動設定]{
 sudo chkconfig --add logstash
 //}
+
+　
 
 //cmd{
 $ sudo chkconfig --add logstash
@@ -246,6 +254,8 @@ Kibanaも他のミドルウェアと同様に、サービス自動起動の設�
 //list[logstash-12][Kibanaの自動起動設定]{
 sudo chkconfig --add kibana
 //}
+
+　
 
 //cmd{
 $ sudo chkconfig --add kibana
@@ -460,9 +470,11 @@ ALBのログは、AWS公式ページ（@<href>{https://docs.aws.amazon.com/elast
 https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188
 192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57
 "GET https://www.example.com:443/ HTTP/1.1" "curl/7.46.0" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2
-arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067
+arn:aws:elasticloadbalancing:us-east-2:123456789012:
+targetgroup/my-targets/73e2d6bc24d8a067
 "Root=1-58337281-1d84f3d73c47ec4e58577259" www.example.com
-arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012
+arn:aws:acm:us-east-2:123456789012:certificate/
+12345678-1234-1234-1234-123456789012
 //}
 
 
@@ -507,12 +519,17 @@ No.	Item	Content
 /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 //}
 
+　
+
 //cmd{
 $ /usr/share/logstash/bin/logstash -f /etc/logstash/conf.d/alb.conf
 {
     "@timestamp" => 2018-02-26T08:15:31.322Z,
           "path" => "/etc/logstash/alb.logs",
-       "message" => "https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57 "GET https://www.example.com:443/ HTTP/1.1" "curl/7.46.0" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067 "Root=1-58337281-1d84f3d73c47ec4e58577259" www.example.com arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012,
+       "message" => "https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  192.168.131.39:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57 "GET https://www.example.com:443/ HTTP/1.1" "curl/7.46.0" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:123456789012:
+       targetgroup/my-targets/73e2d6bc24d8a067 "Root=1-58337281-1d84f3d73c47ec4e58577259" 
+       www.example.com arn:aws:acm:us-east-2:123456789012:certificate/
+       12345678-1234-1234-1234-123456789012,
       "@version" => "1",
           "host" => "ip-xxx-xx-Xx-xx"
 }
@@ -784,18 +801,23 @@ root     32061  1.7 12.8 4811812 521780 pts/0  Tl   14:12
 1:06 /usr/lib/jvm/java/bin/java -Xms2g -Xmx2g -XX:+UseParNewGC -XX:+UseConcMarkSweepGC
 -XX:CMSInitiatingOccupancyFraction=75 -XX:+UseCMSInitiatingOccupancyOnly -XX:+DisableExplicitGC
 -Djava.awt.headless=true -Dfile.encoding=UTF-8 -XX:+HeapDumpOnOutOfMemoryError -cp
-/usr/share/logstash/logstash-core/lib/jars/animal-sniffer-annotations-1.14.jar:
+/usr/share/logstash/logstash-core/lib/jars/
+animal-sniffer-annotations-1.14.jar:
 /usr/share/logstash/logstash-core/lib/jars/commons-compiler-3.0.8.jar:
-/usr/share/logstash/logstash-core/lib/jars/error_prone_annotations-2.0.18.jar:
+/usr/share/logstash/logstash-core/lib/jars/
+error_prone_annotations-2.0.18.jar:
 /usr/share/logstash/logstash-core/lib/jars/google-java-format-1.5.jar:
 /usr/share/logstash/logstash-core/lib/jars/guava-22.0.jar
 :/usr/share/logstash/logstash-core/lib/jars/j2objc-annotations-1.1.jar:
-/usr/share/logstash/logstash-core/lib/jars/jackson-annotations-2.9.1.jar:
+/usr/share/logstash/logstash-core/lib/jars/
+jackson-annotations-2.9.1.jar:
 /usr/share/logstash/logstash-core/lib/jars/jackson-core-2.9.1.jar:
 /usr/share/logstash/logstash-core/lib/jars/jackson-databind-2.9.1.jar:
-/usr/share/logstash/logstash-core/lib/jars/jackson-dataformat-cbor-2.9.1.jar:
+/usr/share/logstash/logstash-core/lib/jars/
+jackson-dataformat-cbor-2.9.1.jar:
 /usr/share/logstash/logstash-core/lib/jars/janino-3.0.8.jar:
-/usr/share/logstash/logstash-core/lib/jars/javac-shaded-9-dev-r4023-3.jar:
+/usr/share/logstash/logstash-core/lib/jars/
+javac-shaded-9-dev-r4023-3.jar:
 /usr/share/logstash/logstash-core/lib/jars/jruby-complete-9.1.13.0.jar:
 /usr/share/logstash/logstash-core/lib/jars/jsr305-1.3.9.jar:
 /usr/share/logstash/logstash-core/lib/jars/log4j-api-2.9.1.jar:
@@ -947,7 +969,10 @@ $ curl -XGET 'localhost:9200/logstash-2016.08.10/doc/DTAU02EB00Bh04bZnyp1/?prett
   "_version" : 1,
   "found" : true,
   "_source" : {
-    "message" : "https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  5.10.83.30:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57 \"GET https://www.example.com:443/ HTTP/1.1\" \"curl/7.46.0\" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067 \"Root=1-58337281-1d84f3d73c47ec4e58577259\" www.example.com arn:aws:acm:us-east-2:123456789012:certificate/12345678-1234-1234-1234-123456789012",
+    "message" : "https 2016-08-10T23:39:43.065466Z app/my-loadbalancer/50dc6c495c0c9188  5.10.83.30:2817 10.0.0.1:80 0.086 0.048 0.037 200 200 0 57 \"GET https://www.example.com:443/ HTTP/1.1\" \"curl/7.46.0\" ECDHE-RSA-AES128-GCM-SHA256 TLSv1.2  arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/
+    my-targets/73e2d6bc24d8a067 \"Root=1-58337281-1d84f3d73c47ec4e58577259\
+    " www.example.com arn:aws:acm:us-east-2:123456789012:certificate/
+    12345678-1234-1234-1234-123456789012",
     "path" : [
       "/etc/logstash/alb.log",
       "/"
@@ -989,7 +1014,8 @@ $ curl -XGET 'localhost:9200/logstash-2016.08.10/doc/DTAU02EB00Bh04bZnyp1/?prett
     "backend_ip" : "10.0.0.1",
     "urihost" : "www.example.com:443",
     "ssl_cipher" : "ECDHE-RSA-AES128-GCM-SHA256",
-    "target_group_arn" : "arn:aws:elasticloadbalancing:us-east-2:123456789012:targetgroup/my-targets/73e2d6bc24d8a067",
+    "target_group_arn" : "arn:aws:elasticloadbalancing:us-east-2:123456789012:
+    targetgroup/my-targets/73e2d6bc24d8a067",
     "host" : "ip-172-31-50-36",
     "trace_id" : "Root=1-58337281-1d84f3d73c47ec4e58577259",
     "@timestamp" : "2016-08-10T23:39:43.065Z",
