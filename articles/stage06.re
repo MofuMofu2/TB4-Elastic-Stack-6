@@ -108,7 +108,7 @@ ELBの時刻形式は、ISO8601のフォーマットを利用しています。
 
 === elb
 elbの名前ですね！
-コレはユーザが任意につける名前なので、GrokPatternの @<code>{NOTSPACE}を使用します。
+これはユーザーが任意につける名前なので、GrokPatternの @<code>{NOTSPACE}を使用します。
 
 //list[stage06_list02][elbのGrokPattern]{
 %{NOTSPACE:elb}
@@ -220,7 +220,7 @@ SSL通信時に使用するフィールドで、使用していない場合は�
 
 
 == Grok Constructorでテスト
-個々のテスト結果は省いてますが、慣れるまでは一つ一つクリアしていってください！
+個々のテスト結果は省いていますが、慣れるまでは一つ一つクリアしていってください！
 あ！ちなみに、今回作成したGrokPattern名がELBではなくCLBなのは、Application Load Balancer（以下、ALB）と区別するためです。
 ALBとCLBでは、ログフォーマットが若干違うため、区別してます。
 

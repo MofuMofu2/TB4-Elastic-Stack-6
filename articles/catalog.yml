@@ -8,7 +8,7 @@ CHAPS:
   - elasticsearch_go.re
   # Logstashを使ってみる
   - logstash.re
-  # LogstashのGrokフィルタを極める
+  # LogstashのGrokフィルターを極める
   - stage.re
   # Logstashのマルチパイプラインを体験する
   - logstash_pipelines.re

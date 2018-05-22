@@ -139,7 +139,7 @@ actions:
 No.	Item	Content
 -----------------
 1	action	アクションを指定します（今回は、削除を指定）
-2	filtertype	indexのフィルタ方式を指定します
+2	filtertype	indexのフィルター方式を指定します
 3	pattern	任意のindexパターンを指定する場合に使用します
 4	age	時間指定する場合に使用します
 5	unit	時間単位を指定します

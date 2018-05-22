@@ -275,7 +275,7 @@ Filebeatの利用方法をひととおり紹介してきました。
 
 
 Filebeat Modulesでは、あらかじめデータソースに対応したModuleが用意されています。
-このModuleを使用することで、Logstashで複雑なフィルタなどを書くことなく、データの収集・加工・Elasticsearchへの保存が可能です。
+このModuleを使用することで、Logstashで複雑なフィルターなどを書くことなく、データの収集・加工・Elasticsearchへの保存が可能です。
 また、Elasticsearchへ保存されたデータをKibanaを用いて可視化することも可能です。この際、Kibanaのグラフを作成する必要はありません。
 
 ==== Filebeat Modulesの構成

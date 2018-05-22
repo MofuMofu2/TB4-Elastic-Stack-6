@@ -370,8 +370,8 @@ fieldの値ごとに折れ線グラフを分けて表示したい場合は@<code
 @<code>{Terms}を指定してfieldを用いてグラフを分割できるように設定します。
 
 @<code>{Field}で実際のfield名を指定します。@<img>{kibana01-img13}では@<code>{author_name.keyword}と記載されていますが、
-field名の後にはデータの型が記載されています。プログラミング言語と違い、文字列型は@<code>{keyword}と記載されます。アイコンはtと書いてあるので
-textなんだなと分かります。
+field名の後にはデータの型が記載されています。プログラミング言語と違い、文字列型は@<code>{keyword}と記載されます。アイコンは「t」と書いてあるので
+textだと分かります。
 
 @<code>{Order By}ではグラフとして表示する@<code>{author_name}は上位5名までと設定しています。@<code>{Descending}は上位XX、
 @<code>{Ascending}は下位XX名となります。

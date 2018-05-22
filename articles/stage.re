@@ -1,4 +1,4 @@
-﻿= LogstashのGrokフィルタを極める
+﻿= LogstashのGrokフィルターを極める
 
 == Logstashのコンフィグの大まかな流れ
 
@@ -29,7 +29,7 @@ Logstashを利用すればさまざまなデータ形式に対応できます。
 INPUTしたデータソースをLogstashのFilterで解析し、構造化します。
 #@#フィールドを識別するっていきなりでてくるとわかりにくい+無くても繋がるのでとりました。入れるならfieldsについて説明が欲しいかも。
 データソースの変換には、正規表現でデータをパースするためのfilterプラグイン@<code>{grok（以降Grok Filterと表記）}
-やIPアドレスから地理情報を得るためのfilterプラグイン@<code>{Geoip（以降Geoip Filterと表記）}などさまざま々なフィルタライブラリ
+やIPアドレスから地理情報を得るためのfilterプラグイン@<code>{Geoip（以降Geoip Filterと表記）}などさまざまなフィルターライブラリ
 （@<href>{https://www.elastic.co/guide/en/logstash/current/filter-plugins.html}）が用意されています。
 
 この章ではこのGrok Filterにフォーカスして解説します。
@@ -38,7 +38,7 @@ INPUTしたデータソースをLogstashのFilterで解析し、構造化しま�
 データを構造化したのち、任意の出力先にデータを送付します。
 Elasticsearch以外の出力先も多数提供されているので、環境に合わせてデータを送付できます。
 
-要は、インプットデータをLogstashに食べさせると、定義したフィルタを介してデータを構造化し、出力先に指定したところに転送してくれるという感じですね。
+要は、インプットデータをLogstashに食べさせると、定義したフィルターを介してデータを構造化し、出力先に指定したところに転送してくれるという感じですね。
 
 それでは、実際にLogstashに触れていきたいと思います。
 
@@ -56,7 +56,7 @@ Logstashを動かすには、@<code>{logstash.conf}（以降confファイルと�
 Logstashの設定ファイルは@<code>{/etc/logstash}に集約されています。
 
 @<list>{stage03_list01}で
-ディレクトリ構造と配置されているファイルの内容について記載しています。今回はrpmパッケージを使ってLogstashをインストールしてます。
+ディレクトリ構造と配置されているファイルの内容について記載しています。今回はrpmパッケージを使ってLogstashをインストールしています。
 
 //list[stage03_list01][/etc/logstashのディレクトリ構造]{
 /etc/logstash/
@@ -151,8 +151,8 @@ Apacheのログフォーマットは、@<code>{common}とします。
 
 このtest02.confですが、inputに@<code>{file}プラグインを記載しています。
 このプラグインは、インプットデータとしてファイルを指定できます。
-また、ログファイルを読み込み方式指定のため、@<code>{start_position}オプションを利用してます。
-デフォルト設定では@<code>{end}ですが、Logstashが起動されてから追記されたログを取り込み対象としたいので、@<code>{beginning}を定義してます。
+また、ログファイルを読み込み方式指定のため、@<code>{start_position}オプションを利用しています。
+デフォルト設定では@<code>{end}ですが、Logstashが起動されてから追記されたログを取り込み対象としたいので、@<code>{beginning}を定義しています。
 その他にもオプションがあるので、詳しくは公式サイトのドキュメント（@<href>{https://www.elastic.co/guide/en/logstash/current/plugins-inputs-file.html}）を参照してください。
 
 
@@ -230,7 +230,7 @@ LogstashはFILTERを利用することで、フィールドを識別し、適切
 
 ==={01-logformat} ログフォーマットを調べる
 ログは引き続き第3章のものを使用します。
-Apacheのサイトにはログのフォーマットが詳細に記載されてます。
+Apacheのサイトにはログのフォーマットが詳細に記載されています。
 
 @<code>{ApacheLogFormat}（@<href>{https://httpd.apache.org/docs/2.4/en/logs.html}）
 
@@ -240,7 +240,7 @@ Apacheのアクセスログのログフォーマットは次のように構成�
  * LogFormat "%h %l %u %t \"%r\" %>s %b" common
  ** %h: サーバーへリクエストしたクライアントIP
  ** %l: クライアントのアイデンティティ情報ですが、デフォルト取得しない設定になっているため、”-”（ハイフン）で表示される
- ** %u: HTTP認証によるリクエストしたユーザID（認証していない場合は、"-"）
+ ** %u: HTTP認証によるリクエストしたユーザーID（認証していない場合は、"-"）
  ** %t: サーバーがリクエストを受け取った時刻
  ** \"%r\": メソッド、パス、プロトコルなど
  ** %>s: ステータスコード
@@ -331,7 +331,7 @@ IP (?:%{IPV6}|%{IPV4})
 
 
 HOSTNAMEに正規表現が記載されていることがわかります。
-また、IPは、IPv6とIPv4に対応できるように構成されてます。
+また、IPは、IPv6とIPv4に対応できるように構成されています。
 これも同じ様にサイトをみると正規表現で記載されていることがわかります。
 
 IPORHOSTでHOSTNAMEとIPが定義されていましたが、@<code>{(?:)}と@<code>{|（パイプ）}とは？と思った方もいるでしょう。
@@ -383,7 +383,7 @@ Grok Constructorの使い方を@<img>{stage04-02}で解説します。
 意図したとおりにclientipというフィールドに "5.10.83.30"というIPアドレスがマッチしたことがわかります。他のフィールドに対してもそれぞれ定義します。
 
 === ident
-ユーザ名が付与されるのと@<code>{-}も含めてマッチできるものをGrokPatternで探すと@<code>{USER}というGrokPatternがあるのでこちらを使用します。
+ユーザー名が付与されるのと@<code>{-}も含めてマッチできるものをGrokPatternで探すと@<code>{USER}というGrokPatternがあるのでこちらを使用します。
 
 //list[stage04_list07][identのGrokPattern]{
 %{USER:ident}
@@ -459,7 +459,7 @@ NOTSPACE \S+
 最後のHTTPのバージョンですが、HTTP部分は不要なので取り除くのと、そもそも、HTTPバージョンがはいっていないパターンもあります。
 そんな時は、@<code>{(?:)?}を利用することで、このGrokPatternにマッチする時は使うけれど、マッチしない時は使わない、といった定義ができるのです！
 これは、便利なので覚えて置いてください。
-最後に最短マッチとして、@<code>{%{DATA\}}もパイプで組み込んでます。
+最後に最短マッチとして、@<code>{%{DATA\}}もパイプで組み込んでいます。
 
 #@#Re:VIEWの@<>{}で}が必要なときはバックスラッシュ
 
@@ -607,8 +607,8 @@ output {
  1. ファイルの読み込み位置を指定し、Logstash起動前のログも対象としたいため、"biginning"としています
  2. パターンファイルの読み込み
  3. messageフィールドに格納されている値を”HTTPD_COMMON_LOG”でマッチングします
- 4. パターンファイル内でIPアドレスをマッチングさせているclientipフィールドを対象にgeoipフィルタを利用し、地理情報を取得します
- 5. Logstashは、ログデータを取り込んだ時間を@timestampに付与するので、dateフィルタを用いることで実際のログデータのタイムスタンプを付与することができます
+ 4. パターンファイル内でIPアドレスをマッチングさせているclientipフィールドを対象にgeoipフィルターを利用し、地理情報を取得します
+ 5. Logstashは、ログデータを取り込んだ時間を@timestampに付与するので、dateフィルターを用いることで実際のログデータのタイムスタンプを付与することができます
  6. パターンファイル内のdateフィールドに対して定義したdateパターンとマッチする場合に値を書き換えます
  7. 日付の月が"Oct"になっているため、localeを"en"に指定しています
  8. 変更を変えたいターゲットとして"@timestamp"を指定します
@@ -668,9 +668,9 @@ output {
 前項でApacheのアクセスログを取得できるようになりました。
 次に、既存のGrokPatternだけではどうにもならないログを対象にGrokしていきたいと思います。
 
-GrokPattenはJava、bind、Redisなどさまざまなものが用意されてます。
+GrokPattenはJava、bind、Redisなどさまざまなものが用意されています。
 また、FireWallという括りでCiscoのASAのGrokPatternが用意されているものもあります。
-ただ、すべてがまかなえてるかというと、そうではありません。
+ただ、すべてがまかなえているかというと、そうではありません。
 
 今回はCiscoのファイアウォール製品であるASAのログを取り込みます。
 やっぱり企業を守っているファイアウォールがどんなログを出しているか気になりますよね？
@@ -703,7 +703,7 @@ Jun 20 11:21:34 ASA-01 : %ASA-6-606002: ASDM session number 0
 
 ==={02-logformat} ログフォーマットを調べる
 まずは、ログフォーマットを調べます。
-Ciscoさんは丁寧にログフォーマットを掲載してます（URL:@<href>{https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog.html}）。
+Ciscoさんは丁寧にログフォーマットを掲載しています（URL:@<href>{https://www.cisco.com/c/en/us/td/docs/security/asa/syslog/b_syslog.html}）。
 
 ……よく見るとわかりますが、数が多いです。Ciscoは世界最大のメーカーですからね。
 
@@ -759,7 +759,7 @@ CISCOTIMESTAMP %{MONTH} +%{MONTHDAY}(?: %{YEAR})? %{TIME}
 //}
 
 
-また、ホスト名は、ユーザが自由に付与する名前のため、柔軟性を求めて@<code>{NOTSPACE}を使用します。
+また、ホスト名は、ユーザーが自由に付与する名前のため、柔軟性を求めて@<code>{NOTSPACE}を使用します。
 また、先頭にスペースが必ず入るので@<code>{\s}を入れます。
 
 
@@ -805,7 +805,7 @@ ASDM session number(?<ASDM-sesion-number>\s[0-9]+)
 これは、@<code>{ASDM session nubber}をマッチしても値は取得したくない場合に使う方法です。
 そこで、隣の@<code>{(?<ASDM-session-number>\s[0-9]+)}というCustomPatternで取得した値が
 @<code>{ASDM-session-number}というフィールドに入ります。
-正規表現部分は、@<code>{\s}のスペースと@<code>{0-9}の数字が複数ならんでも対応できるように@<code>{+}を使用してます。
+正規表現部分は、@<code>{\s}のスペースと@<code>{0-9}の数字が複数ならんでも対応できるように@<code>{+}を使用しています。
 
 最終的に先頭の@<code>{:}とスペースも含むので以下な感じになります。
 
@@ -882,7 +882,7 @@ CISCOFW606001 :\sASDM\ssession\snumber(?<ASDM-session-number>\s[0-9]+)
 
 === パターンファイル
 タイムスタンプやホスト名、イベントIDそしてイベントメッセージのGrokPatternをパターンファイルに定義します。
-GrokPatternの"CISCOFW606001"に"606002"も含んでいるのですが、文字数を短くするために"606001"に集約してます。
+GrokPatternの"CISCOFW606001"に"606002"も含んでいるのですが、文字数を短くするために"606001"に集約しています。
 ただし、含んでいることがわかりにくいと思う方は変更しても問題ありません。
 
 //cmd{
@@ -1069,7 +1069,7 @@ ELBの時刻形式は、ISO8601のフォーマットを利用しています。
 
 === elb
 elbの名前です。
-ユーザが任意につける名前なので、GrokPatternの @<code>{NOTSPACE}を使用します。
+ユーザーが任意につける名前なので、GrokPatternの @<code>{NOTSPACE}を使用します。
 
 //list[stage06_list02][elbのGrokPattern]{
 %{NOTSPACE:elb}
@@ -1180,7 +1180,7 @@ SSL通信時に使用するフィールドで、使用していない場合は�
 
 
 == Grok Constructorでテスト
-個々のテスト結果は省いてますが、慣れるまでは一つ一つクリアしていってください！
+個々のテスト結果は省いていますが、慣れるまでは一つ一つクリアしていってください！
 ちなみに、今回作成したGrokPattern名がELBではなくCLBなのは、Application Load Balancer（以下、ALB）と区別するためです。
 ALBとCLBでは、ログフォーマットが異なるため、区別しています。
 

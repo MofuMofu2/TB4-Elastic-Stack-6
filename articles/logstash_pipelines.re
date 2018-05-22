@@ -152,7 +152,7 @@ HTTPD_COMBINED_LOG %{HTTPD_COMMONLOG} %{QS:referrer} %{QS:agent}
 
 @<code>{Useragent file plugin}を利用すると、Webサイトにアクセスしてきたデバイスの情報や、
 アクセス時に利用していたブラウザのバージョンなどの情報を構造化できます。
-この処理の前にGrok処理を行っているので、フィールド@<code>{agent}にユーザエージェントのデータがパースされて保存されます。
+この処理の前にGrok処理を行っているので、フィールド@<code>{agent}にユーザーエージェントのデータがパースされて保存されます。
 フィールド@<code>{agent}に対してFilter処理を行います。
 また、元データを保持するために、@<code>{target}オプションで元データを別フィールドの@<code>{useragent}に出力しています。
 

@@ -9,7 +9,7 @@ Elastic Stackはバージョンアップがかなり早いツールです。バ�
  * Elastic Stackとは？
  * GoではじめるElasticsearch
  * AWSでLogstashを使ってみる
- * LogstashのGrokフィルタを極める
+ * LogstashのGrokフィルターを極める
  * 複数のデータソースを取り扱う
  * Beatsを体験する
  * Curatorを用いてIndexを操作する
@@ -19,7 +19,7 @@ Elastic Stackはバージョンアップがかなり早いツールです。バ�
 #@# LogstashとBeatsは内容見て更新
 #@# 追加された部分をここにあとで反映（山城）
 
-Elastic Stackとは？という方はまずはじめに@@<code>{Elastic Stackとは？}を読むと良いでしょう。
+Elastic Stackとは？という方はまずはじめに@<code>{Elastic Stackとは？}を読むと良いでしょう。
 基本機能の解説・インストール方法一式を紹介しています。
 
 ローカルで試してみる場合、zipファイルをダウンロードして環境構築するのが簡単です。
