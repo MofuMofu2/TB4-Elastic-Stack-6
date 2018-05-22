@@ -37,7 +37,7 @@ Filebeatは、ログを一箇所に転送する用途で使用します。
 //image[filebeat01][Filebeatの構成]{
 //}
 
-Filebeatをデータソースであるサーバに導入し、Logstashへ転送する構成です。
+Filebeatをデータソースであるサーバーに導入し、Logstashへ転送する構成です。
 Logstashに転送することでログを集約することができます。
 また、Filebeatから転送されたデータを分析しやすい構造に変換する処理を行い、Elasticsearchに保存します。
 
@@ -59,7 +59,7 @@ Filebeatを試す環境は、「AWSでLogstashを使ってみる」を元に構�
 Logstashは、Filebeatから転送されたログをElasticsearchに保存するところまでを行います。
 
 
-//image[filebeat02][サーバの構成について][scale=0.8]{
+//image[filebeat02][サーバーの構成について][scale=0.8]{
 //}
 
 それでは、FilebeatとNginxをインストールしていきます。
@@ -434,11 +434,11 @@ Filebeat Modulesの機能によって、あらかじめDashboardが準備され�
 
 == Metricbeat
 
-Metricbeatは、サーバのリソース（CPU/Mem/process……など）を容易にモニタリングすることができます。
-サーバ以外ににも、DockerやElasticsearchのリソース監視も可能です。
+Metricbeatは、サーバーのリソース（CPU/Mem/process……など）を容易にモニタリングすることができます。
+サーバー以外ににも、DockerやElasticsearchのリソース監視も可能です。
 
 Filebeatと同様、YAMLを編集するだけで設定が完了します。
-今回は、サーバのメトリックをモニタリングできるところをゴールとします。
+今回は、サーバーのメトリックをモニタリングできるところをゴールとします。
 
 
 //list[beats-24][Metricbeatのインストール]{
@@ -528,12 +528,12 @@ CPUやメモリ、プロセスの状態がDashboardに描画されています�
 //image[metricbeat03][MetricbeatのDashboard][scale=0.8]{
 //}
 
-サーバやコンテナなどにMetricbeatを導入すると、Kibanaを利用してサーバの状態をモニタリングすることができます。
-KibanaのDashboardだけで全てのサーバの状態が参照できるので、運用コストを下げることが可能です。
+サーバーやコンテナなどにMetricbeatを導入すると、Kibanaを利用してサーバーの状態をモニタリングすることができます。
+KibanaのDashboardだけで全てのサーバーの状態が参照できるので、運用コストを下げることが可能です。
 
 == Auditbeat
 
-Linuxサーバへ攻撃がないかを確認するため、auditdが出力する@<code>{audit.log}をモニタリングしている方は多いのではないでしょうか。
+Linuxサーバーへ攻撃がないかを確認するため、auditdが出力する@<code>{audit.log}をモニタリングしている方は多いのではないでしょうか。
 しかし、@<code>{audit.log}のモニタリングはハードルが高く、監視環境の構築に時間がかかります。
 
 BeatsのAuditbeatを利用すると、FilebeatやMetricbeatのように少ない学習コストで@<code>{audit.log}のモニタリングが可能です。
@@ -617,6 +617,6 @@ Elasticsearchにデータが保存されているか確認します。
 //}
 
 Beatsの機能、いかがだったでしょうか？
-Moduleを有効化するだけで、簡単にサーバの情報を可視化できる環境が手に入ります。
+Moduleを有効化するだけで、簡単にサーバーの情報を可視化できる環境が手に入ります。
 他のBeatsについては今回扱いませんが、少ない学習コストで情報の可視化が可能です。みなさんもぜひ試してみてはいかがでしょうか。
 
