@@ -121,8 +121,10 @@ Authorのメールアドレスは誌面に掲載する都合上オプション�
 
 //list[kibana01-list05][Gitのコミットログをjsonっぽく整形する]{
 git log  --oneline --pretty=format:'{"commit_hash":"%h","author_name":"%an",
-（ページの都合で改行）"author_date":"%aI","change_summary":"%f","subject":"%s"}'
-（ページの都合で改行）>gitlog.json
+（ページの都合で改行）
+"author_date":"%aI","change_summary":"%f","subject":"%s"}'
+（ページの都合で改行）
+>gitlog.json
 //}
 
 実行すると、次のようなファイルが生成されます。紙面の都合上、途中で改行しています。
