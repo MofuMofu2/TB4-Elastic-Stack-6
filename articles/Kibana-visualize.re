@@ -130,7 +130,9 @@ git log  --oneline --pretty=format:'{"commit_hash":"%h","author_name":"%an",
 実行すると、次のようなファイルが生成されます。紙面の都合上、途中で改行しています。
 
 //cmd{
-{"commit_hash":"fd7fef2","author_name":"MofuMofu2","author_date":"2018-03-04T20:49:57+09:00",
+{"commit_hash":"fd7fef2","author_name":"MofuMofu2",
+（ページの都合で改行）
+"author_date":"2018-03-04T20:49:57+09:00",
 "change_summary":"update","subject":"[update] コマンドと出力結果の見せ方をわけた"}
 //}
 
